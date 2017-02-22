@@ -1,0 +1,66 @@
+﻿@model RegistrationPersonal
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"].</h2>
+
+<form asp-controller="Account" asp-action="RegisterStepTwo" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+    <h4>Create a new account.</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @*<input type="hidden" asp-for="model.ConfirmPassword" value="@Model.model.ConfirmPassword" />
+    <input type="hidden" asp-for="model.Email" value="@Model.model.Email" />
+    <input type="hidden" asp-for="model.Password" value="@Model.model.Password" />*@
+    @*<div class="form-group">
+        <label asp-for="model.Email" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input type="hidden" asp-for="model.Email" class="form-control" />
+            <span asp-validation-for="model.Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="model.ConfirmPassword" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input type="hidden" asp-for="model.ConfirmPassword" class="form-control" />
+            <span asp-validation-for="model.ConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group" >
+        <label asp-for="model.Password" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input type="hidden" asp-for="model.Password" class="form-control" />
+            <span asp-validation-for="model.Password" class="text-danger"></span>
+        </div>
+    </div>*@
+    <div class="form-group">
+        <label asp-for="LastName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="FirstMidName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="FirstMidName" class="form-control" />
+            <span asp-validation-for="FirstMidName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="EnrollmentDate" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="EnrollmentDate" class="form-control" />
+            <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default">Register</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

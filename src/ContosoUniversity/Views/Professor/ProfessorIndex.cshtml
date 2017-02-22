@@ -1,0 +1,231 @@
+﻿@model ContosoUniversity.Models.SchoolViewModels.ProfessorViews
+@{
+    ViewData["Title"] = "Professor Page";
+}
+
+<div class="jumbotron">
+    <h1>Concordia University Professor Page</h1>
+</div>
+
+
+<h2>Details</h2>
+
+<div>
+    <h4>Professor</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Professors.FirstMidName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Professors.FirstMidName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Professors.LastName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Professors.LastName)
+        </dd>
+    </dl>
+        <ul class="nav nav-tabs commSectionTab" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#activities"
+                   aria-controls="activities"
+                   role="tab"
+                   data-toggle="tab">Activities</a>
+            </li>
+            <li role="presentation">
+                <a href="#actions"
+                   aria-controls="actions"
+                   role="tab"
+                   data-toggle="tab">Actions</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="activities">
+                <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Professors.Courses)
+                </dt>
+                <dd>
+                    <form class="form-inline" asp-action="ProfessorIndex" style="padding: 8px;">
+                        <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+                            @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Year: </label>*@
+                            <div class="col-sm-8" style="padding-left:0">
+                                <select name="courseYear" style="font-size: 18px;" id="courseYear" class="form-control" asp-items="@ViewBag.courseYears"></select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+                            @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Semester: </label>*@
+                            <div class="col-sm-8">
+                                <select name="courseSemester" style="font-size: 18px;" id="courseSemester" class="form-control" asp-items="@ViewBag.courseSemesters"></select>
+                            </div>
+                        </div>
+                        <input style="margin-top: 20px;" type="submit" value="Filter Courses " class="btn btn-success" />
+                    </form>
+                    <table class="table table-striped">
+                        <thead class="thead-default">
+                            <tr>
+                                <th>Course Title</th>
+                                <th>Semester</th>
+                                <th>Browse course</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.CoursesAssignments)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Course.FullTitile)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Semester.Title)
+                                    </td>
+                                    <td>
+                                        <a asp-action="MyAssignment" asp-route-id="@item.AssignmentID">Browse course</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Professors.Commities)
+                </dt>
+                <dd>
+                    <table class="table">
+                        <tr>
+                            <th>Committee Title</th>
+                            <th>Status</th>
+                            <th>Review Committee</th>
+                        </tr>
+                        @foreach (var item in Model.Membership)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Committee.Title)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Status)
+                                </td>
+                                <td>
+                                    @{
+                                        if (item.FinishedWork == false)
+                                        {
+                                            <a class="btn btn-success" asp-action="MyCommittee" asp-route-id="@item.Committee.CommitteeID">Open</a>
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(modelItem => item.IsActive)
+
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                                        }
+                    </table>
+                </dd>
+                </dl>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in" id="actions">
+                <dl class="dl-horizontal">
+                    <dt>My requests</dt>
+                    <dd>
+                        <form class="form-inline" asp-action="ProfessorIndex" style="padding: 8px;">
+                            <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Year: </label>*@
+                                <div class="col-sm-8" style="padding-left:0">
+                                    <select name="requestYear" style="font-size: 18px;" id="requestYear" class="form-control" asp-items="@ViewBag.requestYears"></select>
+                                </div>
+                            </div>
+                            <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Semester: </label>*@
+                                <div class="col-sm-8">
+                                    <select name="requestSemester" style="font-size: 18px;" id="requestSemester" class="form-control" asp-items="@ViewBag.requestSemesters"></select>
+                                </div>
+                            </div>
+                            <input style="margin-top: 20px;" type="submit" value="Filter Requests" class="btn btn-success" />
+                            <button style="margin-top: 20px;" class="btn btn-success requestLoad">Request New Load</button>
+                        </form>
+                        <table class="table table-striped">
+                            <thead class="thead-default">
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Status</th>
+                                    <th>Browse request</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Requests)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.SemesterForAssignment.Title)
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (@item.Approved)
+                                                {
+                                                    <short>Approved</short>
+                                                }
+                                                else
+                                                {
+                                                    <short>In the Review Process</short>
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (item.Approved == false)
+                                                {
+                                                    <a asp-action="MyRequest" asp-route-SemesterID="@item.SemesterID" asp-route-ProfessorID="@item.ProfessorID">Review request</a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-action="GivenLoad" asp-route-SemesterID="@item.SemesterID" asp-route-ProfessorID="@item.ProfessorID">Review Given Load</a>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                                }
+                            </tbody>
+                        </table>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+@section Scripts {
+    <script>
+        $("#courseYear").on("change", function (e) {
+            if ($(this).val() == 0) {
+                $("#courseSemester").prop("disabled", true);
+            }
+            else {
+                $("#courseSemester").prop("disabled", false);
+            }
+        });
+        $("#requestYear").on("change", function (e) {
+            if ($(this).val() == 0) {
+                $("#requestSemester").prop("disabled", true);
+            }
+            else {
+                $("#requestSemester").prop("disabled", false);
+            }
+
+        });
+
+        $(".requestLoad").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+            Year = $("#requestYear").val();
+            Semester = $("#requestSemester").val();
+            if (Year != 0 && Year != null && Semester != null) {
+                //$.get('@Url.Action("CoursesToChoose")', { requestYear: Year, requestSemester: Semester });
+                //url = '/Professor/CoursesToChoose?requestYear=' + Year +'&requestSemester=' + Semester;
+                url = "/CoursesToChoose";
+                window.location.href =  url + "?" + "requestYear=" + Year + "&requestSemester=" + Semester;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,70 @@
+@model ContosoUniversity.Models.SchoolViewModels.CoursesToChoose
+@{
+    ViewData["Title"] = "Load Request";
+}
+
+<h2>Choose appropriate courses</h2>
+
+<form asp-action="SubmitRequest">
+    <div class="form-horizontal">
+        <h4>CoursesToChoose</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Checkbox</th>
+                <th>Prefrenece</th>
+                <th>Number</th>
+                <th>Title</th>
+                <th>Department</th>
+            </tr>
+            @for (var i = 0; i < Model.Courses.Count(); i++)
+
+            {
+                <tr id="row@i">
+                    <td></td>
+                    <td>
+                        <input name="Check" asp-for="@Model.Courses[i].Checked" type="checkbox" />
+                    </td>
+                    <input type="hidden" asp-for="@Model.Courses[i].SelectedCourses.CourseID" value="@Model.Courses[i].SelectedCourses.CourseID" />
+                    <td>
+                        <select asp-for="@Model.Courses[i].Choice" class="form-control" asp-items="@Html.GetEnumSelectList<ContosoUniversity.Models.Desire>()">
+                        </select>
+                    </td>
+                    <td>
+                        @Model.Courses[i].SelectedCourses.CourseID
+                    </td>
+                    <td>
+                        @Model.Courses[i].SelectedCourses.Title
+                    </td>
+                    <td>
+                        @Model.Courses[i].SelectedCourses.Department.Name
+                    </td>
+                </tr>
+            }
+        </table>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("tr").each(function(i){
+            if (i>0){
+                $(this).children("select").attr('disabled', 'disabled');
+            }
+        })
+    });
+</script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

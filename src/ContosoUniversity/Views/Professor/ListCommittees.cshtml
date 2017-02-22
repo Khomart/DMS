@@ -1,0 +1,132 @@
+﻿@model ContosoUniversity.Models.SchoolViewModels.ProfCommView
+
+@{
+    ViewData["Title"] = "List of Committies to Join";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Found
+            </th>
+            <th>
+                Apply/Leave
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Committees)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                @{  
+                    bool checker = false;
+                    foreach (var member in Model.Membership)
+                    {
+                        if (item.CommitteeID == member.CommitteeID)
+                        {
+                            checker = true;
+                            if (member.Request == true)
+                            {
+                                <td>
+                                    <a id="button" class="cancel btn btn-warning" comid="@item.CommitteeID" >Cancel</a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a id="button" class="leave btn btn-danger" comid="@item.CommitteeID" >Leave</a>
+                                </td>
+                            }
+                        }
+                    }
+                    if (checker == false)
+                    {
+                        <td>
+                            <a id="button" class="apply btn btn-success" comid="@item.CommitteeID" >Apply</a>
+                        </td>
+                    }
+                }
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.CommitteeID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.CommitteeID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.CommitteeID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script type="text/javascript">
+{
+    $(document).ready(function () {
+  
+        MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+        var observer = new MutationObserver(function (mutations, observer) {
+            console.log(mutations);
+        });
+
+        observer.observe(document, {
+            subtree: true,
+            attributes: true,
+            childList: true,
+            characterData: true,
+            attributeOldValue: true,
+            characterDataOldValue: true
+        });
+
+        $("#button").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+            var url;
+            id = $(this).attr("comid");
+            if (button.hasClass("apply")) {
+                url = '/Professor/ApplyToCommittee';
+                function successFunc() {
+                    button.text("Cancell").addClass("btn-warning").addClass("cancell").removeClass("btn-success").removeClass("apply");
+                }
+            }
+            else if (button.hasClass("cancel")) {
+                url = '/Professor/RemoveApplyToCommittee';
+                function successFunc() {
+                    button.text("Apply").addClass("btn-success").addClass("apply").removeClass("btn-warning").removeClass("cancell");
+                }
+            }
+            else if (button.hasClass("leave")) {
+                url = '/Professor/LeaveCommittee';
+                function successFunc() {
+                    button.text("Apply").addClass("btn-success").addClass("apply").removeClass("btn-danger").removeClass("leave");
+                }
+            };
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ID': id },
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+
+
+            function errorFunc() {
+                alert("An error occured. Please refresh page and contact Administrator if error repeat");
+            }
+
+        });
+    });
+}
+    </script>
+}

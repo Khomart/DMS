@@ -1,0 +1,134 @@
+@model ContosoUniversity.Models.SchoolViewModels.MyCommittee
+
+<div>
+    <h2>Committee</h2>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Committee.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Committee.Title)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Committee.Level)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Committee.Level)
+        </dd>
+        @{
+            if (Model.Committee.Level == Level.Department)
+            {
+                <dt>
+                    @Html.DisplayNameFor(model => model.Committee.Department)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Committee.Department.Name)
+                </dd>
+            }
+            else if (Model.Committee.Level == Level.Faculty)
+            {
+                <dt>
+                    @Html.DisplayNameFor(model => model.Committee.Faculty)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Committee.Faculty.Name)
+                </dd>
+            }
+        }
+        <dt>
+            @Html.DisplayNameFor(model => model.Members)
+        </dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Full Name</th>
+                    <th>Department</th>
+                    <th>Office</th>
+                    <td>Status</td>
+                    <td>End Date</td>
+                    <th>Remove member from Committee</th>
+                </tr>
+                @foreach (var item in Model.Members)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Professor.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Professor.Employment.Department.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Professor.OfficeAssignment.Location)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            @{ 
+                                if (item.FinishedWork == true)
+                                {
+                                    @Html.DisplayFor(modelItem => item.EndDate)
+                                }
+                            }
+                        </td>
+                        <td>
+                            @{
+                                if (item.FinishedWork != true)
+                                {
+                                    <a class="remove btn btn-warning active" ProfID="@item.ProfessorID" CommID="@Model.Committee.CommitteeID">Remove</a>
+                                }
+                                else
+                                {
+                                    <a class="disabled remove btn btn-warning active" ProfID="@item.ProfessorID" CommID="@Model.Committee.CommitteeID">Old member</a>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+            <a asp-action="AddMembers" asp-route-id="@Model.Committee.CommitteeID">Assign members</a>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="ManageCommitie" asp-route-id="@Model.Committee.CommitteeID">Edit</a> |
+    <a asp-action="AdminIndex">Back to List</a>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+{
+    $(document).ready(function () {
+
+        var serviceURL = '/Admin/RemoveMember';
+        $(".remove").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+
+            ProfID = $(this).attr("ProfID");
+            CommID = $(this).attr("CommID");
+            url = '/Admin/RemoveMember';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ProfID': ProfID, 'CommID': CommID },
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.toggleClass('disabled', true);
+                button.addClass('clicked');
+                button.text("Removed")
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        })
+    });
+}
+    </script>
+}

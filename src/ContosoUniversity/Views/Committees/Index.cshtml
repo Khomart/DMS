@@ -1,0 +1,112 @@
+@model IEnumerable<ContosoUniversity.Models.Committee>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+@if (User.IsInRole("Admin"))
+{
+<p>
+    <a asp-controller="Admin" asp-action="CreateCommitie">Create New</a>
+</p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            @if (User.IsInRole("Professor"))
+            {
+                <th>
+                    Apply to Committiee
+                </th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            @if (User.IsInRole("Professor"))
+            {
+                <td>
+                    <a class="apply btn btn-success disabled" CommID="@item.CommitteeID" ProfID="" asp-action="Apply">In Develope</a>
+                </td>
+            }
+            <td>
+                
+                <a asp-action="Details" asp-route-id="@item.CommitteeID">Details</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <span> | </span>
+                    <a asp-action="Edit" asp-route-id="@item.CommitteeID">Edit</a><span> | </span>
+                    <a asp-action="Delete" asp-route-id="@item.CommitteeID">Delete</a>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@section Scripts {
+<script type="text/javascript">
+{
+    $(document).ready(function () {
+        var serviceURL = '/Professor/ApplyToCommittee';
+        $(".apply").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+
+            id = $(this).attr("id");
+            url = '/Professor/ApplyToCommittee';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ID': id },
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.text("Cancell").addClass("btn-danger").addClass("cancell").removeClass("btn-success").removeClass("apply");
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        });
+        $(".cancell").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+
+            id = $(this).attr("id");
+            url = '/Professor/RemoveApplyToCommittee';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ID': id },
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.text("Apply").addClass("btn-success").addClass("apply").removeClass("btn-danger").removeClass("cancell");
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        });
+    });
+}
+    </script>
+}

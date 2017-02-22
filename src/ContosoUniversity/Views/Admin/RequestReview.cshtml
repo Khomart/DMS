@@ -1,0 +1,92 @@
+@model ContosoUniversity.Models.SchoolViewModels.RequestReview
+
+<div>
+    <h4>TeachingRequest</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Request.Annotation)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Request.Annotation)
+        </dd>
+        <br />
+        <dt>
+            @Html.DisplayNameFor(model => model.Request.ListOfCourses)
+        </dt>
+        <dd>
+            <table class="table" style="margin:10px">
+                <tr>
+                    <th>Course Title</th>
+                    <th>Preference</th>
+                </tr>
+                @foreach (var item in Model.Request.ListOfCourses)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Course.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Choice)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+        <hr />
+        <dt>
+            Assign courses
+        </dt>
+        <dd>
+            <form asp-action="GiveLoad">
+                <input type="hidden" asp-for="@Model.Request.ProfessorID" value="@Model.Request.ProfessorID" />
+                <input type="hidden" asp-for="@Model.Request.SemesterID" value="@Model.Request.SemesterID" />
+                <div class="form-horizontal">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>Title</th>
+                            <th>Number</th>
+                            <th>Department</th>
+                        </tr>
+                        @*@foreach (var item in Model)*@
+                        @for (var i = 0; i < Model.Courses.Count(); i++)
+
+                        {
+                            //string selectedRow = "";
+                            //if (item.CourseID == (int?)ViewData["CourseID"])
+                            //{
+                            //    selectedRow = "success";
+                            //}
+                            <tr id="row@i" @*class="@selectedRow" *@>
+                                <input type="hidden" asp-for="@Model.Courses[i].SelectedCourses.CourseID" value="@Model.Courses[i].SelectedCourses.CourseID" />
+                                <td style="text-align: center;">
+                                    <input name="Check" asp-for="@Model.Courses[i].Checked" type="checkbox" />
+                                </td>
+                                <td>
+                                    @Model.Courses[i].SelectedCourses.Title
+                                </td>
+                                <td>
+                                    @Model.Courses[i].SelectedCourses.CourseID
+                                </td>
+                                <td>
+                                    @Model.Courses[i].SelectedCourses.Department.Name
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            <input type="submit" value="Assign" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </dd>
+    </dl>
+</div>
+<div>
+    @*@Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |*@
+    <a asp-action="AdminIndex">Back to List</a>
+</div>

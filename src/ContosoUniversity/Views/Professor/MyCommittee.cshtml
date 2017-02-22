@@ -1,0 +1,314 @@
+@model ContosoUniversity.Models.SchoolViewModels.MyCommittee
+@{
+    ViewData["Title"] = "Committee Page";
+}
+<div>
+    <div class="row">
+        <h2 class="col-sm-4">@Html.DisplayFor(model => model.Committee.Title)</h2>
+        <div class="form-group col-sm-offset-4 col-sm-4" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+            <label style="text-align: right;" class="control-label col-sm-3" for="year">Year: </label>
+            <div class="col-sm-9">
+                <select style="font-size: 18px;" id="year" class="form-control" asp-items="@ViewBag.Years"></select>
+            </div>
+        </div>
+    </div>
+    <hr />
+    @*<h4>Commitee view</h4>*@
+    <div class="row commSection">
+        <div id="ChairName" class="col-sm-6 col-xs-12 commData">
+            <span style="font-weight:bold;">
+                @Html.DisplayNameFor(model => model.Committee.Chair):
+            </span>
+            <h3>
+                @Html.DisplayFor(model => model.Committee.Chair.FullName)
+            </h3>
+        </div>
+        <div id="Level" class="col-sm-6 col-xs-12 commData">
+            <span style="font-weight:bold;">
+                Committee @Html.DisplayNameFor(model => model.Committee.Level):
+            </span>
+            <h3>
+                @Html.DisplayFor(model => model.Committee.Level)
+            </h3>
+        </div>
+    </div>
+    <div class="commSection">
+        <ul class="nav nav-tabs commSectionTab" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#membersSection" 
+                   aria-controls="membersSection"
+                   role="tab" 
+                   data-toggle="tab">@Html.DisplayNameFor(model => model.Committee.CommitieMembers)</a>
+            </li>
+            <li role="presentation">
+                <a href="#meetingsSection"
+                   aria-controls="meetingsSection" 
+                   role="tab"
+                   data-toggle="tab">@Html.DisplayNameFor(model => model.Meetings)</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="membersSection">
+                <div class="row">
+                    <div class="commList col-sm-12">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>End Date</th>
+                                @{
+                                    if ((int)ViewData["ProfessorID"] == Model.Committee.ProfessorID)
+                                    {
+                                        <th>Make inactive</th>
+                                    }
+                                }
+
+
+                            </tr>
+                            @foreach (var item in Model.Members)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Professor.FullName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.IsActive)
+                                    </td>
+                                    <td>
+                                        @{
+                                            if (item.FinishedWork == true)
+                                            {
+                                                @Html.DisplayFor(modelItem => item.EndDate)
+                                            }
+                                        }
+                                    </td>
+                                    @{
+                                        if ((int)ViewData["ProfessorID"] == Model.Committee.ProfessorID)
+                                        {
+                                            if ((int)ViewData["ProfessorID"] == item.ProfessorID || item.FinishedWork == true)
+                                            {
+                                                <td> </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    <a class="btn btn-success remove" profID="@item.Professor.Id" commID="@Model.Committee.CommitteeID">Deactivate</a>
+                                                </td>
+                                            }
+                                        }
+                                    }
+                                </tr>
+                                        }
+                        </table>
+                    </div>
+                    <div class="col-sm-12 membersSection">
+                        @*<span>@Html.DisplayNameFor(model => model.Committee.CommitieMembers):</span>*@
+                        <div class="btn-group" style="padding-bottom:5px;">
+                            @Html.ActionLink("Present", "MyCommittee", new { id = Model.Committee.CommitteeID, membership = 0, year = ViewData["year"] }, new { @id = "button0", @class = "btn btn-success" })
+                            @Html.ActionLink("Past", "MyCommittee", new { id = Model.Committee.CommitteeID, membership = 1, year = ViewData["year"] }, new { @id = "button1", @class = "btn btn-success " })
+                            @Html.ActionLink("All", "MyCommittee", new { id = Model.Committee.CommitteeID, membership = 2, year = ViewData["year"] }, new { @id = "button2", @class = "btn btn-success " })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in" id="meetingsSection">
+                <div class="row">
+                    <div class="col-sm-12 meetingsList">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Meeting Purpose</th>
+                                <th>Location</th>
+                                <th>Date/Suggest</th>
+                                <th>Review</th>
+                            </tr>
+                            @foreach (var item in Model.Meetings)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Title)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Location)
+                                    </td>
+                                    @if (item.FinalDate == true)
+                                    {
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Date)
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        if ((int)ViewData["ProfessorID"] == Model.Committee.ProfessorID)
+                                        {
+                                            <td><a asp-action="Suggestions" asp-route-id="@item.MeetingID">See suggestions</a></td>
+                                        }
+                                        else
+                                        {
+                                            bool found = false;
+                                            @foreach (var suggestion in item.Suggestions)
+                                            {
+                                                if (suggestion.Checkers.Any(i => i.Id  == (int)ViewData["ProfessorID"]))
+                                                {
+                                                    found = true;
+                                                    {
+                                                        <td>You've already suggested date</td>
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            if (found == false)
+                                            {
+                                                <td><a asp-action="SuggestDate" asp-route-id="@item.MeetingID">Suggest Time</a></td>
+                                            }
+                                        }
+                                    }
+                                    @{ if ((int)ViewData["ProfessorID"] == Model.Committee.ProfessorID)
+                                        {
+                                            <td>
+                                                <a asp-action="ViewMeeting" asp-route-comID="@Model.Committee.CommitteeID" asp-route-mtnID="@item.MeetingID">View Meeting</a> |
+                                                <a asp-action="EditMeeting" asp-route-comID="@Model.Committee.CommitteeID" asp-route-mtnID="@item.MeetingID">Edit Meeting</a>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>
+                                                <a asp-action="ViewMeeting" asp-route-comID="@Model.Committee.CommitteeID" asp-route-mtnID="@item.MeetingID">View Meeting</a>
+                                            </td>
+                                        }
+                                    }
+                                </tr>
+                                        }
+                        </table>
+                    </div>
+                </div>  
+            </div>
+        </div>
+    </div>
+    <div style="margin-bottom:10px;" class="btn-group delete-section">
+
+        @{
+            <button class="btn btn-info delete-link">Leave Committee</button>
+            <a class="btn btn-danger delete-confirm" style="display:none" id="leave" asp-action="LeaveCommittee" asp-route-id="@Model.Committee.CommitteeID">Confirm</a>
+            @*<div class="btn btn-primary" style="display:none" data-delete-id="@item.Id">Confirm Delete</div>*@
+            @*<a class="btn btn-danger " id="leave" asp-action="Leave" asp-route-id="@Model.Committee.CommitteeID">Leave Committee</a>*@
+        if ((int)ViewData["ProfessorID"] == Model.Committee.ProfessorID)
+        {
+            <a class="btn btn-success " asp-action="AddMembers" asp-route-id="@Model.Committee.CommitteeID">Assign members</a>
+            <a class="btn btn-success " asp-action="SetMeeting" asp-route-id="@Model.Committee.CommitteeID">Set a Meeting</a>
+        }
+        }
+    </div>
+    <div>
+        <a class="btn btn-info" asp-action="ProfessorIndex">Back to List</a>
+    </div>
+            @section Scripts {
+                <script type="text/javascript">
+                    {
+                        $(document).ready(function () {
+
+                            $("#year").change(function (e) {
+                                yearValue = $("#year").val();
+                                window.location = '../MyCommittee?id=' + @Model.Committee.CommitteeID + '&membership=' + @ViewData["membership"] + '&year=' + yearValue;
+
+                            });
+                            var choice = parseInt(@ViewData["membership"]);
+                            if (choice >= 0 && choice < 3) {
+                                $("#button" + choice).addClass("disabled");
+                            }
+
+                            $(".remove").click(function (e) {
+                                e.preventDefault();
+                                button = $(this);
+
+                                ProfID = $(this).attr("profID");
+                                CommID = $(this).attr("commID");
+                                url = '/Professor/RemoveFromCommittee';
+                                $.ajax({
+                                    type: "POST",
+                                    url: url,
+                                    data: { 'ProfID': ProfID, 'CommID': CommID },
+                                    //contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    success: successFunc,
+                                    error: errorFunc
+                                });
+                                function successFunc() {
+                                    button.toggleClass('disabled', true);
+                                    button.addClass('clicked');
+                                    button.text("Removed")
+                                }
+
+                                function errorFunc() {
+                                    alert('error');
+                                }
+
+                            });
+
+                            $(function () {
+                                $("button.delete-link").click(function () {
+                                    var deleteLink = $(this);
+                                    deleteLink.hide();
+                                    var confirmButton = deleteLink.siblings(".delete-confirm");
+                                    confirmButton.show();
+
+                                    var cancelDelete = function () {
+                                        removeEvents();
+                                        showDeleteLink();
+                                    };
+
+                                    var deleteItem = function () {
+                                        removeEvents();
+                                        confirmButton.hide();
+                                        $.post(
+                                            '@Url.Action("Delete")',
+                                            AddAntiForgeryToken({ id: confirmButton.attr('data-delete-id') }))
+                                           .done(function () {
+                                               var parentRow = deleteLink.parents("tr:first");
+                                               parentRow.fadeOut('fast', function () {
+                                                   parentRow.remove();
+                                               });
+                                           }).fail(function (data) {
+                                               alert("error");
+                                           });
+                                        return false;
+                                    };
+
+                                    var removeEvents = function () {
+                                        confirmButton.off("click", deleteItem);
+                                        $(document).on("click", cancelDelete);
+                                        $(document).off("keypress", onKeyPress);
+                                    };
+
+                                    var showDeleteLink = function () {
+                                        confirmButton.hide();
+                                        deleteLink.show();
+                                    };
+
+                                    var onKeyPress = function (e) {
+                                        //Cancel if escape key pressed
+                                        if (e.which == 27) {
+                                            cancelDelete();
+                                        }
+                                    };
+
+                                    //confirmButton.on("click", deleteItem);
+                                    $(document).on("click", cancelDelete);
+                                    $(document).on("keypress", onKeyPress);
+
+                                    return false;
+                                });
+
+                                AddAntiForgeryToken = function (data) {
+                                    data.__RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
+                                    return data;
+                                };
+                            });
+                        }
+                    )
+                    }
+                </script>
+            }

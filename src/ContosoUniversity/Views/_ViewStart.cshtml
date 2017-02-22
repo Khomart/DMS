@@ -1,0 +1,23 @@
+﻿@{
+    if (this.User.IsInRole("Admin"))
+    {
+        Layout = "_LayoutAdmin";
+    }
+    else if (this.User.IsInRole("Student"))
+    {
+        Layout = "_LayoutVerifiedStudent";
+    }
+    else if (this.User.IsInRole("Professor"))
+    {
+        Layout = "_LayoutProfessor";
+    }
+    else if (this.User.IsInRole("Registered"))
+    {
+        Layout = "_LayoutRegistered";
+    }
+    else
+    {
+        Layout = "_Layout";
+
+    }
+}

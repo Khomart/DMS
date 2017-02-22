@@ -1,0 +1,84 @@
+@model ContosoUniversity.Models.MeetingComment
+
+<form asp-action="CommentEdit" enctype="multipart/form-data">
+    <div class="form-horizontal">
+        <h4>MeetingComment</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ProfessorID" class="form-control" />
+        <input type="hidden" asp-for="MeetingID" class="form-control" />
+        <input type="hidden" asp-for="CommitteeID" class="form-control" />
+        <input type="hidden" asp-for="Private" class="form-control" />
+        <input type="hidden" asp-for="ProfessorName" class="form-control" />
+        <div class="form-group">
+            <label asp-for="Comment" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea asp-for="Comment" class="form-control" ></textarea>
+                <span asp-validation-for="Comment" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Files">File input</label>
+            <input asp-for="Files" type="file" class="form-control-file" id="InputFile" aria-describedby="fileHelp" multiple='multiple'>
+            <small id="fileHelp" class="form-text text-muted">Add required files.</small>
+        </div>
+        <ol>
+            @foreach (var file in ViewBag.Files)
+            {
+                <li>
+                    <text>@file.ViewTitle</text>
+                    @{
+                        int privatniy = 0;
+                        if (Model.Private == true) { privatniy = 1; }
+                        else { privatniy = 2; }
+                    }
+                    <a class="btn btn-success remove" fileID="@file.FileBaseID" commID="@Model.CommitteeID" profID="@Model.ProfessorID" priva="@privatniy" >Remove</a>
+                </li>
+            }
+        </ol>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="ViewMeeting" asp-route-comID="@Model.CommitteeID" asp-route-mtnID="@Model.MeetingID">Back to Meeting</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(".remove").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+
+            FileID = $(this).attr("fileID");
+            CommID = $(this).attr("commID");
+            ProfID = $(this).attr("profID");
+            Priva = $(this).attr("priva");
+            url = '/Professor/RemoveFiles';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'FileID': FileID, 'ProfID': ProfID, 'CommID': CommID, 'Priva': Priva,},
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.toggleClass('disabled', true);
+                button.addClass('clicked');
+                button.text("Removed")
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        });
+    </script>
+}

@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BD524CF4-68E7-48F1-9F8C-39B2163A1A8A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A0ACDBA5-07E1-41F8-BF82-FDA5E3E9A6AF}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ContosoUniversity", "src\ContosoUniversity\ContosoUniversity.xproj", "{E503392D-FC0C-4731-8E33-6F69CA586F97}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E503392D-FC0C-4731-8E33-6F69CA586F97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E503392D-FC0C-4731-8E33-6F69CA586F97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E503392D-FC0C-4731-8E33-6F69CA586F97}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{E503392D-FC0C-4731-8E33-6F69CA586F97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E503392D-FC0C-4731-8E33-6F69CA586F97}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E503392D-FC0C-4731-8E33-6F69CA586F97} = {BD524CF4-68E7-48F1-9F8C-39B2163A1A8A}
+	EndGlobalSection
+EndGlobal

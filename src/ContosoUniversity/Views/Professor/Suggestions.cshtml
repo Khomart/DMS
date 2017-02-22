@@ -1,0 +1,89 @@
+@model ContosoUniversity.Models.SchoolViewModels.ChooseMeetingDate
+    <h2>Meeting date picking</h2>
+    <h4>Suggestions for meeting</h4>
+    <table class="table" border="1">
+            <tr>
+                <th>
+                    Dates
+                </th>
+                @{ foreach( var date in Model.Dates)
+                    {
+                        <th>
+                            @Html.DisplayFor(c => date.Value)
+                        </th>
+                    }
+                }
+
+            </tr>
+            @{ 
+                foreach (var item in Model.Members)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(c => item.Professor.FullName)
+                        </td>
+                        @{ foreach (var date in Model.Dates)
+                            {
+                                if (date.Checkers.Contains(item.Professor))
+                                {
+                                    <td><input type="checkbox" checked="checked" disabled="disabled"></td>
+                                }
+                                else
+                                {
+                                    <td><input type="checkbox" disabled="disabled"></td>
+                                }
+                            }
+                        }
+                    </tr>
+                }
+
+            }
+        <tr>
+            <td>
+                Choose Date:
+            </td>
+            @{ 
+                for(int i=0; i<Model.Dates.Count;i++)
+                {
+                    <td>
+                        <input id="date_@i" type="radio" name="Date" value="@Model.Dates[i].Value" ></input>
+                    </td>
+                }
+            }
+        </tr>
+            </table>
+        <br />
+<input type="hidden" name="MeetingID" class="form-control" id="MeetingID" value="@ViewData["MeetingID"]"></input>
+<input id="dateSubmit" type="submit" value="Submit" class="btn btn-default" />
+
+    <form asp-action="SetMeetingDate">
+        <input type="hidden" name="CommitteeID" class="form-control" id="CommitteeID" value="@ViewData["MeetingID"]"></input>
+        <div class="form-group">
+            <label for="datepicker">Set Date:</label>
+            <input DataFormatString="{0:dd-M-yyyy HH}" type="datetime" name="Date" class="form-control" id="datepicker"></input>
+        </div>
+        <input type="submit" value="Submit" class="btn btn-default" />
+    </form>
+    @section Scripts {
+        <script type="text/javascript">
+            {
+                $(document).ready(function () {
+                    $("#datepicker").datepicker();
+                });
+                var date;
+                $("#dateSubmit").on("click", function () {
+                    for(i=0; i<@Model.Dates.Count;i++)
+                    {
+                        if ($("#date_"+i).is(':checked')){
+                            date = $("#date_"+i).val();
+                        }
+                    }
+                    window.location = '../SetMeetingDate?CommitteeID=' + @ViewData["MeetingID"] + '&Date=' + date;
+                })
+            }
+        </script>
+        }
+    <br />
+    <div>
+        <a asp-action="MyCommittee" asp-route-id='@ViewData["CommitteeID"]'>Back to Committee</a>
+    </div>

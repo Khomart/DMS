@@ -1,0 +1,189 @@
+﻿@font-face {
+	font-family: 'Gill Sans MT Pro Book';
+	src: url('../fonts/GillSansMTPro-Book.eot');
+	src: url('../fonts/GillSansMTPro-Book.eot?#iefix') format('embedded-opentype'),
+		url('../fonts/GillSansMTPro-Book.woff') format('woff'),
+		url('../fonts/GillSansMTPro-Book.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+*{
+    font-family:'Gill Sans MT Pro Book' !important;
+}
+dt{
+        font-size: 14pt;
+}
+dd{
+        font-size: 14pt;
+}
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.markItUpContainer textarea{
+    max-width: 1000px !important;
+}
+/* Set widths on the form inputs since otherwise they're 100% wide */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* buttons and links extension to use brackets: [ click me ] */
+.btn-bracketed::before {
+    display:inline-block;
+    content: "[";
+    padding-right: 0.5em;
+}
+.btn-bracketed::after {
+    display:inline-block;
+    content: "]";
+    padding-left: 0.5em;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"]
+{
+    width: 100%;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+  /* Hide captions */
+  .carousel-caption {
+    display: none
+  }
+}
+
+.clicked {
+        color: #373a3c !important;
+        background-color: #e6e6e6 !important;
+        border-color: #adadad !important;
+        background-image: none !important;
+    }
+
+.navbar{
+    background-color:#4b4b4b !important;
+    border-color: #4b4b4b !important;
+}
+.header .navbar ul.nav>li>a:hover, #boot .header .navbar ul.nav>li>a:focus{
+    color: #c9a859 !important;
+}
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav > li > a {
+    color: #fff !important;
+    font-size: 18px !important;
+}   
+.navbar ul {
+        /*text-transform: uppercase!important;*/
+}
+.navbar-header{
+    font-size: 22px !important;
+}
+.navbar-btn{
+    font-size: 18px!important;
+}
+dd{
+    padding-bottom: 10px !important;
+}
+.btn, select{
+    border-radius:1px !important;
+}
+/*.jumbotron h1{
+        text-transform: uppercase !important;
+    text-align: center !important;
+}
+.jumbotron{
+    background:#c9a859 !important;
+}
+.body-content{
+    margin-top:50px !important;
+}*/
+.comment{
+    border:solid 1px black;
+    padding: 5px;
+    min-height:200px;
+}
+
+.row-content {
+    margin: 0px auto;
+    padding: 15px 0px 50px 0px;
+    border-bottom: 1px ridge;
+    min-height: 250px;
+}
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+.panel {
+	position:relative;
+}
+/*.panel>.panel-heading:after,.panel>.panel-heading:before{
+	position:absolute;
+	top:11px;left:-16px;
+	right:100%;
+	width:0;
+	height:0;
+	display:block;
+	content:" ";
+	border-color:transparent;
+	border-style:solid solid outset;
+	pointer-events:none;
+}*/
+.panel>.panel-heading:after{
+	border-width:7px;
+	border-right-color:#f7f7f7;
+	margin-top:1px;
+	margin-left:2px;
+}
+.panel>.panel-heading:before{
+	border-right-color:#ddd;
+	border-width:8px;
+}
+.panel-body img{
+    max-height: 200px;
+}
+.commData > *{
+    display:inline-block;
+    font-size: 16pt;
+    line-height: 1.428;
+}
+.commData span{
+    font-weight:bold;
+}
+.commData > h3, .commData > div{
+    margin:0 15px 0 0;
+    float:right;
+}
+.commSection{
+    margin-bottom:40px;
+}
+.commList, .meetingsList{
+    font-size: 14pt;
+}
+.commSectionTab a{
+    font-size: 16pt;
+}
+.commList > table, .meetingsList > table{
+    border-bottom:1px solid #ddd;
+}
+.membersSection {
+    margin: 7px;
+}

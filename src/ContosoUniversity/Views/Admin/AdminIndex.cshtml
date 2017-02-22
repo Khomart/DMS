@@ -1,0 +1,134 @@
+﻿@model ContosoUniversity.Models.SchoolViewModels.AdminIndex
+@{
+    ViewData["Title"] = "Administrator Page";
+}
+
+
+<div class="jumbotron">
+    <h1>Concordia University Administrator Page!</h1>
+</div>
+
+
+<h2>Admin</h2>
+
+<div>
+    <h4>Current State</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>New Students requests</dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Review and Approve</th>
+                </tr>
+                @foreach (var item in Model.NewStudents)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            <a asp-action="StudentApproval" class="approve btn btn-success active" id="@item.Id" asp-route-id="@item.Id">Approve</a> 
+                        </td>
+                    </tr>
+                }
+            </table>
+
+        </dd>
+        <dt>New Course Requests</dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Professor</th>
+                    <th>Semester</th>
+                    <th>Review and Approve</th>
+                </tr>
+                @foreach (var item in Model.Requests)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProfessorEntity.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SemesterForAssignment.Title)
+                        </td>
+                        <td>
+                            <a asp-action="RequestReview" asp-route-SemesterID="@item.SemesterID" asp-route-ProfessorID="@item.ProfessorID">Review</a> 
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+        <dt>Commities</dt>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Commities Title</th>
+                    <th>Level</th>
+                    <th>Chair</th>
+                    <th>Manage Commitee</th>
+                </tr>
+                @foreach (var item in Model.Commities)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Level)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Chair.FullName)
+                        </td>
+                        <td>
+                            <a asp-action="ViewCommittee" asp-route-id="@item.CommitteeID">Review</a> | 
+                            <a asp-action="ManageCommitie" asp-route-id="@item.CommitteeID">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </table>
+            <a asp-controller="Admin" asp-action="CreateCommitie">Create Commitee</a>
+        </dd>
+    </dl>
+</div>
+@section Scripts {
+<script type="text/javascript">
+{
+    $(document).ready(function () {
+        
+        var serviceURL = '/Admin/StudentApproval';
+        $(".approve").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+           
+            id = $(this).attr("id");
+            url = '/Admin/StudentApproval';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ID': id },
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.toggleClass('disabled', true);
+                button.addClass('clicked');
+                button.text("Approved")
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        })
+    });
+}
+</script>
+}

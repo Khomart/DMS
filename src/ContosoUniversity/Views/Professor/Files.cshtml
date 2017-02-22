@@ -1,0 +1,15 @@
+@model IEnumerable<ContosoUniversity.Models.FileBase>
+
+
+@foreach (var item in Model)
+{
+    <ol>
+        @foreach (var file in Model)
+        {
+            <li>
+                <input type="checkbox" name="@file.FileBaseID" id="@file.FileBaseID" />
+                @Html.DisplayFor(model => file.ViewTitle)
+            </li>
+        }
+    </ol>
+}

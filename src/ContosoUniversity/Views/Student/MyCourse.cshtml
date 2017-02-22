@@ -1,0 +1,44 @@
+@model ContosoUniversity.Models.Enrollment
+
+@{
+    ViewData["Title"] = "Courseinfo";
+}
+
+<h2>Courseinfo</h2>
+
+<form asp-action="MyCourse">
+    <div class="form-horizontal">
+        <h4>Enrollment</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="EnrollmentID" />
+        <div class="form-group">
+            <label asp-for="Grade" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="Grade" class="form-control" asp-items="@Html.GetEnumSelectList<Grade>()">
+                    <option value="">-- Select Grade --</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Notes" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea rows="10" asp-for="Notes" class="form-control" ></textarea>
+                <span asp-validation-for="Notes" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="StudentIndex">Back to My Page</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

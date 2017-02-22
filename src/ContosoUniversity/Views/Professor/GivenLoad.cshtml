@@ -1,0 +1,48 @@
+@*@model ContosoUniversity.Models.TeachingRequest*@
+@model IEnumerable<ContosoUniversity.Models.SchoolViewModels.GivenLoad>
+@{
+    ViewData["Title"] = "RequestView";
+}
+
+<h2>@ViewData["Semester"] Course Request</h2>
+
+<div>
+    <h4>Request overview</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model)
+        </dt>
+        <dd>
+            <table class="table" style="margin: 10px    ">
+                <tr>
+                    <th>Course</th>
+                    <th>Requested</th>
+                    <th>Assigned</th>
+                </tr>
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Course.FullTitile)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Requested)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Given)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="ProfessorIndex">Back to Main Page</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
