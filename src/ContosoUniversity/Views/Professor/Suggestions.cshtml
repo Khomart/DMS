@@ -38,7 +38,7 @@
                 }
 
             }
-        <tr>
+        @*<tr>
             <td>
                 Choose Date:
             </td>
@@ -50,23 +50,22 @@
                     </td>
                 }
             }
-        </tr>
+        </tr>*@
             </table>
         <br />
-<input type="hidden" name="MeetingID" class="form-control" id="MeetingID" value="@ViewData["MeetingID"]"></input>
-<input id="dateSubmit" type="submit" value="Submit" class="btn btn-default" />
 
     <form asp-action="SetMeetingDate">
-        <input type="hidden" name="CommitteeID" class="form-control" id="CommitteeID" value="@ViewData["MeetingID"]"></input>
+        <input type="hidden" name="MeetingID" class="form-control" id="MeetingID" value="@ViewData["MeetingID"]"></input>
         <div class="form-group">
-            <label for="datepicker">Set Date:</label>
-            <input DataFormatString="{0:dd-M-yyyy HH}" type="datetime" name="Date" class="form-control" id="datepicker"></input>
+            <label for="Date">Set Date:</label>
+            @*<input DataFormatString="{0:dd-M-yyyy HH}" type="datetime" name="Date" class="form-control" id="datepicker"></input>*@
+            <select name="Date" style="font-size: 18px;" id="courseSemester" class="form-control" asp-items="@ViewBag.Dates"></select>
         </div>
         <input type="submit" value="Submit" class="btn btn-default" />
     </form>
     @section Scripts {
         <script type="text/javascript">
-            {
+            @*{
                 $(document).ready(function () {
                     $("#datepicker").datepicker();
                 });
@@ -80,7 +79,7 @@
                     }
                     window.location = '../SetMeetingDate?CommitteeID=' + @ViewData["MeetingID"] + '&Date=' + date;
                 })
-            }
+            }*@
         </script>
         }
     <br />

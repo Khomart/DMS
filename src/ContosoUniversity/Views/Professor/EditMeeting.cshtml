@@ -1,9 +1,9 @@
 @model ContosoUniversity.Models.Meetings
-<h2>Create meeting</h2>
+<h2>Edit meeting</h2>
 
 <form asp-action="EditMeeting" asp-route-CommitteeID="@ViewData["CommitteeID"]" >
     <div class="form-horizontal">
-        <h4>Setup meeting for committee</h4>
+        <h4>Edit meeting for committee</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="MeetingID" />
@@ -37,10 +37,79 @@
         </div>
     </div>
 </form>
-<div>
-    <a asp-action="MyCommittee" asp-route-id="@ViewData["CommitteeID"]">Return to Committee</a>
+<div class="btn-group">
+    <button id="delete" class="btn btn-info delete-link">Delete</button>
+    <a class="btn btn-danger delete-confirm" style="display:none" id="leave" asp-action="DeleteMeeting" asp-route-id="@Model.MeetingID">Confirm Delete</a>
+    <a asp-action="MyCommittee" asp-route-id="@ViewData["CommitteeID"]" class="btn btn-success">Return to Committee</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        {
+            $(document).ready(function () {
+
+                $(function () {
+                    $("button.delete-link").click(function () {
+                        var deleteLink = $(this);
+                        deleteLink.hide();
+                        var confirmButton = deleteLink.siblings(".delete-confirm");
+                        confirmButton.show();
+
+                        var cancelDelete = function () {
+                            removeEvents();
+                            showDeleteLink();
+                        };
+
+                        var deleteItem = function () {
+                            removeEvents();
+                            confirmButton.hide();
+                            $.post(
+                                '@Url.Action("Delete")',
+                                AddAntiForgeryToken({ id: confirmButton.attr('data-delete-id') }))
+                                .done(function () {
+                                    var parentRow = deleteLink.parents("tr:first");
+                                    parentRow.fadeOut('fast', function () {
+                                        parentRow.remove();
+                                    });
+                                }).fail(function (data) {
+                                    alert("error");
+                                });
+                            return false;
+                        };
+
+                        var removeEvents = function () {
+                            confirmButton.off("click", deleteItem);
+                            $(document).on("click", cancelDelete);
+                            $(document).off("keypress", onKeyPress);
+                        };
+
+                        var showDeleteLink = function () {
+                            confirmButton.hide();
+                            deleteLink.show();
+                        };
+
+                        var onKeyPress = function (e) {
+                            //Cancel if escape key pressed
+                            if (e.which == 27) {
+                                cancelDelete();
+                            }
+                        };
+
+                        //confirmButton.on("click", deleteItem);
+                        $(document).on("click", cancelDelete);
+                        $(document).on("keypress", onKeyPress);
+
+                        return false;
+                    });
+
+                    AddAntiForgeryToken = function (data) {
+                        data.__RequestVerificationToken = $('input[name=__RequestVerificationToken]').val();
+                        return data;
+                    };
+                });
+            }
+        )
+        }
+    </script>
 }

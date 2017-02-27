@@ -8,10 +8,10 @@
 </div>
 
 
-<h2>Details</h2>
-
+<h3>Welcome back, <br /><b>@Html.DisplayFor(model => model.Professors.FullName)</b></h3>
+<br />
 <div>
-    <h4>Professor</h4>
+    @*<h4>Professor</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -26,7 +26,7 @@
         <dd>
             @Html.DisplayFor(model => model.Professors.LastName)
         </dd>
-    </dl>
+    </dl>*@
         <ul class="nav nav-tabs commSectionTab" role="tablist">
             <li role="presentation" class="active">
                 <a href="#activities"
@@ -44,87 +44,90 @@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane fade in active" id="activities">
                 <dl class="dl-horizontal">
-                <dt>
-                    @Html.DisplayNameFor(model => model.Professors.Courses)
-                </dt>
-                <dd>
-                    <form class="form-inline" asp-action="ProfessorIndex" style="padding: 8px;">
-                        <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
-                            @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Year: </label>*@
-                            <div class="col-sm-8" style="padding-left:0">
-                                <select name="courseYear" style="font-size: 18px;" id="courseYear" class="form-control" asp-items="@ViewBag.courseYears"></select>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Professors.Courses)
+                    </dt>
+                    <dd>
+                        <form class="form-inline" asp-action="ProfessorIndex" style="padding: 8px;">
+                            <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Year: </label>*@
+                                <div class="col-sm-8" style="padding-left:0">
+                                    <select name="courseYear" style="font-size: 18px;" id="courseYear" class="form-control" asp-items="@ViewBag.courseYears"></select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
-                            @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Semester: </label>*@
-                            <div class="col-sm-8">
-                                <select name="courseSemester" style="font-size: 18px;" id="courseSemester" class="form-control" asp-items="@ViewBag.courseSemesters"></select>
+                            <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Semester: </label>*@
+                                <div class="col-sm-8">
+                                    <select name="courseSemester" style="font-size: 18px;" id="courseSemester" class="form-control" asp-items="@ViewBag.courseSemesters"></select>
+                                </div>
                             </div>
-                        </div>
-                        <input style="margin-top: 20px;" type="submit" value="Filter Courses " class="btn btn-success" />
-                    </form>
-                    <table class="table table-striped">
-                        <thead class="thead-default">
+                            <input style="margin-top: 20px;" type="submit" value="Filter Courses " class="btn btn-success" />
+                        </form>
+                        <table class="table table-striped">
+                            <thead class="thead-default">
+                                <tr>
+                                    <th>Course Title</th>
+                                    <th>Semester</th>
+                                    <th>Browse course</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.CoursesAssignments)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Course.FullTitile)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Semester.Title)
+                                        </td>
+                                        <td>
+                                            <a asp-action="MyAssignment" asp-route-id="@item.AssignmentID">Browse course</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </dd>
+                </dl>
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Professors.Commities)
+                    </dt>
+                    <dd>
+                        <table class="table table-striped">
                             <tr>
-                                <th>Course Title</th>
-                                <th>Semester</th>
-                                <th>Browse course</th>
+                                <th>Committee Title</th>
+                                <th>Status</th>
+                                <th>Review Committee</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.CoursesAssignments)
+                            @foreach (var item in Model.Membership)
                             {
                                 <tr>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.Course.FullTitile)
+                                        @Html.DisplayFor(modelItem => item.Committee.Title)
                                     </td>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.Semester.Title)
+                                        @Html.DisplayFor(modelItem => item.Status)
                                     </td>
                                     <td>
-                                        <a asp-action="MyAssignment" asp-route-id="@item.AssignmentID">Browse course</a>
+                                        @{
+                                            if (item.FinishedWork == false)
+                                            {
+                                                <a class="btn btn-success" asp-action="MyCommittee" asp-route-id="@item.Committee.CommitteeID">Open</a>
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(modelItem => item.IsActive)
+
+                                            }
+                                        }
                                     </td>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                </dd>
-                <dt>
-                    @Html.DisplayNameFor(model => model.Professors.Commities)
-                </dt>
-                <dd>
-                    <table class="table">
-                        <tr>
-                            <th>Committee Title</th>
-                            <th>Status</th>
-                            <th>Review Committee</th>
-                        </tr>
-                        @foreach (var item in Model.Membership)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Committee.Title)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Status)
-                                </td>
-                                <td>
-                                    @{
-                                        if (item.FinishedWork == false)
-                                        {
-                                            <a class="btn btn-success" asp-action="MyCommittee" asp-route-id="@item.Committee.CommitteeID">Open</a>
-                                        }
-                                        else
-                                        {
-                                            @Html.DisplayFor(modelItem => item.IsActive)
-
-                                        }
-                                    }
-                                </td>
-                            </tr>
-                                        }
-                    </table>
-                </dd>
+                                            }
+                        </table>
+                    </dd>
                 </dl>
             </div>
             <div role="tabpanel" class="tab-pane fade in" id="actions">
@@ -194,7 +197,7 @@
                 </dl>
             </div>
         </div>
-
+    </div>
 @section Scripts {
     <script>
         $("#courseYear").on("change", function (e) {

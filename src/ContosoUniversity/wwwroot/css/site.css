@@ -7,7 +7,7 @@
 	font-weight: normal;
 	font-style: normal;
 }
-*{
+table,h1,h2,h3,h4,span,p,div,a{
     font-family:'Gill Sans MT Pro Book' !important;
 }
 dt{
@@ -20,7 +20,9 @@ body {
     padding-top: 50px;
     padding-bottom: 20px;
 }
-
+table{
+    font-size:14pt;
+}
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
@@ -178,7 +180,7 @@ dd{
 .commList, .meetingsList{
     font-size: 14pt;
 }
-.commSectionTab a{
+.commSectionTab a, .nav-tabs li a{
     font-size: 16pt;
 }
 .commList > table, .meetingsList > table{

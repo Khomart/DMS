@@ -537,6 +537,7 @@ namespace ContosoUniversity.Controllers
             _context.CommitieMembership.Remove(membership);
             return RedirectToAction("ProfessorIndex");
         }
+
         [Authorize(Roles = "Professor")]
         [HttpGet, ActionName("SetMeeting")]
         public async Task<IActionResult> SetMeeting(int? id)
@@ -984,6 +985,7 @@ namespace ContosoUniversity.Controllers
                 .Where(i => i.FinishedWork == false && i.Professor != i.Committee.Chair)
                 .ToList();
             set.Dates = _context.DatesSuggestion.Where(i => i.MeetingID == id).ToList();
+            ViewBag.Dates = new SelectList(set.Dates, "Value", "Value");
             ViewData["MeetingID"] = id;
             ViewData["CommitteeID"] = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == (int)id).Committee.CommitteeID;
             return View(set);
@@ -1018,10 +1020,10 @@ namespace ContosoUniversity.Controllers
         }
         [Authorize(Roles = "Professor")]
         [HttpPost, ActionName("SetMeetingDate")]
-        public async Task<IActionResult> SetMeetingDate(string CommitteeID, string Date )
+        public async Task<IActionResult> SetMeetingDate(int MeetingID, string Date )
         {
             DateTime date = Convert.ToDateTime(Request.Form["Date"]);
-            int meetingID = int.Parse(Request.Form["CommitteeID"]);
+            int meetingID = int.Parse(Request.Form["MeetingID"]);
             Meetings meeting = _context.Meetings.SingleOrDefault(i => i.MeetingID == meetingID);
             meeting.Date = date;
             meeting.FinalDate = true;
