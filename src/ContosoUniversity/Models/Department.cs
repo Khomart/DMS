@@ -12,6 +12,7 @@ namespace ContosoUniversity.Models
         public int DepartmentID { get; set; }
 
         [StringLength(50, MinimumLength = 3)]
+        [Display(Name = "Title")]
         public string Name { get; set; }
 
         //[DataType(DataType.Currency)]
@@ -23,9 +24,11 @@ namespace ContosoUniversity.Models
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
+        [Display(Name = "Professor")]
         public int? ProfessorID { get; set; }
         [Required]
         [ForeignKey("Faculty")]
+        [Display(Name = "Faculty")]
         public int FacultyID { get; set; }
 
         [Timestamp]

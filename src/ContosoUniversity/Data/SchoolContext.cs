@@ -33,6 +33,7 @@ namespace ContosoUniversity.Data
         public DbSet<DatesSuggestion> DatesSuggestion { get; set; }
         public DbSet<FileBase> FileBase { get; set; }
         public DbSet<MeetingComment> MeetComments { get; set; }
+        public DbSet<Workload> Workloads { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -96,7 +97,7 @@ namespace ContosoUniversity.Data
             modelBuilder.Entity<MeetingComment>().ToTable("MeetingComment");
             modelBuilder.Entity<MeetingComment>().Property(p => p.CommentID).ValueGeneratedOnAdd();
             modelBuilder.Entity<MeetingComment>().HasOne(c => c.Meeting).WithMany(c => c.Comments).HasForeignKey(k => new { k.MeetingID, k.CommitteeID });
-
+            modelBuilder.Entity<Workload>().ToTable("Workloads");
 
         }
 

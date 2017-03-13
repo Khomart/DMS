@@ -1,0 +1,61 @@
+﻿@model ContosoUniversity.Models.Workload
+
+@{
+    ViewData["Title"] = "Workload Create";
+}
+
+<h2>Create new Workload</h2>
+
+@*<form asp-action="Create">
+    <div class="form-horizontal">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Season" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="Season" asp-items="ViewBag.Semesters" class="form-control"></select>
+                <span asp-validation-for="Season" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="StartYear" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="StartYear" min="@DateTime.Today.Year" class="form-control" />
+                <span asp-validation-for="StartYear" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="StartingDate" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input type="date" min="@DateTime.Today" asp-for="StartingDate" class="form-control" />
+                <span asp-validation-for="StartingDate" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-offset-2 col-sm-3">
+                <div class="checkbox">
+                    <input asp-for="Current" />
+                    <label asp-for="Current"></label>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="checkbox">
+                    <input asp-for="Open" />
+                    <label asp-for="Open"></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>*@
+
+<div>
+    <a asp-action="ProfessorIndex">Back to Main Page</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

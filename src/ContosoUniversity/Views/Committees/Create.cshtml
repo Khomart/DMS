@@ -1,33 +1,49 @@
 @model ContosoUniversity.Models.Committee
 
-@{
-    ViewData["Title"] = "Create";
-}
-
-<h2>Create</h2>
-
-<form asp-action="Create">
+<form asp-action="SubmitCommitie" id="form">
     <div class="form-horizontal">
-        <h4>Committee</h4>
+        <h2>Committee Level</h2>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
-            <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <select asp-for="DepartmentID" class ="form-control" asp-items="ViewBag.DepartmentID"></select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label asp-for="ProfessorID" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <select asp-for="ProfessorID" class ="form-control" asp-items="ViewBag.ProfessorID"></select>
-            </div>
-        </div>
+
         <div class="form-group">
             <label asp-for="Title" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Level" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="Level" class="form-control" asp-items="@Html.GetEnumSelectList<Level>()"></select>
+                <span asp-validation-for="Level" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group" id="faculty">
+            <label asp-for="FacultyID" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="FacultyID" class="form-control" asp-items="ViewBag.FacultyID"></select>
+            </div>
+        </div>
+        <div class="form-group" id="department">
+            <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="DepartmentID" class="form-control" asp-items="ViewBag.DepartmentID"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProfessorID" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" list="professors" id="dataInput" />
+                <span asp-validation-for="ProfessorID" id="ProfValidator" class="text-danger"></span>
+                <datalist id="professors">
+                    @foreach (var item in ViewBag.Professor)
+                    {
+                        <option data-value="@item.Id">@item.FullName</option>
+                    }
+                </datalist>
+                <input asp-for="ProfessorID" type="hidden" id="hiddenProf">
             </div>
         </div>
         <div class="form-group">
@@ -39,9 +55,87 @@
 </form>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="AdminIndex">Back to List</a>
 </div>
 
 @section Scripts {
+    <script type="text/javascript">
+        {
+        $(document).ready(function () {
+            $("#faculty").css("display", "none");
+        });
+        $("#Level").on("change", function (e) {
+            var value = $(this).val();
+            //alert(value);
+            if (value == 0) {
+                //alert(value);
+                $("#department").show("fast");
+                $("#faculty").hide("fast");
+            }
+            else if (value == 1) {
+                //alert(value);
+                $("#department").hide("fast");
+                $("#faculty").show("fast");
+            }
+            else if (value == 2) {
+                //alert(value);
+                $("#department").hide("fast");
+                $("#faculty").hide("fast");
+            }
+        });
+        $("#dataInput").on("change", function (e) {
+            var inputValue = $(this).val(),
+                options = document.querySelectorAll('option[data-value]'),
+                hiddenInput = $('#hiddenProf');
+            var found = false;
+            //alert(inputValue);
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+
+                if (option.innerText === inputValue) {
+                    found = true;
+                    hiddenInput.val(option.getAttribute('data-value'));
+                    //alert("value of hidden input=" + hiddenInput.val());
+                    break;
+                }
+            }
+            if (found == false) {
+                //$("#dataInput").val('');
+                $("#ProfValidator").empty().addClass("field-validation-error").append("<span id='Data-error' class=''>Input don't match with list</span>");
+
+            }
+            else {
+                $("#ProfValidator").addClass("field-validation-valid").empty();
+            }
+            });
+        $("#form").submit(function (event) {
+
+            var dataInput = $("#dataInput").val();
+            var hiddenInput = $('#hiddenProf').val();
+            var options = document.querySelectorAll('option[data-value]');
+            var found = false;
+            for (i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.getAttribute('data-value') == hiddenInput) { found = true; }
+            }
+            if (found == false) {
+                event.preventDefault();
+                $("#ProfValidator").empty().addClass("field-validation-error").append("<span id='Data-error' class=''>Input don't match with list</span>");
+            }
+            else {
+                $("#ProfValidator").addClass("field-validation-valid").empty();
+                event.submit();
+            }
+        }
+        );
+
+            $("#dataInput").on("click focusin", function () {
+                $("#dataInput").val('');
+            })
+        ;
+
+    }</script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+
 }

@@ -14,7 +14,8 @@ namespace ContosoUniversity.Models.SchoolViewModels
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(20, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [RegularExpression("^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)).+$", ErrorMessage = "The Password requires at least 1 numeric, 1 uppercase and 1 lowercase symbols")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }

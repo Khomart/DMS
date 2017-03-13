@@ -45,7 +45,7 @@ namespace ContosoUniversity.Controllers
 
         // GET: Professors
         [Authorize(Roles = "Admin, Professor")]
-        public async Task<IActionResult> Index(int? id, int? courseID)
+        public async Task<IActionResult> Index(int? id/*, int? courseID*/)
         {
             var viewModel = new ProfessorIndexData();
             viewModel.Professors = await _context.Professors
@@ -66,15 +66,15 @@ namespace ContosoUniversity.Controllers
                 viewModel.Courses = professor.Courses.Select(s => s.Course);
             }
 
-            if (courseID != null)
-            {
-                ViewData["CourseID"] = courseID.Value;
-                _context.Enrollments
-                    .Include(i => i.Student)
-                    .Where(c => c.CourseID == courseID.Value).Load();
-                viewModel.Enrollments = viewModel.Courses.Where(
-                    x => x.CourseID == courseID).Single().Enrollments;
-            }
+            //if (courseID != null)
+            //{
+            //    ViewData["CourseID"] = courseID.Value;
+            //    _context.Enrollments
+            //        .Include(i => i.Student)
+            //        .Where(c => c.CourseID == courseID.Value).Load();
+            //    viewModel.Enrollments = viewModel.Courses.Where(
+            //        x => x.CourseID == courseID).Single().Enrollments;
+            //}
 
             return View(viewModel);
         }
@@ -148,14 +148,14 @@ namespace ContosoUniversity.Controllers
                     tempuser.Courses = new List<CourseAssignment>();
                     //var prof = await _context.Professors.SingleOrDefaultAsync(m => m.Id == i.Id);
                     var selectedCoursesHS = new HashSet<string>(selectedCourses);
+                    var currentSem = await _context.Semesters.SingleOrDefaultAsync(i => i.Current == true);
                     foreach (var course in _context.Courses)
                     {
                         if (selectedCoursesHS.Contains(course.CourseID.ToString()))
                         {
-                            var huynya = new CourseAssignment { ProfessorID = tempuser.Id, CourseID = course.CourseID };
+                            var huynya = new CourseAssignment { ProfessorID = tempuser.Id, CourseID = course.CourseID, SemesterID = currentSem.ID };
                             tempuser.Courses.Add(huynya);    
                         }
-
                     }
                     try
                     {
@@ -294,13 +294,14 @@ namespace ContosoUniversity.Controllers
             var selectedCoursesHS = new HashSet<string>(selectedCourses);
             var professorCourses = new HashSet<int>
                 (professorToUpdate.Courses.Select(c => c.Course.CourseID));
+            var currentSem =  _context.Semesters.SingleOrDefault(i => i.Current == true);
             foreach (var course in _context.Courses)
             {
                 if (selectedCoursesHS.Contains(course.CourseID.ToString()))
                 {
                     if (!professorCourses.Contains(course.CourseID))
                     {
-                        professorToUpdate.Courses.Add(new CourseAssignment { ProfessorID = professorToUpdate.Id, CourseID = course.CourseID });
+                        professorToUpdate.Courses.Add(new CourseAssignment { ProfessorID = professorToUpdate.Id, CourseID = course.CourseID, SemesterID = currentSem.ID });
                     }
                 }
                 else

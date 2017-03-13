@@ -58,198 +58,201 @@ namespace ContosoUniversity.Controllers
 
             return Json("Nice!");
         }
-        [Authorize(Roles = "Admin")]
-        [ActionName("CreateCommitie")]
-        public async Task<IActionResult> CreateCommitie()
-        {
-            ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName");
-            ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
-            ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i=> i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
-            ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
-            Committee committee = new Committee();
-            //committee.SemesterID = _context.Semesters.Where(i => i.current == true).SingleOrDefault().ID;
-            return View(committee);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("SubmitCommitie")]
-        public async Task<IActionResult> CreateCommitie(Committee model)
-        {
-            if (ModelState.IsValid)
-            {
-                if (model.Level == Level.Department) model.FacultyID = null;
-                else if (model.Level == Level.Faculty) model.DepartmentID = null;
-                else if (model.Level == Level.University) { model.FacultyID = null;  model.DepartmentID = null; }
-                //model.StartDate = DateTime.Today.Date;
-                if (model.ProfessorID != null)
-                {
-                    DateTime end = new DateTime();
-                    if (DateTime.Today < new DateTime(DateTime.Today.Year, 6, 1)) end = new DateTime(DateTime.Today.Year, 6, 1);
-                    else end = new DateTime(DateTime.Today.Year + 1, 6, 1);
-                    CommitieMembership member = new CommitieMembership()
-                    {
-                        Chair = true,
-                        ProfessorID = (int)model.ProfessorID,
-                        DateOfEnrollment = DateTime.Now,
-                        EstimatedEndDate = end,
-                    };
-                    model.CommitieMembers = new List<CommitieMembership>()
-                    {
-                        member,
-                    };
-                }
-                _context.Add(model);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("AdminIndex");
-            }
-            return View(model);
-        }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("UpdateCommittee")]
-        public async Task<IActionResult> UpdateCommittee(Committee model)
-        {
-            if (model.Level == Level.Department) model.FacultyID = null;
-            else if (model.Level == Level.Faculty) model.DepartmentID = null;
-            else if (model.Level == Level.University) { model.FacultyID = null; model.DepartmentID = null; }
+        // Committie creation and management is now in Committee controller
 
-            var committeeToUpdate = await _context.Committees.Include(i => i.CommitieMembers).SingleOrDefaultAsync(s => s.CommitteeID == model.CommitteeID);
-            if (committeeToUpdate.ProfessorID != model.ProfessorID)
-            {
-                bool found = false;
-                foreach (var member in committeeToUpdate.CommitieMembers)
-                {
-                    if (member.ProfessorID == model.ProfessorID && member.Chair == false)
-                    {
-                        member.Chair = true;
-                        found = true;
-                    }
-                    else if (member.ProfessorID != model.ProfessorID && member.Chair == true)
-                    {
-                        member.Chair = false;
-                    }
-                    else if (member.ProfessorID == model.ProfessorID && member.Chair == true)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found == false)
-                {
-                    DateTime end = new DateTime();
-                    if (DateTime.Today < new DateTime(DateTime.Today.Year, 6, 1)) end = new DateTime(DateTime.Today.Year, 6, 1);
-                    else end = new DateTime(DateTime.Today.Year+1, 6, 1);
-                    CommitieMembership member = new CommitieMembership()
-                    {
-                        Chair = true,
-                        ProfessorID = (int)model.ProfessorID,
-                        CommitteeID = model.CommitteeID,
-                        DateOfEnrollment = DateTime.Now,
-                        EstimatedEndDate = end,
-                    };
-                    _context.CommitieMembership.Add(member);
-                }
+        //[Authorize(Roles = "Admin")]
+        //[ActionName("CreateCommitie")]
+        //public async Task<IActionResult> CreateCommitie()
+        //{
+        //    ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName");
+        //    ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
+        //    ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i=> i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+        //    ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
+        //    Committee committee = new Committee();
+        //    //committee.SemesterID = _context.Semesters.Where(i => i.current == true).SingleOrDefault().ID;
+        //    return View(committee);
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("SubmitCommitie")]
+        //public async Task<IActionResult> CreateCommitie(Committee model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        if (model.Level == Level.Department) model.FacultyID = null;
+        //        else if (model.Level == Level.Faculty) model.DepartmentID = null;
+        //        else if (model.Level == Level.University) { model.FacultyID = null;  model.DepartmentID = null; }
+        //        //model.StartDate = DateTime.Today.Date;
+        //        if (model.ProfessorID != null)
+        //        {
+        //            DateTime end = new DateTime();
+        //            if (DateTime.Today < new DateTime(DateTime.Today.Year, 6, 1)) end = new DateTime(DateTime.Today.Year, 6, 1);
+        //            else end = new DateTime(DateTime.Today.Year + 1, 6, 1);
+        //            CommitieMembership member = new CommitieMembership()
+        //            {
+        //                Chair = true,
+        //                ProfessorID = (int)model.ProfessorID,
+        //                DateOfEnrollment = DateTime.Now,
+        //                EstimatedEndDate = end,
+        //            };
+        //            model.CommitieMembers = new List<CommitieMembership>()
+        //            {
+        //                member,
+        //            };
+        //        }
+        //        _context.Add(model);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction("AdminIndex");
+        //    }
+        //    return View(model);
+        //}
+
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("UpdateCommittee")]
+        //public async Task<IActionResult> UpdateCommittee(Committee model)
+        //{
+        //    if (model.Level == Level.Department) model.FacultyID = null;
+        //    else if (model.Level == Level.Faculty) model.DepartmentID = null;
+        //    else if (model.Level == Level.University) { model.FacultyID = null; model.DepartmentID = null; }
+
+        //    var committeeToUpdate = await _context.Committees.Include(i => i.CommitieMembers).SingleOrDefaultAsync(s => s.CommitteeID == model.CommitteeID);
+        //    if (committeeToUpdate.ProfessorID != model.ProfessorID)
+        //    {
+        //        bool found = false;
+        //        foreach (var member in committeeToUpdate.CommitieMembers)
+        //        {
+        //            if (member.ProfessorID == model.ProfessorID && member.Chair == false)
+        //            {
+        //                member.Chair = true;
+        //                found = true;
+        //            }
+        //            else if (member.ProfessorID != model.ProfessorID && member.Chair == true)
+        //            {
+        //                member.Chair = false;
+        //            }
+        //            else if (member.ProfessorID == model.ProfessorID && member.Chair == true)
+        //            {
+        //                found = true;
+        //                break;
+        //            }
+        //        }
+        //        if (found == false)
+        //        {
+        //            DateTime end = new DateTime();
+        //            if (DateTime.Today < new DateTime(DateTime.Today.Year, 6, 1)) end = new DateTime(DateTime.Today.Year, 6, 1);
+        //            else end = new DateTime(DateTime.Today.Year+1, 6, 1);
+        //            CommitieMembership member = new CommitieMembership()
+        //            {
+        //                Chair = true,
+        //                ProfessorID = (int)model.ProfessorID,
+        //                CommitteeID = model.CommitteeID,
+        //                DateOfEnrollment = DateTime.Now,
+        //                EstimatedEndDate = end,
+        //            };
+        //            _context.CommitieMembership.Add(member);
+        //        }
                 
-            }
-            if (await TryUpdateModelAsync<Committee>(
-                committeeToUpdate,
-                "",
-                s => s.CommitteeID, s => s.ProfessorID, s => s.FacultyID, s => s.Title, s => s.Level))
-            {
+        //    }
+        //    if (await TryUpdateModelAsync<Committee>(
+        //        committeeToUpdate,
+        //        "",
+        //        s => s.CommitteeID, s => s.ProfessorID, s => s.FacultyID, s => s.Title, s => s.Level))
+        //    {
 
-                await _context.SaveChangesAsync();
-                return RedirectToAction("AdminIndex");
-            }
-            else return RedirectToAction("ManageCommitie", new { id = model.CommitteeID });
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction("AdminIndex");
+        //    }
+        //    else return RedirectToAction("ManageCommitie", new { id = model.CommitteeID });
 
-            //if (ModelState.IsValid)
-            //{
-            //    if (model.Level == Level.Department) model.FacultyID = null;
-            //    else if (model.Level == Level.Faculty) model.DepartmentID = null;
-            //    else if (model.Level == Level.University) { model.FacultyID = null; model.DepartmentID = null; }
-            //    _context.Committees.Attach(model);
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction("AdminIndex");
-            //}
-            //return View(model);
-        }
+        //    //if (ModelState.IsValid)
+        //    //{
+        //    //    if (model.Level == Level.Department) model.FacultyID = null;
+        //    //    else if (model.Level == Level.Faculty) model.DepartmentID = null;
+        //    //    else if (model.Level == Level.University) { model.FacultyID = null; model.DepartmentID = null; }
+        //    //    _context.Committees.Attach(model);
+        //    //    await _context.SaveChangesAsync();
+        //    //    return RedirectToAction("AdminIndex");
+        //    //}
+        //    //return View(model);
+        //}
 
-        [Authorize(Roles = "Admin")]
-        [ActionName("ManageCommitie")]
-        public async Task<IActionResult> ManageCommitie(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[Authorize(Roles = "Admin")]
+        //[ActionName("ManageCommitie")]
+        //public async Task<IActionResult> ManageCommitie(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            Committee committee = await _context.Committees
-                .Include(i => i.CommitieMembers)
-                .ThenInclude(i => i.Professor)
-                .ThenInclude(i => i.OfficeAssignment)
-                .SingleOrDefaultAsync(i => i.CommitteeID == id);
-            ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
-            if (committee.Level == Level.Department)
-            {
-                ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", committee.DepartmentID, "Faculty.Name");
-                ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
+        //    Committee committee = await _context.Committees
+        //        .Include(i => i.CommitieMembers)
+        //        .ThenInclude(i => i.Professor)
+        //        .ThenInclude(i => i.OfficeAssignment)
+        //        .SingleOrDefaultAsync(i => i.CommitteeID == id);
+        //    ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
+        //    if (committee.Level == Level.Department)
+        //    {
+        //        ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", committee.DepartmentID, "Faculty.Name");
+        //        ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
 
-            }
-            else if (committee.Level == Level.Faculty)
-            {
-                ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
-                ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name", committee.FacultyID);
-            }else if (committee.Level == Level.University)
-            {
-                ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
-                ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
-            }
-            ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
-            return View(committee);
-        }
+        //    }
+        //    else if (committee.Level == Level.Faculty)
+        //    {
+        //        ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+        //        ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name", committee.FacultyID);
+        //    }else if (committee.Level == Level.University)
+        //    {
+        //        ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+        //        ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
+        //    }
+        //    ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
+        //    return View(committee);
+        //}
 
-        [Authorize(Roles = "Admin")]
-        [ActionName("ViewCommittee")]
-        public async Task<IActionResult> ViewCommittee(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[Authorize(Roles = "Admin")]
+        //[ActionName("ViewCommittee")]
+        //public async Task<IActionResult> ViewCommittee(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            Committee committee = await _context.Committees
-                .Include(i => i.Department)
-                .Include(i => i.Faculty)
-                .Include(i => i.CommitieMembers)
-                .ThenInclude(i => i.Professor)
-                .ThenInclude(i => i.OfficeAssignment)
-                .Include(i => i.CommitieMembers)
-                .ThenInclude(i => i.Professor)
-                .ThenInclude(i => i.Employment)
-                .ThenInclude(i => i.Department)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(i => i.CommitteeID == id);
-            IEnumerable<Meetings> meetings = new List<Meetings>();
-            IEnumerable<CommitieMembership> members = new List<CommitieMembership>();
+        //    Committee committee = await _context.Committees
+        //        .Include(i => i.Department)
+        //        .Include(i => i.Faculty)
+        //        .Include(i => i.CommitieMembers)
+        //        .ThenInclude(i => i.Professor)
+        //        .ThenInclude(i => i.OfficeAssignment)
+        //        .Include(i => i.CommitieMembers)
+        //        .ThenInclude(i => i.Professor)
+        //        .ThenInclude(i => i.Employment)
+        //        .ThenInclude(i => i.Department)
+        //        .AsNoTracking()
+        //        .SingleOrDefaultAsync(i => i.CommitteeID == id);
+        //    IEnumerable<Meetings> meetings = new List<Meetings>();
+        //    IEnumerable<CommitieMembership> members = new List<CommitieMembership>();
 
-            if (committee.CommitieMembers != null)
-            {
-                members = committee.CommitieMembers.ToList();
-            }
+        //    if (committee.CommitieMembers != null)
+        //    {
+        //        members = committee.CommitieMembers.ToList();
+        //    }
 
-            if (committee.Meetings != null)
-            {
-                meetings = committee.Meetings.ToList();
-            }
+        //    if (committee.Meetings != null)
+        //    {
+        //        meetings = committee.Meetings.ToList();
+        //    }
 
 
-            MyCommittee myCommittee = new MyCommittee()
-            {
-                Committee = committee,
-                Members = members,
-                Meetings = meetings,
-            };
-            return View(myCommittee);
-        }
+        //    MyCommittee myCommittee = new MyCommittee()
+        //    {
+        //        Committee = committee,
+        //        Members = members,
+        //        Meetings = meetings,
+        //    };
+        //    return View(myCommittee);
+        //}
 
         [Authorize(Roles = "Admin")]
         [ActionName("RequestReview")]
@@ -322,75 +325,75 @@ namespace ContosoUniversity.Controllers
             return RedirectToAction("AdminIndex");
         }
 
-        [Authorize(Roles = "Admin")]
-        [ActionName("AddMembers")]
-        public async Task<IActionResult> AddMembers(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                int CommID = (int)id;
-                var profs = await _context.Professors.Include(i => i.Employment).ThenInclude(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
-                for (int i = 0; i< profs.Count; i++)
-                {
-                    var prof = profs[i];
-                    foreach (var committie in prof.Commities)
-                    {
-                        if (committie.CommitteeID == CommID && committie.FinishedWork != true)
-                        {
-                            profs.Remove(prof);
-                            i--;
-                            break;
-                        }
-                    }
-                }
-                CommitteeInvitation InviteList = new CommitteeInvitation
-                {
-                    Professors = profs,
-                    CommitteeID = CommID,
-                };
-                return View(InviteList);
-            }
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("Invite")]
-        public async Task<IActionResult> Invite()
-        {
-            int profId = int.Parse(Request.Form["ProfID"]);
-            int commId = int.Parse(Request.Form["CommID"]);
-            CommitieMembership member = new CommitieMembership()
-            {
-                Chair = false,
-                ProfessorID = profId,
-                CommitteeID = commId,
-                DateOfEnrollment = DateTime.Now,
-                EstimatedEndDate = new DateTime(_context.Semesters.AsNoTracking().SingleOrDefault(i => i.Current == true).EndYear, 5, 1),
-            };
-            _context.CommitieMembership.Add(member);
-            await _context.SaveChangesAsync();
-            return Json("Success");
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("RemoveMember")]
-        public async Task<IActionResult> RemoveMember()
-        {
-            int profId = int.Parse(Request.Form["ProfID"]);
-            int commId = int.Parse(Request.Form["CommID"]);
-            var membership = _context.CommitieMembership.Where(i => i.CommitteeID == commId && i.ProfessorID == profId && i.FinishedWork != true).SingleOrDefault();
-            membership.EndDate = DateTime.Now;
-            membership.FinishedWork = true;
-            if(membership.Chair == true)
-            {
-                membership.Chair = false;
-                membership.Committee.ProfessorID = null;
-            }
-            //_context.CommitieMembership.Remove(membership);
-            await _context.SaveChangesAsync();
-            return Json("Success");
-        }
+        //[Authorize(Roles = "Admin")]
+        //[ActionName("AddMembers")]
+        //public async Task<IActionResult> AddMembers(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    else
+        //    {
+        //        int CommID = (int)id;
+        //        var profs = await _context.Professors.Include(i => i.Employment).ThenInclude(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
+        //        for (int i = 0; i< profs.Count; i++)
+        //        {
+        //            var prof = profs[i];
+        //            foreach (var committie in prof.Commities)
+        //            {
+        //                if (committie.CommitteeID == CommID && committie.FinishedWork != true)
+        //                {
+        //                    profs.Remove(prof);
+        //                    i--;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        CommitteeInvitation InviteList = new CommitteeInvitation
+        //        {
+        //            Professors = profs,
+        //            CommitteeID = CommID,
+        //        };
+        //        return View(InviteList);
+        //    }
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("Invite")]
+        //public async Task<IActionResult> Invite()
+        //{
+        //    int profId = int.Parse(Request.Form["ProfID"]);
+        //    int commId = int.Parse(Request.Form["CommID"]);
+        //    CommitieMembership member = new CommitieMembership()
+        //    {
+        //        Chair = false,
+        //        ProfessorID = profId,
+        //        CommitteeID = commId,
+        //        DateOfEnrollment = DateTime.Now,
+        //        EstimatedEndDate = new DateTime(_context.Semesters.AsNoTracking().SingleOrDefault(i => i.Current == true).EndYear, 5, 1),
+        //    };
+        //    _context.CommitieMembership.Add(member);
+        //    await _context.SaveChangesAsync();
+        //    return Json("Success");
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("RemoveMember")]
+        //public async Task<IActionResult> RemoveMember()
+        //{
+        //    int profId = int.Parse(Request.Form["ProfID"]);
+        //    int commId = int.Parse(Request.Form["CommID"]);
+        //    var membership = _context.CommitieMembership.Where(i => i.CommitteeID == commId && i.ProfessorID == profId && i.FinishedWork != true).SingleOrDefault();
+        //    membership.EndDate = DateTime.Now;
+        //    membership.FinishedWork = true;
+        //    if(membership.Chair == true)
+        //    {
+        //        membership.Chair = false;
+        //        membership.Committee.ProfessorID = null;
+        //    }
+        //    //_context.CommitieMembership.Remove(membership);
+        //    await _context.SaveChangesAsync();
+        //    return Json("Success");
+        //}
 
     }
 }

@@ -385,6 +385,84 @@ namespace ContosoUniversity.Migrations
                     b.ToTable("Faculty");
                 });
 
+            modelBuilder.Entity("ContosoUniversity.Models.Workload", b =>
+                {
+                    b.Property<int>("ProfessorID");
+
+                    b.Property<int>("AcBooksAndMono");
+
+                    b.Property<int>("AccJourArt");
+
+                    b.Property<int>("ChaptInBooks");
+
+                    b.Property<int>("CompButUnpubPapers");
+
+                    b.Property<int>("DepCommittees");
+
+                    b.Property<int>("DiscAndTrChairAndOther");
+
+                    b.Property<int>("Duties");
+
+                    b.Property<int>("EditedBooks");
+
+                    b.Property<int>("ExtResGrantApplications");
+
+                    b.Property<int>("ExtResGrantReceived");
+
+                    b.Property<int>("FacCommittees");
+
+                    b.Property<int>("IntAndNatConferences");
+
+                    b.Property<int>("IntResGrantReceived");
+
+                    b.Property<int>("MBA");
+
+                    b.Property<int>("MSc");
+
+                    b.Property<int>("NonRefJourArtic");
+
+                    b.Property<string>("Notes")
+                        .HasAnnotation("MaxLength", 200);
+
+                    b.Property<int>("OtherPresentations");
+
+                    b.Property<int>("OtherPublications");
+
+                    b.Property<int>("PHDPhase2");
+
+                    b.Property<int>("PHDPhase3");
+
+                    b.Property<int>("ProfAssociatons");
+
+                    b.Property<int>("ProjInProgress");
+
+                    b.Property<int>("PubBooksRevs");
+
+                    b.Property<int>("RefConPro");
+
+                    b.Property<int>("RefJourArt");
+
+                    b.Property<int>("RegConferences");
+
+                    b.Property<int>("SemesterID");
+
+                    b.Property<int>("SympWorkshops");
+
+                    b.Property<int>("Textbooks");
+
+                    b.Property<int>("UnivCommittees");
+
+                    b.Property<int>("Year");
+
+                    b.HasKey("ProfessorID");
+
+                    b.HasIndex("ProfessorID");
+
+                    b.HasIndex("SemesterID");
+
+                    b.ToTable("Workloads");
+                });
+
             modelBuilder.Entity("ContosoUniversity.UniversityFunctionalityModels.Models.Semester", b =>
                 {
                     b.Property<int>("ID")
@@ -798,6 +876,19 @@ namespace ContosoUniversity.Migrations
                     b.HasOne("ContosoUniversity.Models.Professor", "Administrator")
                         .WithMany()
                         .HasForeignKey("ProfessorID");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Workload", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Professor", "Professor")
+                        .WithMany("Workloads")
+                        .HasForeignKey("ProfessorID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ContosoUniversity.UniversityFunctionalityModels.Models.Semester", "Semester")
+                        .WithMany()
+                        .HasForeignKey("SemesterID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<int>", b =>

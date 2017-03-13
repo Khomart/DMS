@@ -12,6 +12,7 @@ table,h1,h2,h3,h4,span,p,div,a{
 }
 dt{
         font-size: 14pt;
+           overflow:visible !important;
 }
 dd{
         font-size: 14pt;
@@ -188,4 +189,19 @@ dd{
 }
 .membersSection {
     margin: 7px;
+}
+jumbotron{
+    text-align: center;
+}
+span.text-danger{
+    font-size:18px;
+}
+/*select.btn{
+    margin-top: 5px;
+}*/
+.createNew{
+    margin-left: 9px;
+}
+.jumbotron{
+    text-align: center;
 }

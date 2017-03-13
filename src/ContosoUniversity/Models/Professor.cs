@@ -33,6 +33,7 @@ namespace ContosoUniversity.Models
         public virtual ICollection<TeachingRequest> TeachingRequests { get; set; }
 
         public DepartmentEmploynment Employment { get; set; }
+        public virtual ICollection<Workload> Workloads { set; get; }
 
         [Display(Name = "Full Name")]
         public string FullName

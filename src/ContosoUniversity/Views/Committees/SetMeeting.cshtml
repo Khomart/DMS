@@ -1,0 +1,66 @@
+@model ContosoUniversity.Models.Meetings
+<h2>Create meeting</h2>
+
+<form asp-action="SetMeeting" asp-route-CommitteeID="@ViewData["CommitteeID"]">
+    <div class="form-horizontal">
+        <h4>Setup meeting for committee</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Title" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Location" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger" />
+            </div>
+        </div>
+        <div id="dateForm">
+            <div class="form-group">
+                <label for="Suggestions[0]" class="col-md-2 control-label">Date 1:</label>
+                <div class="col-md-10">
+                    <input id="dateTime0" name="Suggestions[0]" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <input type="button" class="btn btn-success" value="Add another date" onClick="addInput('dateForm');">
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="ViewCommittee" asp-route-id="@ViewData["CommitteeID"]">Return to Committee</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+            $('#dateTime0').datetimepicker();
+            var counter = 1;
+            var limit = 5;
+            function addInput(divName) {
+                if (counter == limit) {
+                    alert("You have reached the limit of possible dates");
+                }
+                else {
+                    var inputDiv = "<div>";
+                    var newdiv = document.createElement('div');
+                    newdiv.setAttribute("class", "form-group");
+                    newdiv.innerHTML = "<label for='Suggestions[" + counter + "]' class='col-md-2 control-label'>Date " + (counter) + ":</label><div class='col-md-10'><input id='dateTime" + (counter) + "' name='Suggestions[" + counter + "]' class='form-control' /></div>";
+                    //newdiv.innerHTML = "Entry " + (counter + 1) + " <br><input type='text' name='myInputs[]'>";
+                    document.getElementById(divName).appendChild(newdiv);
+                    $('#dateTime' + counter).datetimepicker();
+                    counter++;
+                }
+            }
+    </script>
+}

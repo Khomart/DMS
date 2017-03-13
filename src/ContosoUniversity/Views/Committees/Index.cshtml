@@ -4,11 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<h2>Committies</h2>
+<br />
+
 @if (User.IsInRole("Admin"))
 {
 <p>
-    <a asp-controller="Admin" asp-action="CreateCommitie">Create New</a>
+    <a class="btn btn-success createNew createComm" asp-action="CreateCommitie">Create New</a>
 </p>
 }
 <table class="table">
@@ -17,12 +19,22 @@
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chair)
+            </th>
             @if (User.IsInRole("Professor"))
             {
                 <th>
-                    Apply to Committiee
+                    @*Apply (coming soon)*@<span> </span>
                 </th>
             }
+            else if (User.IsInRole("Admin"))
+            {
+                <th>
+                    Manage Committee life
+                </th>
+            }
+
             <th></th>
         </tr>
     </thead>
@@ -32,22 +44,31 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Chair.FullName)
+            </td>
             @if (User.IsInRole("Professor"))
             {
-                <td>
+                @*<td>
                     <a class="apply btn btn-success disabled" CommID="@item.CommitteeID" ProfID="" asp-action="Apply">In Develope</a>
-                </td>
+                </td>*@
             }
+            else if (User.IsInRole("Admin"))
+            {
             <td>
-                
-                <a asp-action="Details" asp-route-id="@item.CommitteeID">Details</a>
+                <a asp-action="ViewCommittee" asp-route-id="@item.CommitteeID">Members and Meetings</a>
                 @if (User.IsInRole("Admin"))
                 {
                     <span> | </span>
-                    <a asp-action="Edit" asp-route-id="@item.CommitteeID">Edit</a><span> | </span>
+                    <a asp-action="ManageCommitie" asp-route-id="@item.CommitteeID">Edit</a><span> | </span>
                     <a asp-action="Delete" asp-route-id="@item.CommitteeID">Delete</a>
                 }
+                else
+                {
+                    <span> </span>
+                }
             </td>
+            }
         </tr>
 }
     </tbody>

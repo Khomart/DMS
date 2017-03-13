@@ -4,45 +4,31 @@
 }
 
 <div class="jumbotron">
-    <h1>Concordia University Student Page!</h1>
+    <h1>DMS Student Page</h1>
 </div>
 
 
-<h2>@Html.DisplayFor(model => model.FullName)</h2>
+<h2>Welcome back, <br /><b>@Html.DisplayFor(model => model.FullName)</b></h2>
+<br />
 <div>
-    <h4>My personal Concordia</h4>
-    <hr />
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.EnrollmentDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.EnrollmentDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.FirstMidName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FirstMidName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Enrollments)
         </dt>
         <dd>
-            <table class="table">
+            <table class="table table-striped">
                 <tr>
+                    <th>#</th>
                     <th>Course Title</th>
                     <th>Grade</th>
+                    <th><span> </span></th>
                 </tr>
                 @foreach (var item in Model.Enrollments)
                 {
                     <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Course.CourseID)
+                        </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Course.Title)
                         </td>
@@ -50,7 +36,7 @@
                             @Html.DisplayFor(modelItem => item.Grade)
                         </td>
                         <td>
-                            <a asp-action="MyCourse" asp-route-id="@item.EnrollmentID">Browse course Information</a>
+                            <a asp-action="MyCourse" asp-route-id="@item.EnrollmentID">Browse Course</a>
                         </td>   
                     </tr>
                 }
@@ -59,6 +45,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="StudentCourseEdit" asp-route-id="@Model.Id">Add new Courses</a> 
+    <a class="btn btn-success" asp-action="StudentCourseEdit" asp-route-id="@Model.Id">Add new Courses</a> 
     @*<a asp-action="Index">Back to List</a>*@
 </div>

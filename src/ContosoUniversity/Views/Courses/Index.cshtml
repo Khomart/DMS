@@ -5,10 +5,12 @@
 }
 
 <h2>Courses</h2>
+<br />
+
 @if (User.IsInRole("Admin"))
 { 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-success createNew" asp-action="Create">Create New</a>
 </p>
 }
 <table class="table">
@@ -19,7 +21,7 @@
             </th>
 
             <th>
-                @Html.DisplayNameFor(model => model.Active)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Credits)
@@ -36,33 +38,67 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CourseID)
-                </td>
-                <th>
-                    @Html.DisplayFor(modelItem => item.Active)
-                </th>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Credits)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Department.Name)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.CourseID">Details</a>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <small> | </small>
-                        <a asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
-                        <small> | </small>
-                        <a asp-action="Delete" asp-route-id="@item.CourseID">Delete</a>
-                    }
-                </td>
-            </tr>
+            if (item.Active == true)
+            {
+                <tr class="bg-success">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CourseID)
+                    </td>
+                    <th>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </th>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Credits)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Department.Name)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.CourseID">Details</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <small> | </small>
+                            <a asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
+                            <small> | </small>
+                            <a asp-action="Delete" asp-route-id="@item.CourseID">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr class="bg-warning">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CourseID)
+                    </td>
+                    <th>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </th>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Credits)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Department.Name)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.CourseID">Details</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <small> | </small>
+                            <a asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
+                            <small> | </small>
+                            <a asp-action="Delete" asp-route-id="@item.CourseID">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+
         }
     </tbody>
 </table>

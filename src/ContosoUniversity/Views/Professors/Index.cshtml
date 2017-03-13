@@ -5,10 +5,12 @@
 }
 
 <h2>Professors</h2>
+<br />
+
 @if (User.IsInRole("Admin"))
 {
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-success createNew" asp-action="Create">Create New</a>
 </p>
 }
 <table class="table">
@@ -46,7 +48,7 @@
                         @item.OfficeAssignment.Location
                     }
                 </td>
-                <td>
+                @*<td>
                     @{ if (item.Courses != null)
                         {
                             foreach (var course in item.Courses)
@@ -55,7 +57,7 @@
                             }
                         }
                     }
-                </td>
+                </td>*@
                 <td>
                     <a asp-action="Index" asp-route-id="@item.Id">Select</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a>
@@ -89,9 +91,9 @@
                 selectedRow = "success";
             }
             <tr class="@selectedRow">
-                <td>
+                @*<td>
                     @Html.ActionLink("Select", "Index", new { courseID = item.CourseID })
-                </td>
+                </td>*@
                 <td>
                     @item.CourseID
                 </td>
@@ -107,7 +109,7 @@
     </table>
 }
 
-@if (Model.Enrollments != null)
+@*@if (Model.Enrollments != null)
 {
     <h3>
         Students Enrolled in Selected Course
@@ -129,4 +131,4 @@
             </tr>
         }
     </table>
-}
+}*@

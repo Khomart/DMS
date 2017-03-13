@@ -24,6 +24,8 @@ namespace ContosoUniversity
 {
     public class Startup
     {
+
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -56,6 +58,12 @@ namespace ContosoUniversity
             services.AddIdentity<IdentityUser<int>, IdentityRole<int>>(options => {
 
                 options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromHours(1);
+                //options.SignIn.RequireConfirmedEmail = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
 
             })
                 .AddEntityFrameworkStores<SchoolContext, int>()
@@ -126,13 +134,17 @@ namespace ContosoUniversity
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                   name: "Student",
-                   template: "{action}/{id?}",
-                   defaults: new { controller = "Student" });
+                    name: "Student",
+                    template: "{action}/{id?}",
+                    defaults: new { controller = "Student" });
                 routes.MapRoute(
-                   name: "Professor",
-                   template: "{action}/{id?}",
-                   defaults: new { controller = "Professor" });
+                    name: "Professor",
+                    template: "{action}/{id?}",
+                    defaults: new { controller = "Professor" });
+                //routes.MapRoute(
+                //    name: "Committees",
+                //    template: "{action}/{id?}",
+                //    defaults: new { controller = "Committees" });
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action}/{id?}",
@@ -165,7 +177,7 @@ namespace ContosoUniversity
                 if (contextSems.Count == 0)
                 {
                     int currentYear;
-                    if (DateTime.Now.Month > 2) currentYear = DateTime.Now.Year;
+                    if (DateTime.Now.Month > 4) currentYear = DateTime.Now.Year;
                     else currentYear = DateTime.Now.Year - 1;
                     DateTime current = DateTime.Today;
                     int currentTerm = 4;
@@ -196,19 +208,8 @@ namespace ContosoUniversity
                                         date = new DateTime(i + 1, 1, 7);
                                         break;
                                 }
-                                if (i == currentYear && ((DateTime.Today.Year < date.Year && DateTime.Today.Month < date.Month) || DateTime.Today.Year < date.Year))
-                                {
-                                    Semester term = new Semester()
-                                    {
-                                        StartYear = i,
-                                        StartingDate = date,
-                                        Open = true,
-                                        Season = (Term)j,
-                                        Current = true,
-                                    };
-                                    contextSems.Add(term);
-                                }
-                                else if (i == currentYear)
+                                //if (i == currentYear && ((DateTime.Today.Year < date.Year && DateTime.Today.Month < date.Month) || DateTime.Today.Year < date.Year))
+                                if (i == currentYear && currentTerm == j)
                                 {
                                     Semester term = new Semester()
                                     {

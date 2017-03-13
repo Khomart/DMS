@@ -83,6 +83,8 @@ namespace ContosoUniversity.Controllers
             ViewBag.Semesters = new SelectList(semesters, "ID", "Title");
             ViewData["Message"] = "Default for professor.";
 
+            List<Semester> sems = await _context.Semesters.Where(i => i.Open == true).ToListAsync();
+            ViewData["openSems"] = sems;
             return View(viewModel);
         }
 

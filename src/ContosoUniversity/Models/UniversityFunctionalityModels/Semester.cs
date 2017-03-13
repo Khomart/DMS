@@ -43,15 +43,9 @@ namespace ContosoUniversity.UniversityFunctionalityModels.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Term Start")]
         public DateTime StartingDate { get; set; }
-
-        //[DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        //[Display(Name = "Term End")]
-        //public DateTime EndDate { get; set; }
-
-        [Display(Name = "Current Term")]
+        [Display(Name = "Current")]
         public bool Current { set; get; }
-
+        [Display(Name = "Open")]
         public bool Open { set; get; }
         public virtual ICollection<CourseAssignment> AssignedCourses { set; get; }
         //public virtual ICollection<Committee> CommitiesRunning { set; get; }

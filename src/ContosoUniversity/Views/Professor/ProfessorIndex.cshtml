@@ -4,7 +4,7 @@
 }
 
 <div class="jumbotron">
-    <h1>Concordia University Professor Page</h1>
+    <h1>DMS Professor Page</h1>
 </div>
 
 
@@ -39,6 +39,9 @@
                    aria-controls="actions"
                    role="tab"
                    data-toggle="tab">Actions</a>
+            </li>
+            <li>
+                <a href="/workload">Workload</a>
             </li>
         </ul>
         <div class="tab-content">
@@ -148,7 +151,7 @@
                                 </div>
                             </div>
                             <input style="margin-top: 20px;" type="submit" value="Filter Requests" class="btn btn-success" />
-                            <button style="margin-top: 20px;" class="btn btn-success requestLoad">Request New Load</button>
+                            <button style="margin-top: 20px;" id="loadRequest" class="btn btn-success requestLoad">Request New Load</button>
                         </form>
                         <table class="table table-striped">
                             <thead class="thead-default">
@@ -198,8 +201,20 @@
             </div>
         </div>
     </div>
+
 @section Scripts {
     <script>
+
+        var openSems = JSON.parse('@Html.Raw(Json.Serialize(ViewData["openSems"]))');
+        var sems = [];
+        for (i = 0; i < openSems.length; i++) {
+            sems.push([openSems[i].startYear, openSems[i].season]);
+        }
+        $("#loadRequest").prop("disabled", true);
+        for (i = 0; i < sems.length; i++) {
+            if (sems[i][0] == $("#requestYear").val() && sems[i][1] == $("#requestSemester").val())
+                $("#loadRequest").prop("disabled", false);
+        }
         $("#courseYear").on("change", function (e) {
             if ($(this).val() == 0) {
                 $("#courseSemester").prop("disabled", true);
@@ -207,6 +222,7 @@
             else {
                 $("#courseSemester").prop("disabled", false);
             }
+
         });
         $("#requestYear").on("change", function (e) {
             if ($(this).val() == 0) {
@@ -216,8 +232,25 @@
                 $("#requestSemester").prop("disabled", false);
             }
 
+            for (i = 0; i < sems.length; i++) {
+                $("#loadRequest").prop("disabled", true);
+                var semVal = $("#requestSemester").val();
+                var yearVal = $("#requestYear").val();
+                for (i = 0; i < sems.length; i++) {
+                    if (sems[i][0] == yearVal && sems[i][1] == semVal)
+                        $("#loadRequest").prop("disabled", false);
+                }
+            }
         });
-
+        $("#requestSemester").on("change", function (e) {
+            $("#loadRequest").prop("disabled", true);
+            var semVal = $("#requestSemester").val();
+            var yearVal = $("#requestYear").val();
+            for (i = 0; i < sems.length; i++) {
+                if (sems[i][0] == yearVal && sems[i][1] == semVal)
+                    $("#loadRequest").prop("disabled", false);
+            }
+        });
         $(".requestLoad").click(function (e) {
             e.preventDefault();
             button = $(this);

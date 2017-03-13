@@ -1,7 +1,7 @@
 @model ContosoUniversity.Models.Enrollment
 
 @{
-    ViewData["Title"] = "Courseinfo";
+    ViewData["Title"] = "Course information";
 }
 
 <h2>Courseinfo</h2>
@@ -23,7 +23,7 @@
         <div class="form-group">
             <label asp-for="Notes" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <textarea rows="10" asp-for="Notes" class="form-control" ></textarea>
+                <textarea rows="10" cols="20" asp-for="Notes" class="form-control" ></textarea>
                 <span asp-validation-for="Notes" class="text-danger" />
             </div>
         </div>

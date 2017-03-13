@@ -55,6 +55,7 @@ namespace ContosoUniversity.Controllers
         public IActionResult Create()
         {
             ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName");
+            ViewData["FacultyID"] = new SelectList(_context.Facultys, "FacultyID", "Name");
             return View();
         }
 
@@ -63,7 +64,7 @@ namespace ContosoUniversity.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DepartmentID,Budget,ProfessorID,Name,RowVersion,StartDate")] Department department)
+        public async Task<IActionResult> Create([Bind("DepartmentID,ProfessorID,FacultyID,Name,RowVersion,StartDate")] Department department)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +73,7 @@ namespace ContosoUniversity.Controllers
                 return RedirectToAction("Index");
             }
             ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", department.ProfessorID);
+            ViewData["FacultyID"] = new SelectList(_context.Facultys, "FacultyID", "Name",department.FacultyID);
             return View(department);
         }
 

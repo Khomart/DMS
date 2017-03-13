@@ -23,5 +23,9 @@ namespace ContosoUniversity.Models
         public Course Course { get; set; }
         [ForeignKey("SmID")]
         public Student Student { get; set; }
+
+        //[ForeignKey("Semester")]
+        //public int SemesterID { get; set; }
+        //public Semester Semester { set; get; }
     }
 }

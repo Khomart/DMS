@@ -27,11 +27,12 @@ namespace ContosoUniversity.Controllers
             string sortOrder,
             string currentFilter,
             string searchString,
+            int? pageSize,
             int? page)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["ProgramSortParm"] = sortOrder == "Program" ? "program_desc" : "Program";
             ViewData["VerifiedSortParm"] = sortOrder == "Verification" ? "verification_desc" : "Verification";
 
 
@@ -58,19 +59,32 @@ namespace ContosoUniversity.Controllers
                 case "name_desc":
                     students = students.OrderByDescending(s => s.LastName);
                     break;
+                case "program_desc":
+                    students = students.OrderByDescending(s => s.Program);
+                    break;
+                case "Program":
+                    students = students.OrderBy(s => s.Program);
+                    break;
                 case "Verification":
-                    students = students.OrderBy(s => s.Approved);
+                    students = students.OrderBy(s => Convert.ToString(s.Approved));
                     break;
                 case "verification_desc":
-                    students = students.OrderByDescending(s => s.Approved);
+                    students = students.OrderByDescending(s => Convert.ToString(s.Approved));
                     break;
                 default:
                     students = students.OrderBy(s => s.LastName);
                     break;
             }
 
-            int pageSize = 3;
-            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), page ?? 1, pageSize));
+            if (pageSize == null) pageSize = 25;
+            var dictionary = new Dictionary<int, string>
+            {
+                { 10, "10" },
+                { 25, "25" },
+                { 50, "50" }
+            };
+            ViewBag.PageSize = new SelectList(dictionary, "Key", "Value",pageSize);
+            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), page ?? 1, (int)pageSize));
         }
         // GET: Students/Details/5
         [Authorize(Roles = "Admin, Professor")]

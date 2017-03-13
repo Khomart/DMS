@@ -33,6 +33,21 @@ namespace ContosoUniversity.Models
                 else return CourseID.ToString();
             }
         }
+        [Display(Name = "Status")]
+        public string Status
+        {
+            get
+            {
+                if (Active == true)
+                {
+                    return "Active";
+                }
+                else
+                {
+                    return "Deactivated";
+                }
+            }
+        }
 
         [Display(Name = "Active Course")]
         public bool Active { get; set; }

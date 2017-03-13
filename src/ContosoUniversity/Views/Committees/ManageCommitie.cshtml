@@ -1,0 +1,158 @@
+@model ContosoUniversity.Models.Committee
+
+<form asp-action="UpdateCommittee">
+    <div class="form-horizontal">
+        <h3>Committee</h3>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="CommitteeID" />
+        <div class="form-group">
+            <label asp-for="Title" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Level" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="Level" class="form-control" asp-items="@Html.GetEnumSelectList<Level>()"></select>
+                <span asp-validation-for="Level" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group" id="department">
+            <label asp-for="DepartmentID" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <select asp-for="DepartmentID" class="form-control" asp-items="ViewBag.DepartmentID"></select>
+                <span asp-validation-for="DepartmentID" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group" id="faculty">
+            <label asp-for="FacultyID" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <select asp-for="FacultyID" class="form-control" asp-items="ViewBag.FacultyID"></select>
+                <span asp-validation-for="FacultyID" class="text-danger" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProfessorID" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" list="professors" id="dataInput" />
+                <span asp-validation-for="ProfessorID" id="ProfValidator" class="text-danger"></span>
+                <datalist id="professors">
+                    @foreach (var item in ViewBag.Professor)
+                    {
+                        <option data-value="@item.Id">@item.FullName</option>
+                    }
+                </datalist>
+                <input asp-for="ProfessorID" type="hidden" id="hiddenProf">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        {
+        $(document).ready(function () {
+            if ($("#Level").val() == 0) {
+                $("#faculty").css("display", "none");
+            } 
+            else if ($("#Level").val() == 1) {
+                $("#department").css("display", "none");
+            }
+            else if ($("#Level").val() == 2) {
+                $("#department").css("display", "none");
+                $("#faculty").css("display", "none");
+            }
+            var options = document.querySelectorAll('option[data-value]');
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+
+                if (option.getAttribute('data-value') === $("#hiddenProf").val()) {
+                    $("#dataInput").val(option.innerText);
+                    break;
+                }
+            }
+        });
+        $("#Level").on("change", function (e) {
+            var value = $(this).val();
+            //alert(value);
+            if (value == 0) {
+                //alert(value);
+                $("#department").show("fast");
+                $("#faculty").hide("fast");
+            }
+            else if (value == 1) {
+                //alert(value);
+                $("#department").hide("fast");
+                $("#faculty").show("fast");
+            }
+            else if (value == 2) {
+                //alert(value);
+                $("#department").hide("fast");
+                $("#faculty").hide("fast");
+            }
+        });
+        $("#dataInput").on("change", function (e) {
+            var inputValue = $(this).val(),
+                options = document.querySelectorAll('option[data-value]'),
+                hiddenInput = $('#hiddenProf');
+            var found = false;
+            //alert(inputValue);
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+
+                if (option.innerText === inputValue) {
+                    found = true;
+                    hiddenInput.val(option.getAttribute('data-value'));
+                    //alert("value of hidden input=" + hiddenInput.val());
+                    break;
+                }
+            }
+            if (found == false) {
+                //$("#dataInput").val('');
+                $("#ProfValidator").empty().addClass("field-validation-error").append("<span id='Data-error' class=''>Input don't match with list</span>");
+
+            }
+            else {
+                $("#ProfValidator").addClass("field-validation-valid").empty();
+            }
+            });
+        $("#form").submit(function (event) {
+
+            var dataInput = $("#dataInput").val();
+            var hiddenInput = $('#hiddenProf').val();
+            var options = document.querySelectorAll('option[data-value]');
+            var found = false;
+            for (i = 0; i < options.length; i++) {
+                var option = options[i];
+                if (option.getAttribute('data-value') == hiddenInput) { found = true; }
+            }
+            if (found == false) {
+                event.preventDefault();
+                $("#ProfValidator").empty().addClass("field-validation-error").append("<span id='Data-error' class=''>Input don't match with list</span>");
+            }
+            else {
+                $("#ProfValidator").addClass("field-validation-valid").empty();
+                event.submit();
+            }
+        }
+        );
+
+            $("#dataInput").on("click focusin", function () {
+                $("#dataInput").val('');
+            })
+        ;
+
+    }</script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
