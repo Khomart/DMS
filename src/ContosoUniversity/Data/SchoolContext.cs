@@ -1,10 +1,8 @@
 ﻿using ContosoUniversity.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using ContosoUniversity.UniversityFunctionalityModels.Models;
 using ContosoUniversity.Models.SchoolViewModels;
-using ContosoUniversity.Models.UniversityFunctionalityModels;
-using System.ComponentModel.DataAnnotations.Schema;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Data
 {
@@ -15,6 +13,7 @@ namespace ContosoUniversity.Data
         }
 
         public DbSet<Course> Courses { get; set; }
+        public DbSet<UniversityProgram> Programs { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Department> Departments { get; set; }
@@ -27,7 +26,7 @@ namespace ContosoUniversity.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<TeachingRequest> TeachingRequests { get; set; }
         public DbSet<Semester> Semesters { get; set; }
-        public DbSet<DepartmentEmploynment> Employments { get; set; }
+        //public DbSet<DepartmentEmploynment> Employments { get; set; }
         public DbSet<CoursePreference> RequestedCourses { get; set; }
         public DbSet<Meetings> Meetings { get; set; }
         public DbSet<DatesSuggestion> DatesSuggestion { get; set; }
@@ -69,15 +68,23 @@ namespace ContosoUniversity.Data
                 i.ToTable("UserToken");
                 i.HasKey(x => new {  x.UserId });
             });
-            modelBuilder.Entity<Course>().ToTable("Course");
+            modelBuilder.Entity<Course>().ToTable("Course").HasKey(c => c.CourseID);
+            modelBuilder.Entity<Course>().Property(c => c.CourseID).ValueGeneratedOnAdd();
+            modelBuilder.Entity<UniversityProgram>().ToTable("Programs").HasKey(c => c.ProgramID);
+            modelBuilder.Entity<UniversityProgram>().Property(c => c.ProgramID).ValueGeneratedOnAdd();
+            modelBuilder.Entity<UniversityProgram>().HasOne(d => d.Department).WithMany(p => p.Programs).OnDelete(Microsoft.EntityFrameworkCore.Metadata.DeleteBehavior.Restrict);
             modelBuilder.Entity<Enrollment>().ToTable("Enrollment");
             modelBuilder.Entity<Student>().ToTable("Student");
+            modelBuilder.Entity<Professor>().HasOne(i => i.Department).WithMany(i => i.Staff).OnDelete(Microsoft.EntityFrameworkCore.Metadata.DeleteBehavior.Restrict);
             modelBuilder.Entity<Department>().ToTable("Department");
+            modelBuilder.Entity<Department>().HasOne(a => a.Administrator).WithMany();
+            modelBuilder.Entity<Department>().HasMany(d => d.Staff).WithOne(d => d.Department);
+            //modelBuilder.Entity<Department>().HasOne(a => a.Administrator).WithMany().OnDelete(Microsoft.EntityFrameworkCore.Metadata.DeleteBehavior.Restrict);
             modelBuilder.Entity<Faculty>().ToTable("Faculty");
             modelBuilder.Entity<OfficeAssignment>().ToTable("OfficeAssignment");
             modelBuilder.Entity<CourseAssignment>().ToTable("CourseAssignment").HasKey(c => c.AssignmentID);
             modelBuilder.Entity<CourseAssignment>().Property(p => p.AssignmentID).ValueGeneratedOnAdd();
-            modelBuilder.Entity<DepartmentEmploynment>().ToTable("Employments").HasKey(c=> new { c.DepartmentID, c.ProfessorID });
+            //modelBuilder.Entity<DepartmentEmploynment>().ToTable("Employments").HasKey(c=> new { c.DepartmentID, c.ProfessorID });
             modelBuilder.Entity<Committee>().ToTable("Committee");
             modelBuilder.Entity<Committee>().HasOne(i => i.Chair).WithMany().OnDelete(Microsoft.EntityFrameworkCore.Metadata.DeleteBehavior.Restrict);
             modelBuilder.Entity<CommitieMembership>().ToTable("CommitieMembership").HasKey(c => new { c.CommitteeID, c.ProfessorID, c.DateOfEnrollment }) ;

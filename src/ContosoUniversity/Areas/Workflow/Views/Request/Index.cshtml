@@ -1,0 +1,167 @@
+@model ContosoUniversity.Areas.Workflow.Models.RequestModels.RequestView
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="bg bgReq"></div>
+<div class="jumbotron">
+    <h1>Course Request</h1>
+</div>
+<nav class="breadcrumb">
+
+    @Html.ActionLink("Home", "Index", "Home", new { @class = "breadcrumb-item active"})
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(),null, new { @class = "breadcrumb-item active" })
+    }
+</nav>
+    <div class="row">
+        <h2 class="col-sm-4">Requests</h2>
+        @*<div class="form-group col-sm-offset-4 col-sm-4" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+        <label style="text-align: right;" class="control-label col-sm-3" for="year">Year: </label>
+        <div class="col-sm-9">
+        <select style="font-size: 18px;" id="year" class="form-control" asp-items="@ViewBag.Years"></select>
+        </div>
+        </div>*@
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+    <div class="btn-group" style="padding-bottom:5px;">
+        @Html.ActionLink("New", "Index", new { status = 1 }, new { @id = "button0", @class = "btn btn-success" })
+        @Html.ActionLink("Evaluated", "Index", new { status = 2 }, new { @id = "button1", @class = "btn btn-success " })
+        @Html.ActionLink("All", "Index", new { status = 3 }, new { @id = "button2", @class = "btn btn-success " })
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Full Name
+                </th>
+                <th>
+                    Semester
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Request
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Requests)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProfessorEntity.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SemesterForAssignment.Title)
+                </td>
+                <td>
+                    @{
+                    if (@item.Approved)
+                    {
+                    <short>Approved</short>
+                    }
+                    else
+                    {
+                    <short>In the Review Process</short>
+                    }
+                    }
+                </td>
+                <td>
+                    <div class="btn-group">
+                        @{
+                        if (@item.Approved)
+                        {
+                        <a class="btn btn-info" asp-action="GivenLoad" asp-route-semesterID="@item.SemesterID" asp-route-professorID="@item.ProfessorID">Review</a>
+                        }
+                        else
+                        {
+                        <a class="btn btn-success" asp-action="RequestReview" asp-route-semesterID="@item.SemesterID" asp-route-professorID="@item.ProfessorID">Evaluate</a>
+                        }
+                        }
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    }
+    else
+    {
+    <br />
+    <a class="btn btn-success" asp-route-id="@ViewData["ID"]" asp-action="RequestSemester">Request</a>
+    <hr />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Semester
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Access
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Requests)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProfessorEntity.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SemesterForAssignment.Title)
+                </td>
+                <td>
+                    @{
+                    if (@item.Approved)
+                    {
+                    <short>Approved</short>
+                    }
+                    else
+                    {
+                    <short>In the Review Process</short>
+                    }
+                    }
+                </td>
+                <td class="btn-group">
+                    @{
+                    if (@item.Approved)
+                    {
+                    <a class="btn btn-info" asp-action="GivenLoad" asp-route-semesterID="@item.SemesterID" asp-route-professorID="@item.ProfessorID">Review</a>
+                    }
+                    else
+                    {
+                    @*<a class="btn btn-success" asp-action="Evaluate" asp-route-semesterID="@item.SemesterID" asp-route-professorID="@item.ProfessorID">Evaluate</a>*@
+                    }
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    }
+
+    @section Scripts {
+    <script type="text/javascript">
+    {
+        var jumboHeight = $('.jumbotron').outerHeight();
+        function parallax() {
+            var scrolled = $(window).scrollTop();
+            $('.bgReq').css('height', (jumboHeight - scrolled) + 'px');
+        }
+
+        $(window).scroll(function (e) {
+            parallax();
+        });
+    }
+    </script>
+    }

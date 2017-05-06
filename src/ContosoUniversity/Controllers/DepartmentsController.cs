@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 using Microsoft.AspNetCore.Authorization;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Controllers
 {
@@ -24,7 +25,7 @@ namespace ContosoUniversity.Controllers
         // GET: Departments
         public async Task<IActionResult> Index()
         {
-            var schoolContext = _context.Departments.Include(d => d.Administrator);
+            var schoolContext = _context.Departments.Include(d => d.Administrator).Include(f => f.Faculty).Where(a => a.Archived == false);
             return View(await schoolContext.ToListAsync());
         }
 
@@ -64,7 +65,7 @@ namespace ContosoUniversity.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DepartmentID,ProfessorID,FacultyID,Name,RowVersion,StartDate")] Department department)
+        public async Task<IActionResult> Create([Bind("DepartmentID,ProfessorID,FacultyID,Name,RowVersion")] Department department)
         {
             if (ModelState.IsValid)
             {
@@ -94,6 +95,8 @@ namespace ContosoUniversity.Controllers
                 return NotFound();
             }
             ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", department.ProfessorID);
+            ViewData["FacultyID"] = new SelectList(_context.Facultys, "FacultyID", "Name", department.FacultyID);
+
             return View(department);
         }
 
@@ -126,7 +129,7 @@ namespace ContosoUniversity.Controllers
             if (await TryUpdateModelAsync<Department>(
                 departmentToUpdate,
                 "",
-                s => s.Name, s => s.StartDate, /*s => s.Budget,*/ s => s.ProfessorID))
+                s => s.Name, s => s.ProfessorID, s => s.FacultyID))
             {
                 try
                 {
@@ -179,11 +182,12 @@ namespace ContosoUniversity.Controllers
                 }
             }
             ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", departmentToUpdate.ProfessorID);
+            ViewData["FacultyID"] = new SelectList(_context.Facultys, "FacultyID", "Name", departmentToUpdate.FacultyID);
             return View(departmentToUpdate);
         }
 
         // GET: Departments/Delete/5
-        public async Task<IActionResult> Delete(int? id, bool? concurrencyError)
+        public async Task<IActionResult> Archive(int? id, bool? concurrencyError)
         {
             if (id == null)
             {
@@ -192,6 +196,7 @@ namespace ContosoUniversity.Controllers
 
             var department = await _context.Departments
                 .Include(d => d.Administrator)
+                .Include(f => f.Faculty)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(m => m.DepartmentID == id);
             if (department == null)
@@ -219,13 +224,14 @@ namespace ContosoUniversity.Controllers
         // POST: Departments/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Department department)
+        public async Task<IActionResult> Archive(int DepartmentID)
         {
             try
             {
-                if (await _context.Departments.AnyAsync(m => m.DepartmentID == department.DepartmentID))
+                var departmentToArchive = await _context.Departments.SingleAsync(m => m.DepartmentID == DepartmentID);
+                if (departmentToArchive != null)
                 {
-                    _context.Departments.Remove(department);
+                    departmentToArchive.Archived = true; 
                     await _context.SaveChangesAsync();
                 }
                 return RedirectToAction("Index");
@@ -233,7 +239,7 @@ namespace ContosoUniversity.Controllers
             catch (DbUpdateConcurrencyException /* ex */)
             {
                 //Log the error (uncomment ex variable name and write a log.)
-                return RedirectToAction("Delete", new { concurrencyError = true, id = department.DepartmentID });
+                return RedirectToAction("Delete", new { concurrencyError = true, id = DepartmentID });
             }
         }
 

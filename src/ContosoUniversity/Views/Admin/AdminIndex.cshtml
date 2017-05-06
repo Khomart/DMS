@@ -4,10 +4,13 @@
 }
 
 
+<div class="bg bgAdmin"></div>
 <div class="jumbotron">
-    <h1>Admin Page</h1>
+    <h1>Administration</h1>
 </div>
-
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", null, new { @class = "breadcrumb-item active" })
+</nav>
 
 <h2>New requests</h2>
 
@@ -56,7 +59,7 @@
                                 @Html.DisplayFor(modelItem => item.Email)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelitem => item.Program)
+                                @Html.DisplayFor(modelitem => item.Program.Title)
                             </td>
                             <td>
                                 <a asp-action="StudentApproval" class="approve btn btn-success active" id="@item.Id" asp-route-id="@item.Id">Approve</a>
@@ -219,37 +222,48 @@
 </div>
 @section Scripts {
 <script type="text/javascript">
-{
-    $(document).ready(function () {
-        
-        var serviceURL = '/Admin/StudentApproval';
-        $(".approve").click(function (e) {
-            e.preventDefault();
-            button = $(this);
-           
-            id = $(this).attr("id");
-            url = '/Admin/StudentApproval';
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: { 'ID': id },
-                //contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: successFunc,
-                error: errorFunc
-            });
-            function successFunc() {
-                button.toggleClass('disabled', true);
-                button.addClass('clicked');
-                button.text("Approved")
-            }
+    {
+        $(document).ready(function () {
 
-            function errorFunc() {
-                alert('An error appeared. Try to refresh page, if it doesn\'t help contact the administrator');
-            }
+            var serviceURL = '/Admin/StudentApproval';
+            $(".approve").click(function (e) {
+                e.preventDefault();
+                button = $(this);
 
-        })
-    });
-}
-</script>
+                id = $(this).attr("id");
+                url = '/Admin/StudentApproval';
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: { 'ID': id },
+                    //contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+                function successFunc() {
+                    button.toggleClass('disabled', true);
+                    button.addClass('clicked');
+                    button.text("Approved")
+                }
+
+                function errorFunc() {
+                    alert('An error appeared. Try to refresh page, if it doesn\'t help contact the administrator');
+                }
+
+            })
+        });
+
+
+        var jumboHeight = $('.jumbotron').outerHeight();
+        function parallax() {
+            var scrolled = $(window).scrollTop();
+            $('.bgAdmin').css('height', (jumboHeight - scrolled) + 'px');
+        }
+
+        $(window).scroll(function (e) {
+            parallax();
+        });
+    }
+    </script>
 }

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
-using ContosoUniversity.UniversityFunctionalityModels.Models;
 using Microsoft.AspNetCore.Authorization;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Controllers
 {
@@ -25,7 +25,7 @@ namespace ContosoUniversity.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Semesters.ToListAsync());
+            return View(await _context.Semesters.OrderByDescending(i=> i.StartYear).ThenByDescending(i => i.Season).ToListAsync());
         }
 
         // GET: Semesters/Details/5

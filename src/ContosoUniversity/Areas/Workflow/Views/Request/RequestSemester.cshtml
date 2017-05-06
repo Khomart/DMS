@@ -1,0 +1,67 @@
+@model IEnumerable<ContosoUniversity.Models.Entities.Semester>
+
+@{
+    ViewData["Title"] = "Semester Choice";
+}
+<br />
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+    }
+    @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(),null, new { @class = "breadcrumb-item  active" })
+    }
+</nav>
+<h2>List of Terms Where You can Rquest Courses</h2>
+<hr />
+<table class="table-striped semList">
+    <tr>
+        <th class="tableLeftTop"><span>    </span></th>
+        <th>Year</th>
+        <th>Term</th>
+    </tr>
+    @{ 
+        int count = 0;
+        foreach (var sem in Model)
+        {
+            count++;
+            {
+            <tr>
+                <td>@count</td>
+                <td>@Html.DisplayFor(modelitem => sem.StartYear) - @Html.DisplayFor(modelitem => sem.EndYear)</td>
+                <td>@Html.DisplayFor(modelitem => sem.Season)</td>
+            </tr>
+            }
+        }
+    }
+</table>
+<br />
+<form asp-action="CourseLoad" method="get">
+    <div class="form-horizontal">
+        <h4>Choose a Term to request </h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label for="SemesterID" class="col-md-2 control-label">Choose Semester:</label>
+            <div class="col-md-10">
+                <select name="semID" for="SemesterID" class="form-control" asp-items="ViewBag.SemesterID"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+<hr />
+<div>
+    <a class="btn btn-info"  asp-action="Index">Back to Requests</a>
+</div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

@@ -1,9 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+<div class="bg bgMain"></div>
 <div class="jumbotron">
-    <h1>DMS - Department Management System</h1>
+    <h1>Department Management System</h1>
 </div>
 <div class="row">
     <div class="col-md-4">
@@ -26,3 +26,17 @@
         <p><a class="btn btn-default" href="#">Maecenas auctor nisl ac ligula ultrices gravida. &raquo;</a></p>
     </div>
 </div>
+@section Scripts {
+    <script type="text/javascript">
+        var jumboHeight = $('.jumbotron').outerHeight();
+        function parallax() {
+            var scrolled = $(window).scrollTop();
+            $('.bgMain').css('height', (jumboHeight - scrolled) + 'px');
+        }
+
+        $(window).scroll(function (e) {
+            parallax();
+        });
+    </script>
+
+}

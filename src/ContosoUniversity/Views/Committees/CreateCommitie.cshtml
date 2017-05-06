@@ -1,4 +1,4 @@
-@model ContosoUniversity.Models.Committee
+@model ContosoUniversity.Models.Entities.Committee
 
 <form asp-action="SubmitCommitie" id="form">
     <div class="form-horizontal">
@@ -16,7 +16,7 @@
         <div class="form-group">
             <label asp-for="Level" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="Level" class="form-control" asp-items="@Html.GetEnumSelectList<Level>()"></select>
+                <select asp-for="Level" class="form-control" asp-items="@Html.GetEnumSelectList<ContosoUniversity.Models.Entities.Level>()"></select>
                 <span asp-validation-for="Level" class="text-danger" />
             </div>
         </div>
@@ -38,6 +38,7 @@
                 <input type="text" class="form-control"  list="professors" id="dataInput"/>
                 <span asp-validation-for="ProfessorID" id="ProfValidator" class="text-danger"></span>
                 <datalist id="professors">
+                    <option data-value=""></option>
                     @foreach (var item in ViewBag.Professor)
                     {
                         <option data-value="@item.Id">@item.FullName</option>
@@ -55,7 +56,7 @@
 </form>
 
 <div>
-    <a asp-action="AdminIndex">Back to List</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
@@ -116,7 +117,7 @@
             var found = false;
             for (i = 0; i < options.length; i++) {
                 var option = options[i];
-                if (option.getAttribute('data-value') == hiddenInput) { found = true; }
+                if (option.getAttribute('data-value') == hiddenInput || option.getAttribute('data-value') == "") { found = true; }
             }
             if (found == false) {
                 event.preventDefault();

@@ -1,0 +1,48 @@
+@model IEnumerable<ContosoUniversity.Models.Entities.UniversityProgram>
+
+@{
+    ViewData["Title"] = "Departments";
+}
+
+<h2>Programs</h2>
+<br />
+
+<p>
+    <a class="btn btn-success createNew" asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Short)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department.Name)
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Short)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department.Name)
+                </td>
+                <td class="btn-group">
+                    <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.ProgramID">Edit</a>
+                    <a class="btn btn-warning" asp-action="Archive" asp-route-id="@item.ProgramID">Archive</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

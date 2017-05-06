@@ -1,4 +1,4 @@
-@model IEnumerable<ContosoUniversity.Models.Course>
+@model IEnumerable<ContosoUniversity.Models.Entities.Course>
 
 @{
     ViewData["Title"] = "Courses";
@@ -17,17 +17,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CourseID)
+                @Html.DisplayNameFor(model => model.ShortTitle)
             </th>
-
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Credits)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Department)
@@ -42,7 +38,7 @@
             {
                 <tr class="bg-success">
                     <td>
-                        @Html.DisplayFor(modelItem => item.CourseID)
+                        @Html.DisplayFor(modelItem => item.ShortTitle)
                     </td>
                     <th>
                         @Html.DisplayFor(modelItem => item.Status)
@@ -51,19 +47,12 @@
                         @Html.DisplayFor(modelItem => item.Credits)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.Department.Name)
                     </td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.CourseID">Details</a>
                         @if (User.IsInRole("Admin"))
                         {
-                            <small> | </small>
-                            <a asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
-                            <small> | </small>
-                            <a asp-action="Delete" asp-route-id="@item.CourseID">Delete</a>
+                            <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
                         }
                     </td>
                 </tr>
@@ -72,7 +61,7 @@
             {
                 <tr class="bg-warning">
                     <td>
-                        @Html.DisplayFor(modelItem => item.CourseID)
+                        @Html.DisplayFor(modelItem => item.Title)
                     </td>
                     <th>
                         @Html.DisplayFor(modelItem => item.Status)
@@ -81,19 +70,12 @@
                         @Html.DisplayFor(modelItem => item.Credits)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.Department.Name)
                     </td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.CourseID">Details</a>
                         @if (User.IsInRole("Admin"))
                         {
-                            <small> | </small>
-                            <a asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
-                            <small> | </small>
-                            <a asp-action="Delete" asp-route-id="@item.CourseID">Delete</a>
+                            <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.CourseID">Edit</a>
                         }
                     </td>
                 </tr>

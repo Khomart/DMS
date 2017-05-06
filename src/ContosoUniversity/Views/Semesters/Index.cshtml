@@ -1,4 +1,4 @@
-@model IEnumerable<ContosoUniversity.UniversityFunctionalityModels.Models.Semester>
+@model IEnumerable<ContosoUniversity.Models.Entities.Semester>
 
 @{
     ViewData["Title"] = "Index";
@@ -40,8 +40,7 @@
                 @Html.DisplayFor(modelItem => item.StartingDate)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                <a class="btn btn-default" asp-action="Edit" asp-route-id="@item.ID">Edit</a>
             </td>
         </tr>
     }
@@ -58,8 +57,7 @@
                 @Html.DisplayFor(modelItem => item.StartingDate)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                <a class="btn btn-default" asp-action="Edit" asp-route-id="@item.ID">Edit</a>
             </td>
         </tr>
     }
@@ -76,8 +74,7 @@
                 @Html.DisplayFor(modelItem => item.StartingDate)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                <a class="btn btn-default" asp-action="Edit" asp-route-id="@item.ID">Edit</a>
             </td>
         </tr>
     }

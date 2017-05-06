@@ -1,47 +1,47 @@
-﻿@model ContosoUniversity.Models.SchoolViewModels.ProfessorViews
+﻿    @model ContosoUniversity.Models.SchoolViewModels.ProfessorViews
 @{
     ViewData["Title"] = "Professor Page";
 }
-
+<div class="bg bgProf"></div>
 <div class="jumbotron">
-    <h1>DMS Professor Page</h1>
+    <h1>DMS - Dashboard</h1>
 </div>
 
+<nav class="breadcrumb">
+    @{ 
+
+    }
+    @Html.ActionLink("Home", "Index", "Home",null, new { @class = "breadcrumb-item active" })
+    @*@if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+    }
+    @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+    }*@
+</nav>
 
 <h3>Welcome back, <br /><b>@Html.DisplayFor(model => model.Professors.FullName)</b></h3>
 <br />
-<div>
-    @*<h4>Professor</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Professors.FirstMidName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Professors.FirstMidName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Professors.LastName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Professors.LastName)
-        </dd>
-    </dl>*@
+@*<div>
         <ul class="nav nav-tabs commSectionTab" role="tablist">
             <li role="presentation" class="active">
                 <a href="#activities"
                    aria-controls="activities"
+                   id="activitiesTab"
                    role="tab"
                    data-toggle="tab">Activities</a>
             </li>
             <li role="presentation">
                 <a href="#actions"
                    aria-controls="actions"
+                   id="actionsTab"
                    role="tab"
                    data-toggle="tab">Actions</a>
             </li>
             <li>
-                <a href="/workload">Workload</a>
+                <a href="/workload" class="disabled" style="background: lightgray;">Workload</a>
             </li>
         </ul>
         <div class="tab-content">
@@ -53,13 +53,11 @@
                     <dd>
                         <form class="form-inline" asp-action="ProfessorIndex" style="padding: 8px;">
                             <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
-                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Year: </label>*@
                                 <div class="col-sm-8" style="padding-left:0">
                                     <select name="courseYear" style="font-size: 18px;" id="courseYear" class="form-control" asp-items="@ViewBag.courseYears"></select>
                                 </div>
                             </div>
                             <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
-                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Semester: </label>*@
                                 <div class="col-sm-8">
                                     <select name="courseSemester" style="font-size: 18px;" id="courseSemester" class="form-control" asp-items="@ViewBag.courseSemesters"></select>
                                 </div>
@@ -139,17 +137,16 @@
                     <dd>
                         <form class="form-inline" asp-action="ProfessorIndex" style="padding: 8px;">
                             <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
-                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Year: </label>*@
                                 <div class="col-sm-8" style="padding-left:0">
                                     <select name="requestYear" style="font-size: 18px;" id="requestYear" class="form-control" asp-items="@ViewBag.requestYears"></select>
                                 </div>
                             </div>
                             <div class="form-group" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
-                                @*<label style="text-align: right; padding-right: 10px; padding-left: 10px;" class="control-label col-sm-4" for="year">Semester: </label>*@
                                 <div class="col-sm-8">
                                     <select name="requestSemester" style="font-size: 18px;" id="requestSemester" class="form-control" asp-items="@ViewBag.requestSemesters"></select>
                                 </div>
                             </div>
+                            <input type="hidden" name="activeAction" value="1" />
                             <input style="margin-top: 20px;" type="submit" value="Filter Requests" class="btn btn-success" />
                             <button style="margin-top: 20px;" id="loadRequest" class="btn btn-success requestLoad">Request New Load</button>
                         </form>
@@ -200,10 +197,15 @@
                 </dl>
             </div>
         </div>
-    </div>
+    </div>*@
 
 @section Scripts {
     <script>
+        if (@ViewData["active"] == 1) $("#actionsTab").tab('show');
+        $(".disabled").click(function (e) {
+            e.preventDefault();
+            return false;
+        });
 
         var openSems = JSON.parse('@Html.Raw(Json.Serialize(ViewData["openSems"]))');
         var sems = [];
@@ -262,6 +264,17 @@
                 url = "/CoursesToChoose";
                 window.location.href =  url + "?" + "requestYear=" + Year + "&requestSemester=" + Semester;
             }
+        });
+
+
+        var jumboHeight = $('.jumbotron').outerHeight();
+        function parallax() {
+            var scrolled = $(window).scrollTop();
+            $('.bgProf').css('height', (jumboHeight - scrolled) + 'px');
+        }
+
+        $(window).scroll(function (e) {
+            parallax();
         });
     </script>
 }

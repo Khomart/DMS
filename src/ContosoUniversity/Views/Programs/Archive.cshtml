@@ -1,0 +1,38 @@
+@model ContosoUniversity.Models.Entities.UniversityProgram
+@{
+    ViewData["Title"] = "Archive";
+}
+<h2>Archive</h2>
+<p class="text-danger">@ViewData["ConcurrencyErrorMessage"]</p>
+<h3>Are you sure you want to archive this? <br />This action cannot be cancelled</h3>
+<div>
+    <h4>Department</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Short)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Short)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Department.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Department.Name)
+        </dd>
+    </dl>
+    <form asp-action="Archive">
+        <input type="hidden" asp-for="ProgramID" />
+        <div class="form-actions no-color btn-group">
+            <input type="submit" value="Archive" class="btn btn-warning" />
+            <a class="btn btn-info" asp-action="Index">Back to List</a>
+        </div>
+    </form>
+</div>

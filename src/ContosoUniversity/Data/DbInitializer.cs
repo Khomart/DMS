@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ContosoUniversity.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using ContosoUniversity.Models.UniversityFunctionalityModels;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Models
 {

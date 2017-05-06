@@ -10,11 +10,14 @@ namespace ContosoUniversity.Models.AccountViewModels
     {
         [Required]
         [EmailAddress]
+        [DataType(DataType.EmailAddress)]
+        [RegularExpression("^[A-Za-z0-9](([_\\.\\-]?[a-zA-Z0-9]+)*)@([A-Za-z0-9]+)(([\\.\\-]?[a-zA-Z0-9]+)*)\\.([A-Za-z]{2,})$", ErrorMessage = "The Email is incorrect")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(20, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [RegularExpression("^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)).+$", ErrorMessage = "The Password requires at least 1 numeric, 1 uppercase and 1 lowercase symbols")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -37,9 +40,7 @@ namespace ContosoUniversity.Models.AccountViewModels
         public string FirstMidName { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        [StringLength(50, ErrorMessage = "Program name cannot be longer than 50 characters.")]
         [Display(Name = "Program Name")]
-        public string ProgramName { get; set; }
+        public int ProgramID { get; set; }
     }
 }

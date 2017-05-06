@@ -1,4 +1,4 @@
-@model ContosoUniversity.UniversityFunctionalityModels.Models.Semester
+@model ContosoUniversity.Models.Entities.Semester
 
 @{
     ViewData["Title"] = "Delete";
@@ -45,8 +45,8 @@
     
     <form asp-action="Delete">
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            <a asp-action="Index">Back to List</a>
+            <input type="submit" value="Delete" class="btn btn-warning" /> |
+            <a class="btn btn-info" asp-action="Index">Back to List</a>
         </div>
     </form>
 </div>

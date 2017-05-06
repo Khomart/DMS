@@ -1,0 +1,293 @@
+@model ContosoUniversity.Models.Workload
+<br />
+<h1>Workload submission for @ViewData["Year"]</h1>
+<hr />
+<form id="WorkflowForm" asp-action="WorkloadForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="active"><a href="#Publications" data-toggle="tab">Publications</a></li>
+            <li><a href="#Research" data-toggle="tab">Grants & Conferences</a></li>
+            <li><a href="#ResSuperv" data-toggle="tab">Supervisions & Scholar</a></li>
+            <li><a href="#Service" data-toggle="tab">Service to University</a></li>
+            <li><a class="saveWorkload" href="#" onclick="saveForm();">Save</a></li>
+            @*<li><a class="btn-warning" href="javascript:{}" onclick="document.getElementById('WorkflowForm').submit();">Submit</a></li>*@
+            <li><input type="submit" value="Submit" class="inputAsTab" /></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="Publications">
+                <div class="row">
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="RefJourArt" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="RefJourArt" class="form-control" />
+                            </div>
+                            <span asp-validation-for="RefJourArt" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AccJourArt" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="AccJourArt" class="form-control" />
+                            </div>
+                            <span asp-validation-for="AccJourArt" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="RefConPro" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="RefConPro" class="form-control" />
+                            </div>
+                            <span asp-validation-for="RefConPro" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AcBooksAndMono" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="AcBooksAndMono" class="form-control" />
+                            </div>
+                            <span asp-validation-for="AcBooksAndMono" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="EditedBooks" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="EditedBooks" class="form-control" />
+                            </div>
+                            <span asp-validation-for="EditedBooks" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="ChaptInBooks" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="ChaptInBooks" class="form-control" />
+                            </div>
+                            <span asp-validation-for="ChaptInBooks" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PubBooksRevs" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="PubBooksRevs" class="form-control" />
+                            </div>
+                            <span asp-validation-for="PubBooksRevs" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Textbooks" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="Textbooks" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Textbooks" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="NonRefJourArtic" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="NonRefJourArtic" class="form-control" />
+                            </div>
+                            <span asp-validation-for="NonRefJourArtic" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="OtherPublications" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="OtherPublications" class="form-control" />
+                            </div>
+                            <span asp-validation-for="OtherPublications" class="text-danger" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in" id="Research">
+                <div class="row">
+                    <div class="col-sm-6" style="border-right: 1px solid #ccc; border-right: 1px solid #ccc;">
+                        <h3>Research Grants</h3>
+                        <div class="form-group">
+                            <label asp-for="ExtResGrantApplications" class="col-md-8 control-label"></label>
+                            <div class="col-md-4">
+                                <input type="number" min="0" asp-for="ExtResGrantApplications" class="form-control" />
+                                <span asp-validation-for="ExtResGrantApplications" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ExtResGrantReceived" class="col-md-8 control-label"></label>
+                            <div class="col-md-4">
+                                <input type="number" min="0" asp-for="ExtResGrantReceived" class="form-control" />
+                                <span asp-validation-for="ExtResGrantReceived" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="IntResGrantReceived" class="col-md-8 control-label"></label>
+                            <div class="col-md-4">
+                                <input type="number" min="0" asp-for="IntResGrantReceived" class="form-control" />
+                                <span asp-validation-for="IntResGrantReceived" class="text-danger" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <h3>Conferences</h3>
+                        <div class="form-group">
+                            <label asp-for="IntAndNatConferences" class="col-md-8 control-label"></label>
+                            <div class="col-md-4">
+                                <input type="number" min="0" asp-for="IntAndNatConferences" class="form-control" />
+                                <span asp-validation-for="IntAndNatConferences" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="RegConferences" class="col-md-8 control-label"></label>
+                            <div class="col-md-4">
+                                <input type="number" min="0" asp-for="RegConferences" class="form-control" />
+                                <span asp-validation-for="RegConferences" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="SympWorkshops" class="col-md-8 control-label"></label>
+                            <div class="col-md-4">
+                                <input type="number" min="0" asp-for="SympWorkshops" class="form-control" />
+                                <span asp-validation-for="SympWorkshops" class="text-danger" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in" id="ResSuperv">
+                <h3>Research Supervisions</h3>
+                <div class="row">
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="DiscAndTrChairAndOther" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="DiscAndTrChairAndOther" class="form-control" />
+                                <span asp-validation-for="DiscAndTrChairAndOther" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PHDPhase3" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="PHDPhase3" class="form-control" />
+                                <span asp-validation-for="PHDPhase3" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PHDPhase2" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="PHDPhase2" class="form-control" />
+                                <span asp-validation-for="PHDPhase2" class="text-danger" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="MBA" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="MBA" class="form-control" />
+                                <span asp-validation-for="MBA" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MSc" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="MSc" class="form-control" />
+                                <span asp-validation-for="MSc" class="text-danger" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <h3>Other Scholar Activities</h3>
+                <div class="row">
+                    <div class="form-group col-sm-6">
+                        <label asp-for="OtherPresentations" class="col-md-6 control-label"></label>
+                        <div class="col-md-6">
+                            <input type="number" min="0" asp-for="OtherPresentations" class="form-control" />
+                            <span asp-validation-for="OtherPresentations" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label asp-for="CompButUnpubPapers" class="col-md-6 control-label"></label>
+                        <div class="col-md-6">
+                            <input type="number" min="0" asp-for="CompButUnpubPapers" class="form-control" />
+                            <span asp-validation-for="CompButUnpubPapers" class="text-danger" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in" id="Service">
+                <div class="row">
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="ProjInProgress" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="ProjInProgress" class="form-control" />
+                                <span asp-validation-for="ProjInProgress" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="UnivCommittees" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="UnivCommittees" class="form-control" />
+                                <span asp-validation-for="UnivCommittees" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FacCommittees" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="FacCommittees" class="form-control" />
+                                <span asp-validation-for="FacCommittees" class="text-danger" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label asp-for="DepCommittees" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="DepCommittees" class="form-control" />
+                                <span asp-validation-for="DepCommittees" class="text-danger" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ProfAssociatons" class="col-md-6 control-label"></label>
+                            <div class="col-md-6">
+                                <input type="number" min="0" asp-for="ProfAssociatons" class="form-control" />
+                                <span asp-validation-for="ProfAssociatons" class="text-danger" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p id="results"></p>
+</form>
+<hr />
+<div>
+    <a class="btn btn-info" asp-action="Index">Back to List</a>
+</div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script>
+            $("input").on("change", showValues);
+            function saveForm() {
+                showValues;
+                var str = $("form").serialize();
+                if (confirm("Are we good?")) {
+                    $.ajax({
+                        url: "/Workflow/Workload/saveForm",
+                        type: 'POST',
+                        data: str,
+                        success: function () {
+                            //familyOverlay(false);
+                            alert("data saved!");
+                        },
+                        error: function () {
+                            alert("Unable to save form");
+                            //familyOverlay(false);
+                        }
+                    });
+                }
+            }
+
+            function showValues() {
+                var str = $("form").serialize();
+                $("#results").text(str);
+
+            }
+        </script>
+        }

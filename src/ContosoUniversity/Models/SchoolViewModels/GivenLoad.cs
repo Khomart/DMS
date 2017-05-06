@@ -1,8 +1,5 @@
-﻿using ContosoUniversity.UniversityFunctionalityModels.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Models.SchoolViewModels
 {

@@ -13,6 +13,7 @@ using ContosoUniversity.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Controllers
 {
@@ -35,12 +36,10 @@ namespace ContosoUniversity.Controllers
 
         public async Task<IActionResult> AdminIndex()
         {
-            AdminIndex viewModel = new AdminIndex()
-            {
-                NewStudents = await _context.Students.Where(c => c.Approved == false).ToListAsync(),
-                Requests = await _context.TeachingRequests.Include(i => i.ProfessorEntity).Include(c => c.SemesterForAssignment).Where(c => c.Approved == false && c.SemesterForAssignment.Open == true).ToListAsync(),
-                Commities = await _context.Committees.Include(c => c.Chair).Include(c => c.CommitieMembers).ToListAsync(),
-            };
+            AdminIndex viewModel = new AdminIndex();
+            viewModel.NewStudents = await _context.Students.Include(p => p.Program).Where(c => c.Approved == false).ToListAsync();
+            viewModel.Requests = await _context.TeachingRequests.Include(i => i.ProfessorEntity).Include(c => c.SemesterForAssignment).Where(c => c.Approved == false && c.SemesterForAssignment.Open == true).ToListAsync();
+            viewModel.Commities = await _context.Committees.Include(c => c.Chair).Include(c => c.CommitieMembers).ToListAsync();
             return View(viewModel);
         }
         [Authorize(Roles = "Admin")]
@@ -53,9 +52,6 @@ namespace ContosoUniversity.Controllers
             //IdentityUser<int> student = await _userManager.FindByNameAsync(user.UserName);
             await _userManager.AddToRoleAsync(user, "Student");
             await _context.SaveChangesAsync();
-
-
-
             return Json("Nice!");
         }
 

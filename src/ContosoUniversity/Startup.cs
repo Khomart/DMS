@@ -11,13 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
+using ContosoUniversity.Models.Entities;
 using ContosoUniversity.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Session;
-using Microsoft.AspNetCore.Http;
-using ContosoUniversity.UniversityFunctionalityModels.Models;
 //using Microsoft.AspNetCore.Owin;
 
 namespace ContosoUniversity
@@ -133,6 +130,9 @@ namespace ContosoUniversity
             app.UseSession();
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "areaRoute",
+                    template: "{area:exists}/{controller}/{action}/{id?}");
                 routes.MapRoute(
                     name: "Student",
                     template: "{action}/{id?}",
@@ -271,7 +271,8 @@ namespace ContosoUniversity
             
             private static async Task CreateUser(SchoolContext context, UserManager<IdentityUser<int>> userManager)
             {
-                var adminUser = await userManager.FindByEmailAsync("admin@concordia.com");
+                // If you forgot to make migrations, do it
+                var adminUser = await userManager.FindByEmailAsync("admin@dms.com");
                 if (adminUser != null)
                 {
                     if (!(await userManager.IsInRoleAsync(adminUser, "Admin")))
@@ -281,8 +282,8 @@ namespace ContosoUniversity
                 {
                     var newAdmin = new Admin
                     {
-                        UserName = "admin@concordia.com",
-                        Email = "admin@concordia.com",
+                        UserName = "admin@dms.com",
+                        Email = "admin@dms.com",
                     };
                     var result = await userManager.CreateAsync(newAdmin, "Ceh;br196240");
                     if (!result.Succeeded)

@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ContosoUniversity.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <nav class="breadcrumb">
+        @Html.ActionLink("Home", "Index", "Home", new { @class = "breadcrumb-item" })
+        @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+        {
+            @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+        }
+        @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+        {
+            @: / @Html.ActionLink(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+        }
+    </nav>
+}

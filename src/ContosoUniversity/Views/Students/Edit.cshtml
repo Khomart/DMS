@@ -13,13 +13,6 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
         <div class="form-group">
-            <label asp-for="Program" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="Program" class="form-control" />
-                <span asp-validation-for="Program" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group">
             <label asp-for="FirstMidName" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input asp-for="FirstMidName" class="form-control" />
@@ -34,6 +27,35 @@
             </div>
         </div>
         <div class="form-group">
+            <label asp-for="Email" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ProgramID" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="ProgramID" class="form-control" asp-items="ViewBag.ProgramID">
+                    <option value="">-- Select Program --</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Approved" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Approved" class="form-control" />
+                <span asp-validation-for="Approved" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="EmailConfirmed" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="EmailConfirmed" class="form-control" />
+                <span asp-validation-for="EmailConfirmed" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
@@ -42,7 +64,7 @@
 </form>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="btn btn-info" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

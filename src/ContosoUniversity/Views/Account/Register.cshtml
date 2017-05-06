@@ -45,10 +45,11 @@
         </div>
     </div>
     <div class="form-group">
-        <label asp-for="ProgramName" class="col-md-2 control-label"></label>
+        <label asp-for="ProgramID" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="ProgramName" class="form-control" />
-            <span asp-validation-for="ProgramName" class="text-danger"></span>
+            <select asp-for="ProgramID" class="form-control" asp-items="ViewBag.ProgramID">
+                <option value="">-- Select Program --</option>
+            </select>
         </div>
     </div>
     <div class="form-group">

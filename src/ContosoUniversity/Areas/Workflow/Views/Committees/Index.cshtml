@@ -1,0 +1,140 @@
+@model ContosoUniversity.Areas.Workflow.Models.CommitteesViews.IndexView
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="bg bgComm"></div>
+<div class="jumbotron">
+    <h1>Committies</h1>
+</div>
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), null, new { @class = "breadcrumb-item active" })
+    }
+    @*@if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+    }*@
+</nav>
+<h2>Committies</h2>
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Chair
+            </th>
+            <th>
+                Access
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Commitees) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Chair.FullName)
+            </td>
+            <td>
+                <div class="btn-group">
+                    @{
+                        @if (User.IsInRole("Professor"))
+                        {
+                            for (int i = 0; i < Model.MembershipIn.Count(); i++)
+                            {
+                                if (Model.MembershipIn[i].CommitteeID == item.CommitteeID && Model.MembershipIn[i].FinishedWork != true)
+                                {
+                                    <a class="btn btn-success" asp-action="ViewCommittee" asp-route-id="@item.CommitteeID">Members and Meetings</a>
+                                    break;
+                                }
+
+                            }
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            <a class="btn btn-success" asp-action="ViewCommittee" asp-route-id="@item.CommitteeID">Members and Meetings</a>
+                        }
+                    }
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.CommitteeID">Details</a>
+                    </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@section Scripts {
+<script type="text/javascript">
+{
+    $(document).ready(function () {
+        var serviceURL = '/Professor/ApplyToCommittee';
+        $(".apply").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+
+            id = $(this).attr("id");
+            url = '/Professor/ApplyToCommittee';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ID': id },
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.text("Cancell").addClass("btn-danger").addClass("cancell").removeClass("btn-success").removeClass("apply");
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        });
+        $(".cancell").click(function (e) {
+            e.preventDefault();
+            button = $(this);
+
+            id = $(this).attr("id");
+            url = '/Professor/RemoveApplyToCommittee';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: { 'ID': id },
+                //contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: successFunc,
+                error: errorFunc
+            });
+            function successFunc() {
+                button.text("Apply").addClass("btn-success").addClass("apply").removeClass("btn-danger").removeClass("cancell");
+            }
+
+            function errorFunc() {
+                alert('error');
+            }
+
+        });
+    });
+    var jumboHeight = $('.jumbotron').outerHeight();
+    function parallax() {
+        var scrolled = $(window).scrollTop();
+        $('.bgMain').css('height', (jumboHeight - scrolled) + 'px');
+    }
+
+    $(window).scroll(function (e) {
+        parallax();
+    });
+}
+    </script>
+}

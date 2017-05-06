@@ -33,6 +33,12 @@
                 <span asp-validation-for="LastName" class="text-danger" />
             </div>
         </div>
+        <div class="form-group">
+            <label asp-for="DepartmentID" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="DepartmentID" class="form-control" asp-items="ViewBag.DepartmentID"></select>
+            </div>
+        </div>
 
         <div class="form-group">
             <label asp-for="OfficeAssignment.Location" class="col-md-2 control-label"></label>
@@ -44,29 +50,49 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <table>
-                    <tr>
-                        @{
-                            int cnt = 0;
-                            List<ContosoUniversity.Models.SchoolViewModels.AssignedCourseData> courses = ViewBag.Courses;
-
-                            foreach (var course in courses)
-                            {
-                                if (cnt++ % 3 == 0)
+                        <table id="courseTable">
+                            <tr id="row_n" style="display:none;">
+                                <td>
+                                    <select class="courseAddProf form-control" id="select1" 
+                                            asp-items="ViewBag.Courses">
+                                        <option>===Select a Course===</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="courseAddProf form-control" id="select2" 
+                                            asp-items="ViewBag.Semesters">
+                                        <option>===Select a Semester===</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="button" class="courseAddProf btn btn-success" value="Remove" onClick="removeInput('row_n');">
+                                </td>
+                            </tr>
+                            @{
+                                for (int i = 0; i < Model.Courses.Count; i++)
                                 {
-                                    @:</tr><tr>
+                                    <tr id="row_@i">
+                                        <td>
+                                            <select class="courseAddProf form-control" id="select1" name="selectedCourses[@i]"
+                                                    asp-items="ViewBag.Courses" >
+                                                <option value="@Model.Courses[i].CourseID">@Model.Courses[i].Course.ShortTitle</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="courseAddProf form-control" id="select2" name="selectedSemesters[@i]"
+                                                    asp-items="ViewBag.Semesters">
+                                                <option value="@Model.Courses[i].SemesterID">@Model.Courses[i].Semester.Title</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="button" class="courseAddProf btn btn-success" value="Remove" onClick="removeInput('#row_@i');">
+                                        </td>
+                                    </tr>
+                                    }
                                 }
-                                @:<td>
-                                    <input type="checkbox"
-                                           name="selectedCourses"
-                                           value="@course.CourseID"
-                                           @(Html.Raw(course.Assigned ? "checked=\"checked\"" : "")) />
-                                           @course.CourseID @:  @course.Title
-                                @:</td>
-                            }
-                            @:</tr>
-                        }
-                </table>
+                        </table>
+                        <input type="button" class="btn btn-success" value="Add a course" onClick="addInput('courseTable');">
+
             </div>
         </div>
 
@@ -79,9 +105,33 @@
 </form>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="btn btn-info" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        var counter = 1;
+        var limit = 15;
+        function addInput(divName) {
+            if (counter == limit) {
+                alert("Please avoid adding too much courses at one time");
+            }
+            else {
+                var clone = $("#row_n").clone();
+                clone.attr("id", "row_" + counter);
+                clone.attr("style", "display: table-row;");
+                clone.find("#select1").attr({ "name": 'selectedCourses[' + counter + ']', "class": 'courseAddProf form-control' });
+                clone.find("#select2").attr({ "name": 'selectedSemesters[' + counter + ']', "class": 'courseAddProf form-control' });
+                clone.find('input').attr({ "onClick": 'removeInput("#row_' + counter + '")', "class": 'courseAddProf btn btn-success'});
+                $("#courseTable").append(clone);
+                counter++;
+            }
+        }
+        function removeInput(divName) {
+
+            $(divName).remove();
+        }
+
+    </script>
 }

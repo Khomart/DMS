@@ -41,59 +41,6 @@ namespace ContosoUniversity.Migrations
                     b.ToTable("CommitieMembership");
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.Committee", b =>
-                {
-                    b.Property<int>("CommitteeID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("DepartmentID");
-
-                    b.Property<int?>("FacultyID");
-
-                    b.Property<int>("Level");
-
-                    b.Property<int?>("ProfessorID")
-                        .IsRequired();
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasAnnotation("MaxLength", 120);
-
-                    b.HasKey("CommitteeID");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.HasIndex("FacultyID");
-
-                    b.HasIndex("ProfessorID");
-
-                    b.ToTable("Committee");
-                });
-
-            modelBuilder.Entity("ContosoUniversity.Models.Course", b =>
-                {
-                    b.Property<int>("CourseID");
-
-                    b.Property<bool>("Active");
-
-                    b.Property<int>("Credits");
-
-                    b.Property<int>("DepartmentID");
-
-                    b.Property<int?>("TeachingRequestRequestID");
-
-                    b.Property<string>("Title")
-                        .HasAnnotation("MaxLength", 50);
-
-                    b.HasKey("CourseID");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.HasIndex("TeachingRequestRequestID");
-
-                    b.ToTable("Course");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.CourseAssignment", b =>
                 {
                     b.Property<int>("AssignmentID")
@@ -158,33 +105,6 @@ namespace ContosoUniversity.Migrations
                     b.ToTable("DateSuggestion");
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.Department", b =>
-                {
-                    b.Property<int>("DepartmentID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("FacultyID");
-
-                    b.Property<string>("Name")
-                        .HasAnnotation("MaxLength", 50);
-
-                    b.Property<int?>("ProfessorID");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate();
-
-                    b.Property<DateTime>("StartDate");
-
-                    b.HasKey("DepartmentID");
-
-                    b.HasIndex("FacultyID");
-
-                    b.HasIndex("ProfessorID");
-
-                    b.ToTable("Department");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.Enrollment", b =>
                 {
                     b.Property<int>("EnrollmentID")
@@ -209,6 +129,162 @@ namespace ContosoUniversity.Migrations
                     b.HasIndex("SmID");
 
                     b.ToTable("Enrollment");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Committee", b =>
+                {
+                    b.Property<int>("CommitteeID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<int?>("DepartmentID");
+
+                    b.Property<int?>("FacultyID");
+
+                    b.Property<int>("Level");
+
+                    b.Property<int?>("ProfessorID");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 120);
+
+                    b.HasKey("CommitteeID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.HasIndex("FacultyID");
+
+                    b.HasIndex("ProfessorID");
+
+                    b.ToTable("Committee");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Course", b =>
+                {
+                    b.Property<int>("CourseID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Active");
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<int>("Credits");
+
+                    b.Property<int>("DepartmentID");
+
+                    b.Property<string>("ShortTitle")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 20);
+
+                    b.Property<int?>("TeachingRequestRequestID");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 50);
+
+                    b.HasKey("CourseID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.HasIndex("TeachingRequestRequestID");
+
+                    b.ToTable("Course");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Department", b =>
+                {
+                    b.Property<int>("DepartmentID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<int>("FacultyID");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 50);
+
+                    b.Property<int?>("ProfessorID");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.HasKey("DepartmentID");
+
+                    b.HasIndex("FacultyID");
+
+                    b.HasIndex("ProfessorID");
+
+                    b.ToTable("Department");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Faculty", b =>
+                {
+                    b.Property<int>("FacultyID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<string>("Name")
+                        .HasAnnotation("MaxLength", 50);
+
+                    b.Property<int?>("ProfessorID");
+
+                    b.Property<DateTime>("StartDate");
+
+                    b.HasKey("FacultyID");
+
+                    b.HasIndex("ProfessorID");
+
+                    b.ToTable("Faculty");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Semester", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<bool>("Current");
+
+                    b.Property<bool>("Open");
+
+                    b.Property<int>("Season");
+
+                    b.Property<int>("StartYear");
+
+                    b.Property<DateTime>("StartingDate");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Semester");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.UniversityProgram", b =>
+                {
+                    b.Property<int>("ProgramID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Archived");
+
+                    b.Property<int>("DepartmentID");
+
+                    b.Property<string>("Short")
+                        .HasAnnotation("MaxLength", 20);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 50);
+
+                    b.HasKey("ProgramID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.ToTable("Programs");
                 });
 
             modelBuilder.Entity("ContosoUniversity.Models.FileBase", b =>
@@ -328,22 +404,6 @@ namespace ContosoUniversity.Migrations
                     b.ToTable("OfficeAssignment");
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.SchoolViewModels.DepartmentEmploynment", b =>
-                {
-                    b.Property<int>("DepartmentID");
-
-                    b.Property<int>("ProfessorID");
-
-                    b.HasKey("DepartmentID", "ProfessorID");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.HasIndex("ProfessorID")
-                        .IsUnique();
-
-                    b.ToTable("Employments");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.TeachingRequest", b =>
                 {
                     b.Property<int>("RequestID")
@@ -366,28 +426,10 @@ namespace ContosoUniversity.Migrations
                     b.ToTable("TeachingRequest");
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.UniversityFunctionalityModels.Faculty", b =>
-                {
-                    b.Property<int>("FacultyID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name")
-                        .HasAnnotation("MaxLength", 50);
-
-                    b.Property<int?>("ProfessorID");
-
-                    b.Property<DateTime>("StartDate");
-
-                    b.HasKey("FacultyID");
-
-                    b.HasIndex("ProfessorID");
-
-                    b.ToTable("Faculty");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.Workload", b =>
                 {
-                    b.Property<int>("ProfessorID");
+                    b.Property<int>("WorkloadID")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AcBooksAndMono");
 
@@ -410,6 +452,8 @@ namespace ContosoUniversity.Migrations
                     b.Property<int>("ExtResGrantReceived");
 
                     b.Property<int>("FacCommittees");
+
+                    b.Property<bool>("Finished");
 
                     b.Property<int>("IntAndNatConferences");
 
@@ -434,6 +478,8 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<int>("ProfAssociatons");
 
+                    b.Property<int>("ProfessorID");
+
                     b.Property<int>("ProjInProgress");
 
                     b.Property<int>("PubBooksRevs");
@@ -444,7 +490,7 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<int>("RegConferences");
 
-                    b.Property<int>("SemesterID");
+                    b.Property<bool>("Reviewed");
 
                     b.Property<int>("SympWorkshops");
 
@@ -454,33 +500,11 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<int>("Year");
 
-                    b.HasKey("ProfessorID");
+                    b.HasKey("WorkloadID");
 
                     b.HasIndex("ProfessorID");
 
-                    b.HasIndex("SemesterID");
-
                     b.ToTable("Workloads");
-                });
-
-            modelBuilder.Entity("ContosoUniversity.UniversityFunctionalityModels.Models.Semester", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Current");
-
-                    b.Property<bool>("Open");
-
-                    b.Property<int>("Season");
-
-                    b.Property<int>("StartYear");
-
-                    b.Property<DateTime>("StartingDate");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Semester");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole<int>", b =>
@@ -650,7 +674,11 @@ namespace ContosoUniversity.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUser<int>");
 
+                    b.Property<bool>("Archived");
+
                     b.Property<int?>("DatesSuggestionSuggestionID");
+
+                    b.Property<int>("DepartmentID");
 
                     b.Property<string>("FirstMidName")
                         .IsRequired()
@@ -665,6 +693,8 @@ namespace ContosoUniversity.Migrations
 
                     b.HasIndex("DatesSuggestionSuggestionID");
 
+                    b.HasIndex("DepartmentID");
+
                     b.ToTable("Professors");
 
                     b.HasDiscriminator().HasValue("Professor");
@@ -676,6 +706,8 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<bool>("Approved");
 
+                    b.Property<bool>("Archived");
+
                     b.Property<string>("FirstMidName")
                         .IsRequired()
                         .HasColumnName("FirstName")
@@ -685,9 +717,9 @@ namespace ContosoUniversity.Migrations
                         .IsRequired()
                         .HasAnnotation("MaxLength", 50);
 
-                    b.Property<string>("Program")
-                        .IsRequired()
-                        .HasAnnotation("MaxLength", 50);
+                    b.Property<int>("ProgramID");
+
+                    b.HasIndex("ProgramID");
 
                     b.ToTable("Student");
 
@@ -696,7 +728,7 @@ namespace ContosoUniversity.Migrations
 
             modelBuilder.Entity("ContosoUniversity.Models.CommitieMembership", b =>
                 {
-                    b.HasOne("ContosoUniversity.Models.Committee", "Committee")
+                    b.HasOne("ContosoUniversity.Models.Entities.Committee", "Committee")
                         .WithMany("CommitieMembers")
                         .HasForeignKey("CommitteeID")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -707,36 +739,9 @@ namespace ContosoUniversity.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.Committee", b =>
-                {
-                    b.HasOne("ContosoUniversity.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentID");
-
-                    b.HasOne("ContosoUniversity.Models.UniversityFunctionalityModels.Faculty", "Faculty")
-                        .WithMany()
-                        .HasForeignKey("FacultyID");
-
-                    b.HasOne("ContosoUniversity.Models.Professor", "Chair")
-                        .WithMany()
-                        .HasForeignKey("ProfessorID");
-                });
-
-            modelBuilder.Entity("ContosoUniversity.Models.Course", b =>
-                {
-                    b.HasOne("ContosoUniversity.Models.Department", "Department")
-                        .WithMany("Courses")
-                        .HasForeignKey("DepartmentID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ContosoUniversity.Models.TeachingRequest")
-                        .WithMany("GivenCourses")
-                        .HasForeignKey("TeachingRequestRequestID");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.CourseAssignment", b =>
                 {
-                    b.HasOne("ContosoUniversity.Models.Course", "Course")
+                    b.HasOne("ContosoUniversity.Models.Entities.Course", "Course")
                         .WithMany("Assignments")
                         .HasForeignKey("CourseID")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -746,7 +751,7 @@ namespace ContosoUniversity.Migrations
                         .HasForeignKey("ProfessorID")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ContosoUniversity.UniversityFunctionalityModels.Models.Semester", "Semester")
+                    b.HasOne("ContosoUniversity.Models.Entities.Semester", "Semester")
                         .WithMany("AssignedCourses")
                         .HasForeignKey("SemesterID")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -754,7 +759,7 @@ namespace ContosoUniversity.Migrations
 
             modelBuilder.Entity("ContosoUniversity.Models.CoursePreference", b =>
                 {
-                    b.HasOne("ContosoUniversity.Models.Course", "Course")
+                    b.HasOne("ContosoUniversity.Models.Entities.Course", "Course")
                         .WithMany()
                         .HasForeignKey("CourseID")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -773,26 +778,14 @@ namespace ContosoUniversity.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.Department", b =>
-                {
-                    b.HasOne("ContosoUniversity.Models.UniversityFunctionalityModels.Faculty", "Faculty")
-                        .WithMany("Departments")
-                        .HasForeignKey("FacultyID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ContosoUniversity.Models.Professor", "Administrator")
-                        .WithMany()
-                        .HasForeignKey("ProfessorID");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.Enrollment", b =>
                 {
-                    b.HasOne("ContosoUniversity.Models.Course", "Course")
+                    b.HasOne("ContosoUniversity.Models.Entities.Course", "Course")
                         .WithMany("Enrollments")
                         .HasForeignKey("CourseID")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ContosoUniversity.UniversityFunctionalityModels.Models.Semester")
+                    b.HasOne("ContosoUniversity.Models.Entities.Semester")
                         .WithMany("EnrollmentsInCourses")
                         .HasForeignKey("SemesterID");
 
@@ -802,13 +795,66 @@ namespace ContosoUniversity.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Committee", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentID");
+
+                    b.HasOne("ContosoUniversity.Models.Entities.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyID");
+
+                    b.HasOne("ContosoUniversity.Models.Professor", "Chair")
+                        .WithMany()
+                        .HasForeignKey("ProfessorID");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Course", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Entities.Department", "Department")
+                        .WithMany("Courses")
+                        .HasForeignKey("DepartmentID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ContosoUniversity.Models.TeachingRequest")
+                        .WithMany("GivenCourses")
+                        .HasForeignKey("TeachingRequestRequestID");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Department", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Entities.Faculty", "Faculty")
+                        .WithMany("Departments")
+                        .HasForeignKey("FacultyID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ContosoUniversity.Models.Professor", "Administrator")
+                        .WithMany()
+                        .HasForeignKey("ProfessorID");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.Faculty", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Professor", "Administrator")
+                        .WithMany()
+                        .HasForeignKey("ProfessorID");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Entities.UniversityProgram", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Entities.Department", "Department")
+                        .WithMany("Programs")
+                        .HasForeignKey("DepartmentID");
+                });
+
             modelBuilder.Entity("ContosoUniversity.Models.FileBase", b =>
                 {
-                    b.HasOne("ContosoUniversity.Models.Committee")
+                    b.HasOne("ContosoUniversity.Models.Entities.Committee")
                         .WithMany("Files")
                         .HasForeignKey("CommitteeID");
 
-                    b.HasOne("ContosoUniversity.Models.Course")
+                    b.HasOne("ContosoUniversity.Models.Entities.Course")
                         .WithMany("Files")
                         .HasForeignKey("CourseID");
 
@@ -831,7 +877,7 @@ namespace ContosoUniversity.Migrations
 
             modelBuilder.Entity("ContosoUniversity.Models.Meetings", b =>
                 {
-                    b.HasOne("ContosoUniversity.Models.Committee", "Committee")
+                    b.HasOne("ContosoUniversity.Models.Entities.Committee", "Committee")
                         .WithMany("Meetings")
                         .HasForeignKey("CommitteeID")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -845,19 +891,6 @@ namespace ContosoUniversity.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Models.SchoolViewModels.DepartmentEmploynment", b =>
-                {
-                    b.HasOne("ContosoUniversity.Models.Department", "Department")
-                        .WithMany("Staff")
-                        .HasForeignKey("DepartmentID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ContosoUniversity.Models.Professor", "Professor")
-                        .WithOne("Employment")
-                        .HasForeignKey("ContosoUniversity.Models.SchoolViewModels.DepartmentEmploynment", "ProfessorID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("ContosoUniversity.Models.TeachingRequest", b =>
                 {
                     b.HasOne("ContosoUniversity.Models.Professor", "ProfessorEntity")
@@ -865,17 +898,10 @@ namespace ContosoUniversity.Migrations
                         .HasForeignKey("ProfessorID")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ContosoUniversity.UniversityFunctionalityModels.Models.Semester", "SemesterForAssignment")
+                    b.HasOne("ContosoUniversity.Models.Entities.Semester", "SemesterForAssignment")
                         .WithMany()
                         .HasForeignKey("SemesterID")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("ContosoUniversity.Models.UniversityFunctionalityModels.Faculty", b =>
-                {
-                    b.HasOne("ContosoUniversity.Models.Professor", "Administrator")
-                        .WithMany()
-                        .HasForeignKey("ProfessorID");
                 });
 
             modelBuilder.Entity("ContosoUniversity.Models.Workload", b =>
@@ -883,11 +909,6 @@ namespace ContosoUniversity.Migrations
                     b.HasOne("ContosoUniversity.Models.Professor", "Professor")
                         .WithMany("Workloads")
                         .HasForeignKey("ProfessorID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ContosoUniversity.UniversityFunctionalityModels.Models.Semester", "Semester")
-                        .WithMany()
-                        .HasForeignKey("SemesterID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -928,6 +949,18 @@ namespace ContosoUniversity.Migrations
                     b.HasOne("ContosoUniversity.Models.DatesSuggestion")
                         .WithMany("Checkers")
                         .HasForeignKey("DatesSuggestionSuggestionID");
+
+                    b.HasOne("ContosoUniversity.Models.Entities.Department", "Department")
+                        .WithMany("Staff")
+                        .HasForeignKey("DepartmentID");
+                });
+
+            modelBuilder.Entity("ContosoUniversity.Models.Student", b =>
+                {
+                    b.HasOne("ContosoUniversity.Models.Entities.UniversityProgram", "Program")
+                        .WithMany("Students")
+                        .HasForeignKey("ProgramID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }

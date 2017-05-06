@@ -1,0 +1,344 @@
+@model ContosoUniversity.Models.SchoolViewModels.MeetingView
+<br />
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item active" })
+    }
+    @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(Model.Meeting.Committee.Title, "ViewCommittee", ViewContext.RouteData.Values["controller"].ToString(), new { id = Model.Meeting.CommitteeID }, new { @class = "breadcrumb-item" })
+    }
+    @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(Model.Meeting.Title, ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { comID = Model.Meeting.CommitteeID, mtnID = Model.Meeting.MeetingID }, new { @class = "breadcrumb-item  active" })
+    }
+</nav>
+@{
+    ViewData["Title"] = "Meeting Page";
+}
+<h2>@Html.DisplayFor(model => model.Meeting.Title)</h2>
+<br />
+<ul class="list-inline meetingsInline">
+    <li><span>Committee:</span>  @Html.DisplayFor(model => model.Meeting.Committee.Title)</li>
+    <li><span>@Html.DisplayNameFor(model => model.Meeting.Location):</span>  @Html.DisplayFor(model => model.Meeting.Location)</li>
+    <li><span>@Html.DisplayNameFor(model => model.Meeting.Date):</span>
+        @{
+            if (Model.Meeting.FinalDate == true)
+            {
+                @Html.DisplayFor(model => model.Meeting.Date)
+            }
+            else
+            {
+                @:Not set
+            }
+        }
+    </li>
+</ul>
+<hr />
+@*<dl class="row">
+        <dt>
+            Committee
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Meeting.Committee.Title)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Meeting.Location)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Meeting.Location)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Meeting.Date)
+        </dt>
+        @{
+            if (Model.Meeting.FinalDate == true)
+            {
+
+                <dd>
+                    @Html.DisplayFor(model => model.Meeting.Date)
+                </dd>
+            }
+            else
+            {
+                <dd>
+                    Not set
+                </dd>
+            }
+        }
+    </dl>
+    <div class="input-group" style="margin-bottom:10px;">
+        <a data-toggle="modal" data-target="#myModal2" class="btn btn-success">Add Comment</a>
+        <a data-toggle="modal" data-target="#myModal" class="btn btn-success">Add new File</a>
+    </div>*@
+<ul class="nav nav-tabs" role="tablist" id="meetingTab">
+    <li role="presentation" class="active">
+        <a href="#publicSection" aria-controls="publicSection"
+           role="tab" data-toggle="tab">Public Comments</a>
+    </li>
+    <li role="presentation">
+        <a href="#privateSection"
+           aria-controls="privateSection" role="tab"
+           data-toggle="tab">My Notes</a>
+    </li>
+    <li role="presentation">
+        <a href="#fileSection"
+           aria-controls="privateSection" role="tab"
+           data-toggle="tab">Attachments</a>
+    </li>
+    <li role="presentation">
+        <a data-toggle="modal" data-target="#myModal2" class="btn-success commentBtn">Add New Comment</a>
+    </li>
+    <li>
+        <a data-toggle="modal" data-target="#myModal" class="btn-success fileBtn">Upload an Attachment</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="publicSection">
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-10 col-xs-12">
+                @{
+                    var countpub = 0;
+                    foreach (var comment in Model.PublicComments)
+                    {
+                        if (countpub > 0)
+                        {
+                            <hr />
+                        }
+                        countpub++;
+                        TimeSpan diff = (DateTime.Now - comment.DateStamp);
+                        string commWritten;
+                        if (diff.Days >= 1)
+                        {
+                            commWritten = " " + diff.Days + " days ago";
+                        }
+                        else
+                        {
+                            commWritten = " at " + comment.DateStamp.ToString("t");
+                        }
+                        {
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span>Wrote </span>
+                                <strong> @Html.DisplayFor(ModelItem => comment.ProfessorName)</strong><span class="text-muted messageTime">@commWritten</span>
+                            </div>
+                            <div class="panel-body">
+                                @Html.Raw(comment.Comment)
+                            </div><!-- /panel-body -->
+                        </div><!-- /panel panel-default -->
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane fade in" id="privateSection">
+        <div class="row">
+            <div class="col-sm-offset-1 col-sm-10 col-xs-12">
+                @{ 
+                    var countPriv = 0;
+                    foreach (var comment in Model.PrivateComments)
+                    {
+                        if (countPriv > 0)
+                        {
+                            <hr />
+                        }
+                        countPriv++;
+                        TimeSpan diff = (DateTime.Now - comment.DateStamp);
+                        string commWritten;
+                        if (diff.Days >= 1)
+                        {
+                            commWritten = "commented " + diff.Days + " days ago";
+                        }
+                        else
+                        {
+                            commWritten = "commented at " + comment.DateStamp.ToString("t");
+                        }
+                        {
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <span class="text-muted messageTime">@commWritten</span>
+                                </div>
+                                <div class="panel-body">
+                                    @Html.Raw(comment.Comment)
+                                </div><!-- /panel-body -->
+                            </div><!-- /panel panel-default -->
+                            }
+                        }
+                    }
+            </div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane fade in" id="fileSection">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Public Files</h3>
+                <ul class="list-unstyled">
+                    @foreach (var file in Model.PublicFiles)
+            {
+                        <li>
+                            <div style="border:solid 1px black;">
+                                <dl class="">
+                                    <dt>
+                                        <span>Uploaded: </span> @Html.DisplayFor(owner => file.Author)
+                                    </dt>
+                                    <dd>
+                                        <a style="font-size:18px;" href="@file.File.Location"><span>Title: </span>@file.File.ViewTitle </a>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-sm-6">
+                <h3>My Files</h3>
+                <ul class="list-unstyled">
+
+                    @foreach (var file in Model.PrivateFiles)
+            {
+                        <li>
+                            <a style="font-size:18px;" href="@file.File.Location">@file.File.ViewTitle </a><br />
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+        <br />
+        <div>
+            <a class="btn btn-info" asp-action="ViewCommittee" asp-route-id="@ViewData["CommitteeID"]">Return to Committee</a>
+        </div>
+
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add new file(s)</h4>
+                    </div>
+                    <form asp-action="FileAdd" enctype="multipart/form-data">
+                        <div class="modal-body" style="padding: 20px;">
+                            @*<form asp-action="FileAdd" enctype="multipart/form-data">*@
+                            <div class="form-horizontal">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" name="ProfessorID" value="@ViewData["ProfessorID"]" class="form-control" />
+                                <input type="hidden" name="MeetingID" value="@Model.Meeting.MeetingID" class="form-control" />
+                                <input type="hidden" name="CommitteeID" value="@ViewData["CommitteeID"]" class="form-control" />
+                                <div class="form-group">
+                                    <label name="Private" class="col-md-2 control-label">Make private</label>
+                                    <div class="col-md-10">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label">
+                                                <input name="Private" class="form-check-input" value="true" type="checkbox">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label name="Files" class="col-md-2 control-label">File input</label>
+                                    <div class="col-md-10">
+                                        <input name="Files" type="file" class="form-control-file" id="InputFile" aria-describedby="fileHelp" multiple>
+                                        <small id="fileHelp" class="form-text text-muted">Add required files.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            @*</form>*@
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            @*<div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">*@
+                            <input type="submit" value="Submit files" class="btn btn-default" />
+                            @*</div>
+                                </div>*@
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade bs-example-modal-lg" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Write a comment:</h4>
+                    </div>
+                    <form asp-action="CommentAdd">
+                        <div class="modal-body" style="padding: 20px;">
+                            <div class="form-horizontal">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" name="ProfessorID" value="@ViewData["ProfessorID"]" class="form-control" />
+                                <input type="hidden" name="MeetingID" value="@Model.Meeting.MeetingID" class="form-control" />
+                                <input type="hidden" name="CommitteeID" value="@ViewData["CommitteeID"]" class="form-control" />
+
+                                <div class="form-group">
+                                    @*<label name="Comment" class="col-md-2 control-label"></label>*@
+                                    <div class="col-md-12">
+                                        <textarea id="html" cols="80" rows="20" name="Comment"></textarea>
+                                    </div>
+                                </div>
+                                @*<div class="form-group">
+                                    <label for="Private" class="col-md-2 control-label">Make private</label>
+                                    <div class="col-md-10">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label">
+                                                <input name="Private" class="form-check-input" value="true" type="checkbox">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>*@
+                                @*<div class="form-group">
+                                        <div class="col-md-offset-2 col-md-10">
+                                            <input type="submit" value="Create" class="btn btn-default" />
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button style="float: left;" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <input style="float: right;" type="submit" value="Post" class="btn btn-default" />
+                            <input style="float: right;    margin: 10px 10px 0 0;" name="Private" class="form-check-input" value="true" type="checkbox">
+                            <label style="float: right;    margin-top: 5px;" for="Private" class="col-md-2 control-label">Make private</label>
+          
+     
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        @section Scripts {
+            <script src="//cloud.tinymce.com/stable/tinymce.min.js?apiKey=65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo"></script>
+            <script>
+                //tinymce.init({
+                //selector: 'textarea',
+                //mediaembed_api_key: '65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo'
+                //});
+                tinymce.init({
+                    selector: 'textarea',
+                    height: 200,
+                    menubar: false,
+                    mediaembed_api_key: '65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo',
+                    plugins: [
+                      'advlist autolink lists link image charmap print preview anchor',
+                      'searchreplace visualblocks code fullscreen',
+                      'insertdatetime media table contextmenu paste code'
+                    ],
+                    toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                    content_css: '//www.tinymce.com/css/codepen.min.css'
+                });
+            </script>
+
+            @*<script language="javascript">
+                $(document).ready(function () {
+                    $('#html').markItUp(myHtmlSettings);
+                });
+            </script>*@
+            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        }

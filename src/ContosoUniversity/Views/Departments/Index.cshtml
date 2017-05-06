@@ -1,4 +1,4 @@
-@model IEnumerable<ContosoUniversity.Models.Department>
+@model IEnumerable<ContosoUniversity.Models.Entities.Department>
 
 @{
     ViewData["Title"] = "Departments";
@@ -20,9 +20,8 @@
                 @Html.DisplayNameFor(model => model.Administrator)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StartDate)
+                @Html.DisplayNameFor(model => model.Faculty.Name)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -36,12 +35,13 @@
                     @Html.DisplayFor(modelItem => item.Administrator.FullName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.StartDate)
+                    @Html.DisplayFor(modelItem => item.Faculty.Name)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.DepartmentID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.DepartmentID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.DepartmentID">Delete</a>
+                    <div class="btn-group">
+                        <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.DepartmentID">Edit</a>
+                        <a class="btn btn-warning" asp-action="Archive" asp-route-id="@item.DepartmentID">Archive</a>
+                    </div>
                 </td>
             </tr>
         }

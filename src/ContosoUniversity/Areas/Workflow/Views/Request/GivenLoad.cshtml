@@ -1,0 +1,70 @@
+@*@model ContosoUniversity.Models.TeachingRequest*@
+@model IEnumerable<ContosoUniversity.Models.SchoolViewModels.GivenLoad>
+@{
+    ViewData["Title"] = "RequestView";
+}
+<br />
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item" })
+    }
+    @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { semesterID = ViewData["SemesterID"], professorID = ViewData["ProfessorID"]}, new { @class = "breadcrumb-item  active" })
+    }
+</nav>
+<h2>@ViewData["Semester"] Course Request</h2>
+
+<div>
+    <h4>Request overview</h4>
+    <hr />
+    <table class="table" style="margin: 10px    ">
+        <tr>
+            <th>Course</th>
+            <th>Requested</th>
+            <th>Assigned</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Course.Title)
+                </td>
+                @if (item.Requested)
+                {
+                    <td>
+                        Yes
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        No
+                    </td>
+                }
+                @if (item.Given)
+                {
+                    <td>
+                        Yes
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        No
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+
+<div>
+    <a class="btn btn-info" asp-action="Index">Back to Requests</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

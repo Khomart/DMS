@@ -9,9 +9,9 @@
 
 @if(User.IsInRole("Admin"))
 {
-@*<p>
-    <a asp-action="Create">Create New</a>
-</p>*@
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
 }
 <form asp-action="Index" method="get">
     <div class="form-actions no-color">
@@ -35,10 +35,14 @@
             <th>
                 <a asp-action="Index" asp-route-sortOrder="@ViewData["ProgramSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Program</a>
             </th>
+@if (User.IsInRole("Admin"))
+{
             <th>
                 <a asp-action="Index" asp-route-sortOrder="@ViewData["VerifiedSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Verified</a>
             </th>
+            <th>Email Confirmed</th>
             <th></th>
+}
         </tr>
     </thead>
     <tbody>
@@ -52,16 +56,23 @@
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Program)
+                    @Html.DisplayFor(modelItem => item.Program.Short)
                 </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Approved)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                    </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Approved)
+                    <div class="btn-group">
+                        <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="btn btn-warning" asp-action="Archive" asp-route-id="@item.Id">Delete</a>
+                    </div>
                 </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                }
             </tr>
         }
     </tbody>
@@ -76,6 +87,7 @@
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-page="@(Model.PageIndex - 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-pageSize="@ViewData["PSize"]"
    class="btn btn-default @prevDisabled btn">
     Previous
 </a>
@@ -83,6 +95,7 @@
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-page="@(Model.PageIndex + 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-pageSize="@ViewData["PSize"]"
    class="btn btn-default @nextDisabled btn">
     Next
 </a> <span style="margin:0 5px 0 10px;">Show by: </span>

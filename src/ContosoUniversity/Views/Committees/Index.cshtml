@@ -1,4 +1,4 @@
-@model IEnumerable<ContosoUniversity.Models.Committee>
+@model IEnumerable<ContosoUniversity.Models.Entities.Committee>
 
 @{
     ViewData["Title"] = "Index";
@@ -39,37 +39,39 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Chair.FullName)
-            </td>
-            @if (User.IsInRole("Professor"))
-            {
-                @*<td>
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Chair.FullName)
+        </td>
+        @if (User.IsInRole("Professor"))
+        {
+            @*<td>
                     <a class="apply btn btn-success disabled" CommID="@item.CommitteeID" ProfID="" asp-action="Apply">In Develope</a>
                 </td>*@
-            }
-            else if (User.IsInRole("Admin"))
-            {
+        }
+        else if (User.IsInRole("Admin"))
+        {
             <td>
-                <a asp-action="ViewCommittee" asp-route-id="@item.CommitteeID">Members and Meetings</a>
-                @if (User.IsInRole("Admin"))
-                {
-                    <span> | </span>
-                    <a asp-action="ManageCommitie" asp-route-id="@item.CommitteeID">Edit</a><span> | </span>
-                    <a asp-action="Delete" asp-route-id="@item.CommitteeID">Delete</a>
-                }
-                else
-                {
-                    <span> </span>
-                }
+                <div class="btn-group">
+                    @*<a asp-action="ViewCommittee" asp-route-id="@item.CommitteeID">Members and Meetings</a>*@
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="btn btn-info" asp-action="ManageCommitie" asp-route-id="@item.CommitteeID">Edit</a>
+                        <a class="btn btn-warning" asp-action="Archive" asp-route-id="@item.CommitteeID">Archive</a>
+                    }
+                    else
+                    {
+                        <span> </span>
+                    }
+                </div>
             </td>
-            }
-        </tr>
+        }
+    </tr>
 }
     </tbody>
 </table>

@@ -8,21 +8,27 @@ using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ContosoUniversity.Models.SchoolViewModels;
 
 namespace ContosoUniversity.Controllers
 {
-    [Authorize(Roles = "Admin, Professor")]
+    [Authorize(Roles = "Admin, Professor, Registered, Student")]
     public class StudentsController : Controller
     {
+        private readonly UserManager<IdentityUser<int>> _userManager;
         private readonly SchoolContext _context;
 
-        public StudentsController(SchoolContext context)
+        public StudentsController(SchoolContext context, 
+            UserManager<IdentityUser<int>> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;
         }
 
         // GET: Students
-        [Authorize(Roles = "Admin, Professor")]
+        [Authorize(Roles = "Admin, Professor, Registered, Student")]
         public async Task<IActionResult> Index(
             string sortOrder,
             string currentFilter,
@@ -47,7 +53,7 @@ namespace ContosoUniversity.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            var students = from s in _context.Students
+            var students = from s in _context.Students.Include(p => p.Program).Where(s => s.Archived == false)
                            select s;
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -83,6 +89,7 @@ namespace ContosoUniversity.Controllers
                 { 25, "25" },
                 { 50, "50" }
             };
+            ViewData["PSize"] = pageSize;
             ViewBag.PageSize = new SelectList(dictionary, "Key", "Value",pageSize);
             return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), page ?? 1, (int)pageSize));
         }
@@ -99,7 +106,7 @@ namespace ContosoUniversity.Controllers
                 .Include(s => s.Enrollments)
                     .ThenInclude(e => e.Course)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.Id == id);
+                .SingleOrDefaultAsync(m => m.Id == id && m.Archived == false);
 
             if (student == null)
             {
@@ -113,6 +120,8 @@ namespace ContosoUniversity.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
+            ViewData["ProgramID"] = PopulateDropdown.Populate(_context, "program");
+            //ViewData["ProgramID"] = new SelectList(_context.Programs.Where(a => a.Archived == false), "ProgramID", "Title");
             return View();
         }
 
@@ -123,24 +132,37 @@ namespace ContosoUniversity.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(
-            [Bind("EnrollmentDate,FirstMidName,LastName")] Student student)
+           /* [Bind("Program,FirstMidName,LastName")] */RegStudModel student)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                var user = new Student
                 {
-                    _context.Add(student);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction("Index");
+                    UserName = student.Email,
+                    Email = student.Email,
+                    FirstMidName = student.FirstMidName,
+                    LastName = student.LastName,
+                    ProgramID = student.ProgramID,
+                    Archived = false,
+                };
+
+                var result = await _userManager.CreateAsync(user, student.Password);
+                if (!result.Succeeded)
+                {
+                    var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+                    throw new Exception(exceptionText);
                 }
+                else await _userManager.AddToRoleAsync(user, "STUDENT");
+                return RedirectToAction("Index");
             }
-            catch (DbUpdateException /* ex */)
+            else
             {
-                //Log the error (uncomment ex variable name and write a log.
-                ModelState.AddModelError("", "Unable to save changes. " +
-                    "Try again, and if the problem persists " +
-                    "see your system administrator.");
+                var errors = ModelState.Select(x => x.Value.Errors)
+                                        .Where(y => y.Count > 0)
+                                        .ToList();
             }
+            ViewData["ProgramID"] = PopulateDropdown.Populate(_context, "program", student.ProgramID);
+            //ViewData["ProgramID"] = new SelectList(_context.Programs.Where(a => a.Archived == false), "ProgramID", "Title",student.ProgramID);
             return View(student);
         }
 
@@ -153,11 +175,16 @@ namespace ContosoUniversity.Controllers
                 return NotFound();
             }
 
-            var student = await _context.Students.SingleOrDefaultAsync(m => m.Id == id);
+            var student = await _context.Students.Include(p => p.Program).SingleOrDefaultAsync(m => m.Id == id);
             if (student == null)
             {
                 return NotFound();
             }
+            var programsList = _context.Programs.Where(a => a.Archived == false && a.ProgramID != student.ProgramID);
+            if (student.Program.Archived == true)
+                programsList.Append(student.Program);
+            ViewData["ProgramID"] = PopulateDropdown.Populate(_context, "program", student.ProgramID);
+            //ViewData["ProgramID"] = new SelectList(programsList, "ProgramID", "Title",student.ProgramID);
             return View(student);
         }
 
@@ -177,7 +204,7 @@ namespace ContosoUniversity.Controllers
             if (await TryUpdateModelAsync<Student>(
                 studentToUpdate,
                 "",
-                s => s.FirstMidName, s => s.LastName, s => s.Program))
+                s => s.FirstMidName, s => s.LastName, s => s.ProgramID, s => s.Email, s => s.Approved, s => s.EmailConfirmed))
             {
                 try
                 {
@@ -192,12 +219,13 @@ namespace ContosoUniversity.Controllers
                         "see your system administrator.");
                 }
             }
+            ViewData["ProgramID"] = PopulateDropdown.Populate(_context, "program", studentToUpdate.ProgramID);
             return View(studentToUpdate);
         }
 
         // GET: Students/Delete/5
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
+        public async Task<IActionResult> Archive(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
@@ -223,10 +251,10 @@ namespace ContosoUniversity.Controllers
         }
 
         // POST: Students/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ArchiveConfirmed(int id)
         {
             var student = await _context.Students
                 .AsNoTracking()

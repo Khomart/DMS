@@ -14,6 +14,7 @@ using ContosoUniversity.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
+using ContosoUniversity.Data;
 
 namespace ContosoUniversity.Controllers
 {
@@ -25,14 +26,18 @@ namespace ContosoUniversity.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly SchoolContext _context;
+
 
         public AccountController(
+            SchoolContext context,
             UserManager<IdentityUser<int>> userManager,
             SignInManager<IdentityUser<int>> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
             ILoggerFactory loggerFactory)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -94,6 +99,8 @@ namespace ContosoUniversity.Controllers
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
         {
+            ViewData["ProgramID"] = PopulateDropdown.Populate(_context, "program");
+            //ViewData["ProgramID"] = new SelectList(_context.Programs.Where(a => a.Archived == false), "ProgramID", "Title");
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -111,10 +118,11 @@ namespace ContosoUniversity.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    Program = model.ProgramName,
+                    ProgramID = model.ProgramID,
                     FirstMidName = model.FirstMidName,
                     LastName = model.LastName,
                     Approved = false,
+                    Archived = false,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -131,6 +139,8 @@ namespace ContosoUniversity.Controllers
                     return RedirectToLocal(null);
                 }
             }
+            //ViewData["ProgramID"] = new SelectList(_context.Programs.Where(a => a.Archived == false), "ProgramID", "Title", model.ProgramID);
+            ViewData["ProgramID"] = PopulateDropdown.Populate(_context, "program", model.ProgramID);
             return View(model);
 
             //ViewData["ReturnUrl"] = returnUrl;

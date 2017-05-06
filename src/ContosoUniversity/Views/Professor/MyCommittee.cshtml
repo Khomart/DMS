@@ -166,7 +166,7 @@
                                             }
                                         }
                                     }
-                                    @{ if ((int)ViewData["ProfessorID"] == Model.Committee.ProfessorID)
+                                    @{ if ((int)ViewData["UserID"] == Model.Committee.ProfessorID)
                                         {
                                             <td>
                                                 <a asp-action="ViewMeeting" asp-route-comID="@Model.Committee.CommitteeID" asp-route-mtnID="@item.MeetingID">View Meeting</a> |

@@ -1,0 +1,184 @@
+@model IEnumerable<ContosoUniversity.Models.Workload>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="bg bgWork"></div>
+<div class="jumbotron">
+    <h1>Workloads</h1>
+</div>
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), null, new { @class = "breadcrumb-item active" })
+    }
+</nav>
+<div class="row">
+    <h2 class="col-sm-4">Workloads</h2>
+    @*<div class="form-group col-sm-offset-4 col-sm-4" style="font-size: 22px;margin-top: 20px;font-weight: 600;">
+        <label style="text-align: right;" class="control-label col-sm-3" for="year">Year: </label>
+        <div class="col-sm-9">
+            <select style="font-size: 18px;" id="year" class="form-control" asp-items="@ViewBag.Years"></select>
+        </div>
+    </div>*@
+</div>
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="btn-group" style="padding-bottom:5px;">
+            @Html.ActionLink("Pending", "Index", new { status = 1 }, new { @id = "button0", @class = "btn btn-success" })
+            @Html.ActionLink("Reviewed", "Index", new { status = 2 }, new { @id = "button1", @class = "btn btn-success " })
+            @Html.ActionLink("All", "Index", new { status = 3 }, new { @id = "button2", @class = "btn btn-success " })
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Full Name
+                    </th>
+                    <th>
+                        Year
+                    </th>
+                    <th>
+                        Reviewed
+                    </th>
+                    <th>
+                        Details
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Professor.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Year)
+                        </td>
+                        <td>
+                            @{
+                                if (@item.Reviewed)
+                                {
+                                    <short>Yes</short>
+                                }
+                                else
+                                {
+                                    <short>No</short>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                @{
+                                    if (@item.Reviewed)
+                                    {
+                                        <a class="btn btn-info disabled" asp-action="Details" asp-route-id="@item.WorkloadID">Details</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-success" asp-action="Evaluate" asp-route-id="@item.WorkloadID">Evaluate</a>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                                    }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        <br />
+        @if ((bool)ViewData["Open"] == true)
+        {
+            <a class="btn btn-success" asp-route-id="@ViewData["ID"]" asp-action="WorkloadForm">Create Form</a>
+        }
+        else
+        {
+            <div>
+                <a class="btn btn-success disabled" asp-route-id="@ViewData["ID"]">Create Form</a>
+                <h4 style="display:inline-block; margin-left:10px;"> You cannot create new form at this moment </h4>
+            </div>
+        }
+        <hr />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>
+                        Year
+                    </th>
+                    <th>
+                        Reviewed
+                    </th>
+                    <th>
+                        Details
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ 
+                    var counter = 0;
+
+                    foreach (var item in Model)
+                    {
+                    counter++;
+                    <tr>
+                        <td>@counter</td>
+                        @*<td>
+                            @Html.DisplayFor(modelItem => item.Professor.FullName)
+                        </td>*@
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Year)
+                        </td>
+                        <td>
+                            @{
+                                if (@item.Reviewed)
+                                {
+                                    <short>Yes</short>
+                                }
+                                else
+                                {
+                                    <short>No</short>
+                                }
+                            }
+                        </td>
+                        <td class="btn-group">
+                            @{
+                                if (@item.Reviewed)
+                                {
+                                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.WorkloadID">Details</a>
+                                }
+                                else
+                                {
+                                    <span></span>
+                                    @*<a class="btn btn-success" asp-action="Evaluate" asp-route-semesterID="@item.SemesterID" asp-route-professorID="@item.ProfessorID">Evaluate</a>*@
+                                }
+                            }
+                        </td>
+                    </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    }
+
+@section Scripts {
+    <script>
+    {
+        var jumboHeight = $('.jumbotron').outerHeight();
+        function parallax() {
+            var scrolled = $(window).scrollTop();
+            $('.bgWork').css('height', (jumboHeight - scrolled) + 'px');
+        }
+
+        $(window).scroll(function (e) {
+            parallax();
+        });
+    }
+    </script>
+}

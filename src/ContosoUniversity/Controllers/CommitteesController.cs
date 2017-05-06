@@ -14,6 +14,7 @@ using System.Text;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Controllers
 {
@@ -34,7 +35,7 @@ namespace ContosoUniversity.Controllers
         [Authorize(Roles = "Admin, Professor")]
         public async Task<IActionResult> Index()
         {
-            var schoolContext = _context.Committees.Include(c => c.Chair).Include(c => c.Department);
+            var schoolContext = _context.Committees.Where( m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department);
             return View(await schoolContext.ToListAsync());
         }
 
@@ -47,7 +48,7 @@ namespace ContosoUniversity.Controllers
                 return NotFound();
             }
 
-            var committee = await _context.Committees.SingleOrDefaultAsync(m => m.CommitteeID == id);
+            var committee = await _context.Committees.SingleOrDefaultAsync(m => m.CommitteeID == id && m.Archived == false);
             if (committee == null)
             {
                 return NotFound();
@@ -56,39 +57,15 @@ namespace ContosoUniversity.Controllers
             return View(committee);
         }
 
-        //// GET: Committees/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName");
-        //    ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "Name");
-        //    return View();
-        //}
-
-        //// POST: Committees/Create
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("CommitteeID,DepartmentID,ProfessorID,StartDate,Title")] Committee committee)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(committee);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction("Index");
-        //    }
-        //    ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
-        //    ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "Name", committee.DepartmentID);
-        //    return View(committee);
-        //}
-
         [Authorize(Roles = "Admin")]
         [ActionName("CreateCommitie")]
         public async Task<IActionResult> CreateCommitie()
         {
-            ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName");
+            //ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName");
+            //ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+            ViewData["ProfessorID"] = PopulateDropdown.Populate(_context, "professor");
             ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
-            ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+            ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department",null, "Faculty.Name");
             ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
             Committee committee = new Committee();
             //committee.SemesterID = _context.Semesters.Where(i => i.current == true).SingleOrDefault().ID;
@@ -97,26 +74,34 @@ namespace ContosoUniversity.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("SubmitCommitie")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCommitie([Bind("CommitteeID,DepartmentID,ProfessorID,StartDate,Title")] Committee model)
+        public async Task<IActionResult> CreateCommitie([Bind("DepartmentID,ProfessorID,Title,Level")] Committee model)
         {
             if (ModelState.IsValid)
             {
                 if (model.Level == Level.Department) model.FacultyID = null;
                 else if (model.Level == Level.Faculty) model.DepartmentID = null;
                 else if (model.Level == Level.University) { model.FacultyID = null; model.DepartmentID = null; }
-                //model.StartDate = DateTime.Today.Date;
                 if (model.ProfessorID != null)
                 {
                     DateTime end = new DateTime();
                     if (DateTime.Today < new DateTime(DateTime.Today.Year, 6, 1)) end = new DateTime(DateTime.Today.Year, 6, 1);
                     else end = new DateTime(DateTime.Today.Year + 1, 6, 1);
-                    CommitieMembership member = new CommitieMembership()
-                    {
-                        Chair = true,
-                        ProfessorID = (int)model.ProfessorID,
-                        DateOfEnrollment = DateTime.Now,
-                        EstimatedEndDate = end,
-                    };
+                    CommitieMembership member = new CommitieMembership();
+                    if (model.ProfessorID != null)
+                        member = new CommitieMembership()
+                        {
+                            Chair = true,
+                            ProfessorID = (int)model.ProfessorID,
+                            DateOfEnrollment = DateTime.Now,
+                            EstimatedEndDate = end,
+                        };
+                    else
+                        member = new CommitieMembership()
+                        {
+                            Chair = true,
+                            DateOfEnrollment = DateTime.Now,
+                            EstimatedEndDate = end,
+                        };
                     model.CommitieMembers = new List<CommitieMembership>()
                     {
                         member,
@@ -126,6 +111,10 @@ namespace ContosoUniversity.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+            ViewData["ProfessorID"] = PopulateDropdown.Populate(_context, "professor");
+            ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
+            ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", null, "Faculty.Name");
+            ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
             return View(model);
         }
 
@@ -143,21 +132,25 @@ namespace ContosoUniversity.Controllers
                 .ThenInclude(i => i.Professor)
                 .ThenInclude(i => i.OfficeAssignment)
                 .SingleOrDefaultAsync(i => i.CommitteeID == id);
-            ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
+            ViewData["ProfessorID"] = PopulateDropdown.Populate(_context, "professor", committee.ProfessorID);
+            //ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
             if (committee.Level == Level.Department)
             {
-                ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", committee.DepartmentID, "Faculty.Name");
+                ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", committee.DepartmentID, "Faculty.Name");
+                //ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", committee.DepartmentID, "Faculty.Name");
                 ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
 
             }
             else if (committee.Level == Level.Faculty)
             {
-                ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+                ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", null , "Faculty.Name");
+                //ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
                 ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name", committee.FacultyID);
             }
             else if (committee.Level == Level.University)
             {
-                ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
+                ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", null, "Faculty.Name");
+                //ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
                 ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
             }
             ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
@@ -174,7 +167,13 @@ namespace ContosoUniversity.Controllers
             else if (model.Level == Level.University) { model.FacultyID = null; model.DepartmentID = null; }
 
             var committeeToUpdate = await _context.Committees.Include(i => i.CommitieMembers).SingleOrDefaultAsync(s => s.CommitteeID == model.CommitteeID);
-            if (committeeToUpdate.ProfessorID != model.ProfessorID)
+            if (model.ProfessorID == null && committeeToUpdate.ProfessorID == null){}
+            else if (model.ProfessorID == null && committeeToUpdate.ProfessorID != null)
+            {
+                committeeToUpdate.ProfessorID = null;
+                committeeToUpdate.CommitieMembers.SingleOrDefault(i => i.Chair == true).Chair = false;
+            }
+            else if (model.ProfessorID != null && committeeToUpdate.ProfessorID != model.ProfessorID)
             {
                 bool found = false;
                 foreach (var member in committeeToUpdate.CommitieMembers)
@@ -216,7 +215,6 @@ namespace ContosoUniversity.Controllers
                 "",
                 s => s.CommitteeID, s => s.ProfessorID, s => s.FacultyID, s => s.Title, s => s.Level))
             {
-
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -231,7 +229,6 @@ namespace ContosoUniversity.Controllers
             {
                 return NotFound();
             }
-
             Committee committee = await _context.Committees
                 .Include(i => i.Chair)
                 .Include(i => i.CommitieMembers)
@@ -239,7 +236,6 @@ namespace ContosoUniversity.Controllers
                 .ThenInclude(i => i.OfficeAssignment)
                 .Include(i => i.CommitieMembers)
                 .ThenInclude(i => i.Professor)
-                .ThenInclude(i => i.Employment)
                 .ThenInclude(i => i.Department)
                 .Include(i => i.Meetings)
                 .ThenInclude(i => i.Suggestions)
@@ -392,8 +388,8 @@ namespace ContosoUniversity.Controllers
             else
             {
                 int CommID = (int)id;
-                var profs = await _context.Professors.Include(i => i.Employment).ThenInclude(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
-                for (int i = 0; i < profs.Count; i++)
+                var profs = await _context.Professors.Include(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
+                for (int i = 0; i < profs.Count(); i++)
                 {
                     var prof = profs[i];
                     foreach (var committie in prof.Commities)
@@ -427,32 +423,14 @@ namespace ContosoUniversity.Controllers
                 ProfessorID = profId,
                 CommitteeID = commId,
                 FinishedWork = false,
-                DateOfEnrollment = DateTime.Today.Date,
+                DateOfEnrollment = DateTime.Now,
                 EstimatedEndDate = new DateTime(_context.Semesters.AsNoTracking().SingleOrDefault(i => i.Current == true).EndYear, 5, 1),
             };
             _context.CommitieMembership.Add(member);
             await _context.SaveChangesAsync();
             return Json("Success");
         }
-        //[Authorize(Roles = "Admin")]
-        //[HttpPost, ActionName("Invite")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Invite()
-        //{
-        //    int profId = int.Parse(Request.Form["ProfID"]);
-        //    int commId = int.Parse(Request.Form["CommID"]);
-        //    CommitieMembership member = new CommitieMembership()
-        //    {
-        //        Chair = false,
-        //        ProfessorID = profId,
-        //        CommitteeID = commId,
-        //        DateOfEnrollment = DateTime.Now,
-        //        EstimatedEndDate = new DateTime(_context.Semesters.AsNoTracking().SingleOrDefault(i => i.Current == true).EndYear, 5, 1),
-        //    };
-        //    _context.CommitieMembership.Add(member);
-        //    await _context.SaveChangesAsync();
-        //    return Json("Success");
-        //}
+ 
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("RemoveMember")]
         public async Task<IActionResult> RemoveMember()
@@ -481,7 +459,7 @@ namespace ContosoUniversity.Controllers
             {
                 return NotFound();
             }
-            Committee committee = _context.Committees.AsNoTracking().Single(i => i.CommitteeID == id);
+            Committee committee = await _context.Committees.AsNoTracking().SingleAsync(i => i.CommitteeID == id);
             ViewData["CommitteeID"] = committee.CommitteeID;
             return View();
 
@@ -526,7 +504,7 @@ namespace ContosoUniversity.Controllers
             {
                 return NotFound();
             }
-            Meetings meeting = _context.Meetings.Include(i => i.Committee).Single(i => i.CommitteeID == comID && i.MeetingID == mtnID);
+            Meetings meeting = await _context.Meetings.Include(i => i.Committee).SingleAsync(i => i.CommitteeID == comID && i.MeetingID == mtnID);
             ViewData["CommitteeID"] = meeting.CommitteeID;
             return View(meeting);
 
@@ -688,7 +666,10 @@ namespace ContosoUniversity.Controllers
         [ActionName("Suggestions")]
         public async Task<IActionResult> Suggestions(int? id)
         {
-
+            if(id == null)
+            {
+                return NotFound();
+            }
             ChooseMeetingDate set = new ChooseMeetingDate();
             List<DatesSuggestion> suggestions = await _context.DatesSuggestion.Include(i => i.Checkers).Where(i => i.MeetingID == id).ToListAsync();
             set.Members = _context.Meetings.Include(c => c.Committee)
@@ -717,72 +698,14 @@ namespace ContosoUniversity.Controllers
             return RedirectToAction("ViewCommittee", new { id = meeting.CommitteeID });
         }
 
-
-
-        //// GET: Committees/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var committee = await _context.Committees.SingleOrDefaultAsync(m => m.CommitteeID == id);
-        //    if (committee == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
-        //    ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "Name", committee.DepartmentID);
-        //    return View(committee);
-        //}
-
-        //// POST: Committees/Edit/5
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("CommitteeID,DepartmentID,ProfessorID,StartDate,Title")] Committee committee)
-        //{
-        //    if (id != committee.CommitteeID)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(committee);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!CommitteeExists(committee.CommitteeID))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction("Index");
-        //    }
-        //    ViewData["ProfessorID"] = new SelectList(_context.Professors, "Id", "FullName", committee.ProfessorID);
-        //    ViewData["DepartmentID"] = new SelectList(_context.Departments, "DepartmentID", "Name", committee.DepartmentID);
-        //    return View(committee);
-        //}
-
-        // GET: Committees/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Archive(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var committee = await _context.Committees.SingleOrDefaultAsync(m => m.CommitteeID == id);
+            var committee = await _context.Committees.Include(p => p.Chair).SingleOrDefaultAsync(m => m.CommitteeID == id);
             if (committee == null)
             {
                 return NotFound();
@@ -794,10 +717,10 @@ namespace ContosoUniversity.Controllers
         // POST: Committees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ConfirmArchive(int id)
         {
             var committee = await _context.Committees.SingleOrDefaultAsync(m => m.CommitteeID == id);
-            _context.Committees.Remove(committee);
+            committee.Archived = true;
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }

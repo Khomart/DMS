@@ -1,0 +1,83 @@
+@model ContosoUniversity.Models.SchoolViewModels.CoursesToChoose
+@{
+    ViewData["Title"] = "Load Request";
+}
+<br />
+<nav class="breadcrumb">
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
+    @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { @class = "breadcrumb-item active" })
+    }
+    @if (ViewContext.RouteData.Values["action"].ToString() != "Index")
+    {
+        @: / @Html.ActionLink(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new  {semID = Model.SemesterID }, new { @class = "breadcrumb-item  active" })
+    }
+</nav>
+<h2>Choose appropriate courses</h2>
+
+<form asp-action="SubmitRequest">
+    <div class="form-horizontal">
+        <h4>CoursesToChoose</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="SemesterID" />
+        <input type="hidden" asp-for="ProfessorID" />
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Checkbox</th>
+                <th>Prefrenece</th>
+                @*<th>Number</th>*@
+                <th>Title</th>
+                <th>Department</th>
+            </tr>
+            @for (var i = 0; i < Model.Courses.Count(); i++)
+            {
+                <tr id="row@i">
+                    <td></td>
+                    <td>
+                        <input name="Check" asp-for="@Model.Courses[i].Checked" type="checkbox" />
+                    </td>
+                    <td>
+                        <input type="hidden" asp-for="@Model.Courses[i].SelectedCourses.CourseID" value="@Model.Courses[i].SelectedCourses.CourseID" />
+                        <select asp-for="@Model.Courses[i].Choice" class="form-control" asp-items="@Html.GetEnumSelectList<ContosoUniversity.Models.Desire>()">
+                        </select>
+                    </td>
+                    @*<td>
+                        @Model.Courses[i].SelectedCourses.CourseID
+                    </td>*@
+                    <td>
+                        @Model.Courses[i].SelectedCourses.Title
+                    </td>
+                    <td>
+                        @Model.Courses[i].SelectedCourses.Department.Name
+                    </td>
+                </tr>
+            }
+        </table>
+        <div class="form-group">
+            <div class="col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+<hr />
+
+<div>
+    <a class="btn btn-info" asp-action="RequestSemester" asp-route-id="@Model.ProfessorID">Back to Semesters</a>
+</div>
+
+@section Scripts {
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("tr").each(function(i){
+            if (i>0){
+                $(this).children("select").attr('disabled', 'disabled');
+            }
+        })
+    });
+</script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

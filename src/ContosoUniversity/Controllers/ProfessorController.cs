@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Models;
 using ContosoUniversity.Models.SchoolViewModels;
-using ContosoUniversity.UniversityFunctionalityModels.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -21,6 +20,7 @@ using Microsoft.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using static ContosoUniversity.Models.SchoolViewModels.ChoseDates;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Controllers
 {
@@ -45,7 +45,7 @@ namespace ContosoUniversity.Controllers
 
         [Authorize(Roles = "Professor")]
         [ActionName("ProfessorIndex")]
-        public async Task<IActionResult> ProfessorIndex(int? courseYear, int? courseSemester, int? requestYear, int? requestSemester)
+        public async Task<IActionResult> ProfessorIndex(int? courseYear, int? courseSemester, int? requestYear, int? requestSemester, int? activeAction)
         {
             IdentityUser<int> user = await _userManager.FindByNameAsync(User.Identity.Name);
             var viewModel = new ProfessorViews();
@@ -69,12 +69,12 @@ namespace ContosoUniversity.Controllers
             PopulateYearAndSemeter(courseYear, courseSemester);
             ViewBag.courseYears = ViewData["years"];
             ViewBag.courseSemesters = ViewData["semesters"];
-            if(courseYear != null && courseYear != 0)
+            if (courseYear != null && courseYear != 0)
                 viewModel.CoursesAssignments = _context.CourseAssignments.Include(c => c.Course).Include(s => s.Semester).AsNoTracking().Where(s => s.ProfessorID == user.Id && s.Semester.StartYear == courseYear && (int)s.Semester.Season == requestSemester).ToList();
-            else if(courseYear != null && courseYear == 0)
+            else if (courseYear != null && courseYear == 0)
                 viewModel.CoursesAssignments = _context.CourseAssignments.Include(c => c.Course).Include(s => s.Semester).AsNoTracking().Where(s => s.ProfessorID == user.Id).ToList();
             else if (courseYear == null)
-            viewModel.CoursesAssignments = _context.CourseAssignments.Include(c => c.Course).Include(s => s.Semester).AsNoTracking().Where(s => s.ProfessorID == user.Id && s.Semester.StartYear == (int)ViewData["thisYear"] && (int)s.Semester.Season == (int)ViewData["thisSemester"]).ToList();
+                viewModel.CoursesAssignments = _context.CourseAssignments.Include(c => c.Course).Include(s => s.Semester).AsNoTracking().Where(s => s.ProfessorID == user.Id && s.Semester.StartYear == (int)ViewData["thisYear"] && (int)s.Semester.Season == (int)ViewData["thisSemester"]).ToList();
             //viewModel.Requests = _context.TeachingRequests.Include(c => c.SemesterForAssignment).Where(s => s.ProfessorID == user.Id).AsNoTracking().ToList();
 
             ViewData["ProfessorID"] = user.Id;
@@ -85,6 +85,8 @@ namespace ContosoUniversity.Controllers
 
             List<Semester> sems = await _context.Semesters.Where(i => i.Open == true).ToListAsync();
             ViewData["openSems"] = sems;
+            if (activeAction == 1) ViewData["active"] = 1;
+            else ViewData["active"] = 0;
             return View(viewModel);
         }
 
@@ -159,34 +161,37 @@ namespace ContosoUniversity.Controllers
         [ActionName("CoursesToChoose")]
         public async Task<IActionResult> CoursesToChoose(int? requestYear, int? requestSemester,FormCollection formCollection /*,[System.Web.Http.FromUri] string sem*/)
         {
-            Semester semesterWeLook = _context.Semesters.Where(i => i.StartYear == requestYear && (int)i.Season == requestSemester).Single();
+            Semester semesterWeLook = _context.Semesters.AsNoTracking().Where(i => i.StartYear == requestYear && (int)i.Season == requestSemester).Single();
             if (semesterWeLook.Open != true) { return RedirectToAction("ProfessorIndex"); }
             int sem = semesterWeLook.ID;
 
             IdentityUser<int> user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var requests = await _context.TeachingRequests.Where(id => id.ProfessorID == user.Id && id.SemesterID == sem).SingleOrDefaultAsync();
+            Professor professor = await _context.Professors.SingleAsync(i => i.UserName == user.UserName);
+            var requests = await _context.TeachingRequests.Where(id => id.ProfessorID == professor.Id && id.SemesterID == sem).SingleOrDefaultAsync();
             if (requests != null) { return RedirectToAction("ProfessorIndex"); }
             else
             {
-                TeachingRequest request = new TeachingRequest()
-                {
-                    ProfessorID = user.Id,
-                };
-                if (HttpContext.Session.GetObjectFromJson<TeachingRequest>("request") == null)
-                {
-                    var semesters = _context.Semesters.OrderBy(m => m.Season).Where(m => m.Open == true).AsNoTracking();
-                    ViewBag.Semesters = new SelectList(semesters, "ID", "Season", sem);
-                    request.SemesterID = sem;
-                    //request.SemesterForAssignment = await _context.Semesters.Where(i => i.ID == Int32.Parse(sem)).AsNoTracking().SingleOrDefaultAsync();
-                    HttpContext.Session.SetObjectAsJson("request", request);
-                }
-                else
-                {
-                    request = HttpContext.Session.GetObjectFromJson<TeachingRequest>("request");
-                    var semesters = _context.Semesters.OrderBy(m => m.Season).Where(m => m.Open == true).AsNoTracking();
-                    ViewBag.Semesters = new SelectList(semesters, "ID", "Season", request.SemesterID);
-                }
+                //TeachingRequest request = new TeachingRequest()
+                //{
+                //    ProfessorID = user.Id,
+                //};
+                //if (HttpContext.Session.GetObjectFromJson<TeachingRequest>("request") == null)
+                //{
+                //    var semesters = _context.Semesters.OrderBy(m => m.Season).Where(m => m.Open == true).AsNoTracking();
+                //    ViewBag.Semesters = new SelectList(semesters, "ID", "Season", sem);
+                //    request.SemesterID = sem;
+                //    //request.SemesterForAssignment = await _context.Semesters.Where(i => i.ID == Int32.Parse(sem)).AsNoTracking().SingleOrDefaultAsync();
+                //    HttpContext.Session.SetObjectAsJson("request", request);
+                //}
+                //else
+                //{
+                //    request = HttpContext.Session.GetObjectFromJson<TeachingRequest>("request");
+                //    var semesters = _context.Semesters.OrderBy(m => m.Season).Where(m => m.Open == true).AsNoTracking();
+                //    ViewBag.Semesters = new SelectList(semesters, "ID", "Season", request.SemesterID);
+                //}
                 CoursesToChoose courses = new CoursesToChoose();
+                courses.SemesterID = sem;
+                courses.ProfessorID = professor.Id;
                 var fullCourseList = await _context.Courses.Include(t => t.Department).Where(i => i.Active == true).AsNoTracking().ToListAsync();
                 List<ChoosenCourse> somelist = new List<ChoosenCourse>();
                 foreach (var s in fullCourseList)
@@ -218,12 +223,14 @@ namespace ContosoUniversity.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(User.Identity.Name);
-                var request = HttpContext.Session.GetObjectFromJson<TeachingRequest>("request");
-                if (_context.TeachingRequests.Any(i => i.ProfessorID == user.Id && i.SemesterID == request.SemesterID))
-                    return RedirectToAction("AccessDenied", "Account");
-                //Honestly, I have no clue what I've done here. 
-                //I better check this later, browser can make unexpected things here.
-                //Whole HttpContext usage unnessecery. Or maybe not. 
+                //var request = HttpContext.Session.GetObjectFromJson<TeachingRequest>("request");
+                //if (_context.TeachingRequests.Any(i => i.ProfessorID == user.Id && i.SemesterID == request.SemesterID))
+                //    return RedirectToAction("AccessDenied", "Account");
+                TeachingRequest request = new TeachingRequest();
+                request.SemesterID = model.SemesterID;
+                request.ProfessorID = model.ProfessorID;
+                request.Approved = false;
+                request.ProfessorEntity = _context.Professors.Single(i => i.Id == model.ProfessorID);
 
                 request.ListOfCourses = new List<CoursePreference>();
                 foreach (ChoosenCourse item in model.Courses)
@@ -233,7 +240,7 @@ namespace ContosoUniversity.Controllers
                         _context.Courses.Attach(item.SelectedCourses);
                         request.ListOfCourses.Add(new CoursePreference { Choice = item.Choice, CourseID = item.SelectedCourses.CourseID, Course = item.SelectedCourses });
                     }
-                request.ProfessorEntity = await _context.Professors.Include(i => i.Employment).Where(i => i.Id == request.ProfessorID).SingleOrDefaultAsync();
+                request.ProfessorEntity = await _context.Professors.Include(i => i.Department).Where(i => i.Id == request.ProfessorID).SingleOrDefaultAsync();
                 _context.Professors.Attach(request.ProfessorEntity);
                 //request.ListOfCourses = somelist;
                 _context.Add(request);
@@ -411,7 +418,6 @@ namespace ContosoUniversity.Controllers
                 .ThenInclude(i => i.OfficeAssignment)
                 .Include(i => i.CommitieMembers)
                 .ThenInclude(i => i.Professor)
-                .ThenInclude(i => i.Employment)
                 .ThenInclude(i => i.Department)
                 .Include(i => i.Meetings)
                 .ThenInclude(i => i.Suggestions)
@@ -484,8 +490,8 @@ namespace ContosoUniversity.Controllers
             else
             {
                 int CommID = (int)id;
-                var profs = await _context.Professors.Include(i => i.Employment).ThenInclude(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
-                for (int i = 0; i < profs.Count; i++)
+                var profs = await _context.Professors.Include(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
+                for (int i = 0; i < profs.Count(); i++)
                 {
                     var prof = profs[i];
                     foreach (var committie in prof.Commities)
@@ -877,7 +883,7 @@ namespace ContosoUniversity.Controllers
             {
                 privatni = false;
             }
-            MeetingComment comment = _context.MeetComments.Include(i => i.Files).Where(i => i.CommitteeID == commID && i.Private == privatni && i.ProfessorID == profID).Single();
+            MeetingComment comment = await _context.MeetComments.Include(i => i.Files).Where(i => i.CommitteeID == commID && i.Private == privatni && i.ProfessorID == profID).SingleAsync();
             FileBase file = comment.Files.Single(i => i.FileBaseID == fileID);
             comment.Files.Remove(file);
             _context.SaveChanges();
@@ -998,21 +1004,14 @@ namespace ContosoUniversity.Controllers
         {
             IdentityUser<int> user = await _userManager.FindByNameAsync(User.Identity.Name);
             Professor professor = _context.Professors.Single(i => i.Id == user.Id);
-            //var membership =  _context.Meetings.Single(i => i.MeetingID == model.MeetingID).Committee.CommitieMembers.Single(d => d.ProfessorID == user.Id);
-            //if (membership == null)
-            //{
-            //    return RedirectToAction("AccessDenied", "Account");
-            //}
             if (ModelState.IsValid)
             {
-                //var Meeting = _context.Meetings.Include(i => i.Suggestions).Single(i => i.MeetingID == model.MeetingID);
                 DatesSuggestion suggestion;
                 foreach (var date in model.Dates)
                     if(date.choice == true)
                     {
                         suggestion = _context.DatesSuggestion.Include(i=>i.Checkers).Single(i => i.SuggestionID == date.date.SuggestionID);
                         suggestion.Checkers.Add(professor);
-                        //Meeting.Suggestions.Single(i => i.SuggestionID == date.date.SuggestionID).Checkers.Add(professor);
                     }
                 await _context.SaveChangesAsync();
                 Committee committee = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == model.MeetingID).Committee;

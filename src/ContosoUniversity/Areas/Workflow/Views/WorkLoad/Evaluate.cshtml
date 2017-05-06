@@ -1,0 +1,163 @@
+@model ContosoUniversity.Models.Workload
+
+<div>
+    <h2>Workload</h2>
+    <hr />
+    <form asp-action="Evaluate">
+        <input type="hidden" asp-for="WorkloadID" />
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#Publications" data-toggle="tab">Publications</a></li>
+                <li><a href="#Research" data-toggle="tab">Grants & Conferences</a></li>
+                <li><a href="#ResSuperv" data-toggle="tab">Supervisions & Scholar</a></li>
+                <li><a href="#Service" data-toggle="tab">Service to University</a></li>
+            </ul>
+            <div class="tab-content" id="workfloPresentaion">
+                <div role="tabpanel" class="tab-pane fade in active" id="Publications">
+                    <h3>Publications</h3>
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12 tabsectionBordered">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.RefJourArt)<span>
+                                    <input asp-for="RefJourArt" type="hidden" class="form-control" />@Html.DisplayFor(model => model.RefJourArt)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.AccJourArt)<span>
+                                    <input asp-for="AccJourArt" type="hidden" class="form-control" />@Html.DisplayFor(model => model.AccJourArt)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.RefConPro)<span>
+                                    <input asp-for="RefConPro" type="hidden" class="form-control" />@Html.DisplayFor(model => model.RefConPro)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.AcBooksAndMono)<span>
+                                    <input asp-for="AcBooksAndMono" type="hidden" class="form-control" />@Html.DisplayFor(model => model.AcBooksAndMono)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.EditedBooks)<span>
+                                    <input asp-for="EditedBooks" type="hidden" class="form-control" />@Html.DisplayFor(model => model.EditedBooks)</span></p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.ChaptInBooks)<span>
+                                    <input asp-for="ChaptInBooks" type="hidden" class="form-control" />@Html.DisplayFor(model => model.ChaptInBooks)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.PubBooksRevs)<span>
+                                    <input asp-for="PubBooksRevs" type="hidden" class="form-control" />@Html.DisplayFor(model => model.PubBooksRevs)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.Textbooks)<span>
+                                    <input asp-for="Textbooks" type="hidden" class="form-control" />@Html.DisplayFor(model => model.Textbooks)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.NonRefJourArtic)<span>
+                                    <input asp-for="NonRefJourArtic" type="hidden" class="form-control" />@Html.DisplayFor(model => model.NonRefJourArtic)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.OtherPublications)<span>
+                                    <input asp-for="OtherPublications" type="hidden" class="form-control" />@Html.DisplayFor(model => model.OtherPublications)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade in" id="Research">
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12 tabsectionBordered">
+                            <h3>Research Grants</h3>
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.ExtResGrantApplications)<span>
+                                    <input asp-for="ExtResGrantApplications" type="hidden" class="form-control" />@Html.DisplayFor(model => model.ExtResGrantApplications)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.ExtResGrantReceived)<span>
+                                    <input asp-for="ExtResGrantReceived" type="hidden" class="form-control" />@Html.DisplayFor(model => model.ExtResGrantReceived)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.IntResGrantReceived)<span>
+                                    <input asp-for="IntResGrantReceived" type="hidden" class="form-control" />@Html.DisplayFor(model => model.IntResGrantReceived)</span></p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <h3>Conferences</h3>
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.IntAndNatConferences)<span>
+                                    <input asp-for="IntAndNatConferences" type="hidden" class="form-control" />@Html.DisplayFor(model => model.IntAndNatConferences)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.RegConferences)<span>
+                                    <input asp-for="RegConferences" type="hidden" class="form-control" />@Html.DisplayFor(model => model.RegConferences)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.SympWorkshops)<span>
+                                    <input asp-for="SympWorkshops" type="hidden" class="form-control" />@Html.DisplayFor(model => model.SympWorkshops)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade in" id="ResSuperv">
+                    <h3>Research Supervisions</h3>
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12 tabsectionBordered">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.DiscAndTrChairAndOther)<span>
+                                    <input asp-for="DiscAndTrChairAndOther" type="hidden" class="form-control" />@Html.DisplayFor(model => model.DiscAndTrChairAndOther)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.PHDPhase3)<span>
+                                    <input asp-for="PHDPhase3" type="hidden" class="form-control" />@Html.DisplayFor(model => model.PHDPhase3)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.PHDPhase2)<span>
+                                    <input asp-for="PHDPhase2" type="hidden" class="form-control" />@Html.DisplayFor(model => model.PHDPhase2)</span></p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.MBA)<span>
+                                    <input asp-for="MBA" type="hidden" class="form-control" />@Html.DisplayFor(model => model.MBA)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.MSc)<span>
+                                    <input asp-for="MSc" type="hidden" class="form-control" />@Html.DisplayFor(model => model.MSc)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <h3>Other Scholar Activities</h3>
+                    <div class="row">
+                        <div class="form-group col-sm-6 tabsectionBordered">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.OtherPresentations)<span>
+                                    <input asp-for="OtherPresentations" type="hidden" class="form-control" />@Html.DisplayFor(model => model.OtherPresentations)</span></p>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.CompButUnpubPapers)<span>
+                                    <input asp-for="CompButUnpubPapers" type="hidden" class="form-control" />@Html.DisplayFor(model => model.CompButUnpubPapers)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade in" id="Service">
+                    <h3>Service to University</h3>
+                    <div class="row">
+                        <div class="col-sm-6 col-xs-12 tabsectionBordered">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.ProjInProgress)<span>
+                                    <input asp-for="ProjInProgress" type="hidden" class="form-control" />@Html.DisplayFor(model => model.ProjInProgress)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.UnivCommittees)<span>
+                                    <input asp-for="UnivCommittees" type="hidden" class="form-control" />@Html.DisplayFor(model => model.UnivCommittees)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.FacCommittees)<span>
+                                    <input asp-for="FacCommittees" type="hidden" class="form-control" />@Html.DisplayFor(model => model.FacCommittees)</span></p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <div class="workflowList">
+                                <p>@Html.DisplayNameFor(model => model.DepCommittees)<span>
+                                    <input asp-for="DepCommittees" type="hidden" class="form-control" />@Html.DisplayFor(model => model.DepCommittees)</span></p>
+                                <p>@Html.DisplayNameFor(model => model.ProfAssociatons)<span>
+                                    <input asp-for="ProfAssociatons" type="hidden" class="form-control" />@Html.DisplayFor(model => model.ProfAssociatons)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label asp-for="Duties" class="col-md-1 control-label"></label>
+                <div class="col-md-1">
+                    <input asp-for="Duties" class="form-control" />
+                    <span asp-validation-for="Duties" class="text-danger" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="col-md-1 control-label">Comment</label>
+                <div class="col-md-11">
+                    <textarea asp-for="Notes" class="form-control" rows="6" id="comment"></textarea>
+                    <span asp-validation-for="Notes" class="text-danger" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="btn-group col-md-11">
+                    <a class="btn btn-info" asp-action="Index">Back to List</a>
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </form>    
+</div>

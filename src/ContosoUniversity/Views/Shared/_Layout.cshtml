@@ -30,8 +30,6 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     @*<li><a asp-area="" asp-controller="Students" asp-action="Index">Students</a></li>
                     <li><a asp-area="" asp-controller="Courses" asp-action="Index">Courses</a></li>
                     <li><a asp-area="" asp-controller="Professors" asp-action="Index">Professors</a></li>
@@ -43,6 +41,7 @@
         </div>
     </div>
     <div class="container body-content">
+        @*@await Html.PartialAsync("_BreadCrumbs")*@
         @RenderBody()
         <hr />
         <footer>
@@ -65,7 +64,7 @@
         </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
-
     @RenderSection("scripts", required: false)
+
 </body>
 </html>

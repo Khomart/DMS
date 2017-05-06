@@ -8,6 +8,7 @@ using ContosoUniversity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ContosoUniversity.Models.Entities;
 
 namespace ContosoUniversity.Controllers
 {
@@ -50,25 +51,6 @@ namespace ContosoUniversity.Controllers
             }
         }
 
-        // GET: Courses/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            
-            var course = await _context.Courses
-                .Include(c => c.Department)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.CourseID == id);
-            if (course == null || (!(User.IsInRole("admin")) && course.Active == false) )
-            {
-                return NotFound();
-            }
-
-            return View(course);
-        }
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
@@ -78,17 +60,17 @@ namespace ContosoUniversity.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("CourseID,Credits,DepartmentID,Title")] Course course)
+        public async Task<IActionResult> Create([Bind("Credits,DepartmentID,Title,ShortTitle")] Course course)
         {
             course.Active = true;
             if (ModelState.IsValid)
             {
-                course.Active = true;
-                _context.Add(course);
+                _context.Courses.Add(course);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            PopulateDepartmentsDropDownList(course.DepartmentID);
+            ViewBag.DepartmentID = PopulateDropdown.Populate(_context, "department", course.DepartmentID);
+            //PopulateDepartmentsDropDownList(course.DepartmentID);
             return View(course);
         }
         [Authorize(Roles = "Admin")]
@@ -107,7 +89,8 @@ namespace ContosoUniversity.Controllers
             {
                 return NotFound();
             }
-            PopulateDepartmentsDropDownList(course.DepartmentID);
+            ViewBag.DepartmentID = PopulateDropdown.Populate(_context, "department");
+            //PopulateDepartmentsDropDownList(course.DepartmentID);
             return View(course);
         }
         [Authorize(Roles = "Admin")]
@@ -126,7 +109,7 @@ namespace ContosoUniversity.Controllers
 
             if (await TryUpdateModelAsync<Course>(courseToUpdate,
                 "",
-                c => c.Credits, c => c.DepartmentID, c => c.Title, c => c.Active))
+                c => c.Credits, c => c.DepartmentID, c => c.Title, c => c.ShortTitle, c => c.Active))
             {
                 try
                 {
@@ -141,49 +124,21 @@ namespace ContosoUniversity.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            PopulateDepartmentsDropDownList(courseToUpdate.DepartmentID);
+            ViewBag.DepartmentID = PopulateDropdown.Populate(_context, "department", courseToUpdate.DepartmentID);
+            //PopulateDepartmentsDropDownList(courseToUpdate.DepartmentID);
             return View(courseToUpdate);
         }
 
         private void PopulateDepartmentsDropDownList(object selectedDepartment = null)
         {
             var departmentsQuery = from d in _context.Departments
+                                   where d.Archived == false
                                    orderby d.Name
                                    select d;
+            var selectedArchived = _context.Departments.SingleOrDefault(i => i.DepartmentID == (int)selectedDepartment);
+            if (selectedArchived != null && selectedArchived.Archived == true)
+                departmentsQuery.Append(selectedArchived);
             ViewBag.DepartmentID = new SelectList(departmentsQuery.AsNoTracking(), "DepartmentID", "Name", selectedDepartment);
-        }
-
-        // GET: Courses/Delete/5
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var course = await _context.Courses
-                .Include(c => c.Department)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.CourseID == id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-
-            return View(course);
-        }
-
-        // POST: Courses/Delete/5
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var course = await _context.Courses.SingleOrDefaultAsync(m => m.CourseID == id);
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
         }
 
         [Authorize(Roles = "Admin")]
