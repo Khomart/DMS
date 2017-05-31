@@ -40,6 +40,8 @@ namespace ContosoUniversity.Models
         [Required]
         public bool Approved { get; set; }
         public bool Archived { set; get; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
 
     }
 }

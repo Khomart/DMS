@@ -1,4 +1,4 @@
-@model IEnumerable<ContosoUniversity.Models.Entities.Semester>
+@model PaginatedList<ContosoUniversity.Models.Entities.Semester>
 
 @{
     ViewData["Title"] = "Index";
@@ -6,20 +6,29 @@
 
 <h2>Semesters</h2>
 <br />
-<p>
+@*<p>
     <a class="btn btn-success createNew" asp-action="Create">Create New</a>
-</p>
+</p>*@
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Year filter: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default btn" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Season)
+                Season
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StartYear)
+                Year
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StartingDate)
+                Starts
             </th>
             <th></th>
         </tr>
@@ -81,3 +90,17 @@
 }
     </tbody>
 </table>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+    <a asp-action="Index"
+       asp-route-page="@(Model.PageIndex - 1)"
+       class="btn btn-default @prevDisabled btn">
+        Previous
+    </a>
+    <a asp-action="Index"
+        asp-route-page="@(Model.PageIndex + 1)"
+        class="btn btn-default @nextDisabled btn">
+        Next
+    </a>

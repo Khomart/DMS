@@ -1,7 +1,7 @@
 @model ContosoUniversity.Models.Entities.Committee
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Title + " Detailes";
 }
 <br />
 <nav class="breadcrumb">
@@ -38,6 +38,12 @@
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Level)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Commentary)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Commentary)
         </dd>
     </dl>
 </div>

@@ -37,7 +37,7 @@
                             @Html.DisplayFor(modelItem => item.Course.Title)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Choice)
+                            @Html.DisplayNameFor(modelItem => item.Choice)
                         </td>
                     </tr>
                 }
@@ -57,7 +57,8 @@
                         <tr>
                             <th></th>
                             <th>Title</th>
-                            <th>Number</th>
+                            <th>Credits</th>
+                            @*<th>Faculty</th>*@
                             <th>Department</th>
                         </tr>
                         @for (var i = 0; i < Model.Courses.Count(); i++)
@@ -72,8 +73,11 @@
                                     @Model.Courses[i].SelectedCourses.Title
                                 </td>
                                 <td>
-                                    @Model.Courses[i].SelectedCourses.CourseID
+                                    @Model.Courses[i].SelectedCourses.Credits
                                 </td>
+                                @*<td>
+                                    @Model.Courses[i].SelectedCourses.Department.Faculty.Name
+                                </td>*@
                                 <td>
                                     @Model.Courses[i].SelectedCourses.Department.Name
                                 </td>

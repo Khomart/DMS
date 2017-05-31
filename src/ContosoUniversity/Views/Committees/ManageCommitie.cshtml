@@ -1,8 +1,12 @@
 @model ContosoUniversity.Models.Entities.Committee
 
+@{
+    ViewData["Title"] = "Edit " + Model.Title;
+}
+
 <form asp-action="UpdateCommittee">
     <div class="form-horizontal">
-        <h3>Committee</h3>
+        <h3>Committee Edit</h3>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="CommitteeID" />
@@ -47,6 +51,13 @@
                 </datalist>
                 <input asp-for="ProfessorID" type="hidden" id="hiddenProf">
             </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Commentary" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea rows="10" asp-for="Commentary" class="form-control"></textarea>
+            </div>
+            <span asp-validation-for="Commentary" class="text-danger" />
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

@@ -1,7 +1,7 @@
 @model ContosoUniversity.Areas.Workflow.Models.CommitteesViews.IndexView
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Committies";
 }
 <div class="bg bgComm"></div>
 <div class="jumbotron">
@@ -129,7 +129,7 @@
     var jumboHeight = $('.jumbotron').outerHeight();
     function parallax() {
         var scrolled = $(window).scrollTop();
-        $('.bgMain').css('height', (jumboHeight - scrolled) + 'px');
+        $('.bgComm').css('height', (jumboHeight - scrolled) + 'px');
     }
 
     $(window).scroll(function (e) {

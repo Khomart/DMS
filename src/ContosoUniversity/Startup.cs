@@ -292,6 +292,20 @@ namespace ContosoUniversity
                         throw new Exception(exceptionText);
                     }
                     await userManager.AddToRoleAsync(newAdmin, "Admin");
+
+                    //var newAdminProf = new Professor
+                    //{
+                    //    UserName = "admin_professor@dms.com",
+                    //    Email = "admin_professor@dms.com",
+                    //};
+                    //var resultProfAdmin = await userManager.CreateAsync(newAdminProf, "0ntIfbelv347f");
+                    //if (!resultProfAdmin.Succeeded)
+                    //{
+                    //    var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+                    //    throw new Exception(exceptionText);
+                    //}
+                    //await userManager.AddToRoleAsync(newAdminProf, "Professor");
+
                 }
             }
 

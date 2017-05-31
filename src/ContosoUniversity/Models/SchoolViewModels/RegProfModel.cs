@@ -15,6 +15,11 @@ namespace ContosoUniversity.Models.SchoolViewModels
         [Display(Name = "Email")]
         public string Email { get; set; }
 
+
+        [Required]
+        [Display(Name = "Change Password")]
+        public bool ChangePassword { get; set; }
+
         [Required]
         [StringLength(20, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [RegularExpression("^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)).+$", ErrorMessage = "The Password requires at least 1 numeric, 1 uppercase and 1 lowercase symbols")]
@@ -41,7 +46,7 @@ namespace ContosoUniversity.Models.SchoolViewModels
         [Display(Name = "First Name")]
         public string FirstMidName { get; set; }
 
-        public ICollection<CourseAssignment> Courses { get; set; }
+        //public ICollection<CourseAssignment> Courses { get; set; }
 
         public OfficeAssignment OfficeAssignment { get; set; }
     }

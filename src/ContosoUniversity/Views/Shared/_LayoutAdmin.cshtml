@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @*<title>@ViewData["Title"] - DMS - Admin</title>*@
-    <title>Dashboard</title>
+    <title>@ViewData["Title"] - DMS</title>
 
     <environment names="Development">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -51,10 +51,12 @@
                             <li><a asp-area="Workflow" asp-controller="Request" asp-action="Index">Course Request</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a asp-area="Workflow" asp-controller="Workload" asp-action="Index">Workload</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a asp-area="Workflow" asp-controller="AcademicYear" asp-action="Index">Academic Years</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manageme Entities<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage Entities<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a asp-area="" asp-controller="Professors" asp-action="Index">Professors</a></li>
                             <li role="separator" class="divider"></li>

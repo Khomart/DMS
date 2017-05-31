@@ -91,7 +91,7 @@ namespace ContosoUniversity.Controllers
             };
             ViewData["PSize"] = pageSize;
             ViewBag.PageSize = new SelectList(dictionary, "Key", "Value",pageSize);
-            return View(await PaginatedList<Student>.CreateAsync(students.AsNoTracking(), page ?? 1, (int)pageSize));
+            return View( PaginatedList<Student>.Create(students.AsNoTracking(), page ?? 1, (int)pageSize));
         }
         // GET: Students/Details/5
         [Authorize(Roles = "Admin, Professor")]

@@ -11,7 +11,7 @@ namespace ContosoUniversity.Models.SchoolViewModels
     public class MeetingView
     {
         public Meetings Meeting { set; get; }
-        public IEnumerable<MeetingComment> PublicComments { set; get; }
+        public PaginatedList<MeetingComment> PublicComments { set; get; }
         public IEnumerable<MeetingComment> PrivateComments { set; get; }
         public IEnumerable<FilesAssosiation> PrivateFiles { set; get; }
         public IEnumerable<FilesAssosiation> PublicFiles { set; get; }

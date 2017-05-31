@@ -14,6 +14,15 @@ namespace ContosoUniversity.Models
         [Required]
         [StringLength(50)]
         public string Title { get; set; }
+        public string ShortTitle {
+            get
+            {
+                if (Title.Length > 10)
+                    return Title.Substring(0, 10) + "...";
+                else
+                    return Title;
+            }
+        }
         [Display(Name = "Meeting Date Suggestions")]
         public virtual List<DatesSuggestion> Suggestions { get; set; }
         [Display(Name = "Meeting Date")]
@@ -36,6 +45,8 @@ namespace ContosoUniversity.Models
 
         public virtual ICollection<MeetingComment> Comments { get; set; }
         public virtual ICollection<FileBase> Files { get; set; }
+        [Display(Name = "Archived Meeting")]
+        public bool Archived { set; get; }
     }
 
     public class MeetingComment
@@ -48,16 +59,20 @@ namespace ContosoUniversity.Models
         [Required]
         public bool Private { get; set; }
 
-        [Required]
+        public bool adminComment { set; get; }
         [ForeignKey("Professor")]
-        public int ProfessorID { set; get; }
-        public int Professor { set; get; }
+        public int? ProfessorID { set; get; }
+        public Professor Professor { set; get; }
         [ForeignKey("MeetingID")]
         public Meetings Meeting { get; set; }
 
         [StringLength(350)]
         [Display(Name = "Comment")]
         public string Comment { set; get; }
+
+        [StringLength(50)]
+        [Display(Name = "Title")]
+        public string CommentTitle { set; get; }
 
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH-mm}", ApplyFormatInEditMode = true)]
@@ -67,5 +82,7 @@ namespace ContosoUniversity.Models
         [Display(Name = "Professor Name")]
         public string ProfessorName { set; get; }
         public ICollection<FileBase> Files { set; get; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }

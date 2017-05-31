@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ContosoUniversity.Models.SchoolViewModels;
 using ContosoUniversity.Models.Entities;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ContosoUniversity.Models
 {
@@ -47,7 +48,13 @@ namespace ContosoUniversity.Models
                 return LastName + " " + FirstMidName;
             }
         }
-        
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
         public bool Archived { set; get; }
+
+        public static explicit operator Professor(EntityEntry v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

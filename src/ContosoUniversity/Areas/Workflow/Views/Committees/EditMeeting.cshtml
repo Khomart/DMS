@@ -1,4 +1,7 @@
 @model ContosoUniversity.Models.Meetings
+@{
+    ViewData["Title"] = "Edit " + Model.ShortTitle + " Meeting";
+}
 <br />
 <nav class="breadcrumb">
     @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
@@ -47,16 +50,18 @@
         </div>*@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </div>
     </div>
 </form>
-<div class="btn-group">
-    <button id="delete" class="btn btn-info delete-link">Delete</button>
-    <a class="btn btn-danger delete-confirm" style="display:none" id="leave" asp-action="DeleteMeeting" asp-route-id="@Model.MeetingID">Confirm Delete</a>
-    <a asp-action="ViewCommittee" asp-route-id="@ViewData["CommitteeID"]" class="btn btn-info">Return to Committee</a>
-</div>
+<form asp-action="DeleteMeeting" asp-route-ID="@Model.MeetingID" asp-route-comID="@Model.CommitteeID" method="post">
+    <div class="btn-group">
+        <button id="delete" class="btn btn-info delete-link">Delete</button>
+        <input class="btn btn-danger delete-confirm" style="display:none" id="leave" type="submit" value="Confirm Delete" />
+        <a asp-action="ViewCommittee" asp-route-id="@ViewData["CommitteeID"]" class="btn btn-info">Return to Committee</a>
+    </div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

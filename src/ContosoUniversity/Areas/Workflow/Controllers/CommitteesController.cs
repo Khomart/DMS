@@ -128,7 +128,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                     members = committee.CommitieMembers.Where(i => i.DateOfEnrollment.Year == DateTime.Today.Year && i.FinishedWork == true).OrderByDescending(i => i.DateOfEnrollment).ToList();
                 else if (membership == 0 || membership == null)
                     members = committee.CommitieMembers.Where(i => i.DateOfEnrollment.Year == DateTime.Today.Year && i.FinishedWork == false).OrderByDescending(i => i.DateOfEnrollment).ToList();
-                meetings = committee.Meetings.Where(i => i.OpenDate.Year == DateTime.Today.Year).ToList();
+                meetings = committee.Meetings.Where(i => i.OpenDate.Year == DateTime.Today.Year && i.Archived == false).ToList();
             }
             else if (year != 0)
             {
@@ -138,7 +138,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                     members = committee.CommitieMembers.Where(i => i.DateOfEnrollment.Year == year && i.FinishedWork == true).OrderByDescending(i => i.DateOfEnrollment).ToList();
                 if (membership == 0 || membership == null)
                     members = committee.CommitieMembers.Where(i => i.DateOfEnrollment.Year == year && i.FinishedWork == false).OrderByDescending(i => i.DateOfEnrollment).ToList();
-                meetings = committee.Meetings.Where(i => i.OpenDate.Year == year).ToList();
+                meetings = committee.Meetings.Where(i => i.OpenDate.Year == year && i.Archived == false).ToList();
             }
             else
             {
@@ -148,7 +148,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                     members = committee.CommitieMembers.Where(i => i.FinishedWork == true).OrderByDescending(i => i.DateOfEnrollment).ToList();
                 else if (membership == 0 || membership == null)
                     members = committee.CommitieMembers.Where(i => i.FinishedWork == false).OrderByDescending(i => i.DateOfEnrollment).ToList();
-                meetings = committee.Meetings.ToList();
+                meetings = committee.Meetings.Where(i => i.Archived == false).ToList();
             }
             if (membership != null)
                 ViewData["membership"] = membership;
@@ -357,6 +357,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             }
             Committee committee = await _context.Committees.AsNoTracking().SingleAsync(i => i.CommitteeID == id);
             ViewData["CommitteeID"] = committee.CommitteeID;
+            ViewData["Title"] = committee.Title;
             ViewData["comTitle"] = _context.Committees.Single(i => i.CommitteeID == (int)id).Title;
             return View();
 
@@ -370,6 +371,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account");
             }
+            model.Archived = false;
             if (ModelState.IsValid && Suggestions.Count() > 0)
             {
                 model.Suggestions = new List<DatesSuggestion>();
@@ -392,6 +394,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             }
 
             ViewData["CommitteeID"] = model.CommitteeID;
+            ViewData["Title"] = model.Title;
             ViewData["comTitle"] = _context.Committees.Single(i => i.CommitteeID == model.CommitteeID).Title;
             return View(model);
         }
@@ -415,8 +418,26 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
 
         }
         [Authorize(Roles = "Admin, Professor")]
+        [HttpPost, ActionName("DeleteMeeting")]
+        public async Task<IActionResult> DeleteMeeting(int? ID, int? comID)
+        {
+            if (ID == null || comID == null)
+            {
+                return NotFound();
+            }
+            var privelegy = await CheckPrivelegy((int)comID);
+            if ((bool)privelegy[2] == false)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+            Meetings meeting = await _context.Meetings.SingleAsync(i => i.MeetingID == ID);
+            meeting.Archived = true;
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ViewCommittee", new { id = meeting.CommitteeID });
+        }
+        [Authorize(Roles = "Admin, Professor")]
         [ActionName("ViewMeeting")]
-        public async Task<IActionResult> ViewMeeting(int? comID, int? mtnID)
+        public async Task<IActionResult> ViewMeeting(int? comID, int? mtnID, int? page)
         {
             if (comID == null || mtnID == null)
             {
@@ -427,25 +448,33 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account");
             }
-            MeetingView view = new MeetingView();
-            view.Meeting = await _context.Meetings.Include(i => i.Files).Include(i => i.Comments).ThenInclude(i => i.Files).Include(i => i.Committee).SingleAsync(i => i.CommitteeID == comID && i.MeetingID == mtnID);
-            view.PublicComments =  view.Meeting.Comments.Where(i => i.Private == false).ToList();
-            view.PrivateComments = view.Meeting.Comments.Where(i => i.Private == true && i.ProfessorID == (int)privelegy[0]).ToList();
+            MeetingView view = new MeetingView();//sdelat' chto-to s comment owner (might be admin, which cant be casted in prof)
+            view.Meeting = await _context
+                .Meetings
+                .Include(i => i.Files)
+                .Include(i => i.Comments)
+                //.Include(i => i.Files)
+                .Include(i => i.Committee)
+                .SingleAsync(i => i.CommitteeID == comID && i.MeetingID == mtnID);
+            if(view.Meeting.Archived) return RedirectToAction("AccessDenied", "Account");
+            //view.PublicComments =  view.Meeting.Comments.Where(i => i.Private == false).ToList().OrderByDescending(d => d.DateStamp);
+            view.PublicComments = PaginatedList<MeetingComment>.Create(view.Meeting.Comments.Where(i => i.Private == false).ToList().OrderByDescending(d => d.DateStamp), page ?? 1, 10);
+            view.PrivateComments = view.Meeting.Comments.Where(i => i.Private == true && i.ProfessorID == (int)privelegy[0]).ToList().OrderByDescending(d => d.DateStamp);
 
-            var PublicFiles = view.Meeting.Files.Where(i => i.OwnerID == (int)privelegy[0] && i.Owned == Ownership.meetingPub).ToList();
+            var PublicFiles = view.Meeting.Files.Where(i => i.OwnerID == (int)privelegy[0] && i.Owned == Ownership.meetingPub).ToList().OrderByDescending(d => d.Added);
             List<FilesAssosiation> publicFiles = new List<FilesAssosiation>();
 
-                foreach (var file in PublicFiles)
-                {
-                    FilesAssosiation newFile = new FilesAssosiation();
-                    newFile.File = file;
-                    if (file.OwnerID != 1) newFile.Author = _context.Professors.Single(i => i.Id == file.OwnerID).FullName;
-                    else newFile.Author = "Administrator";
-                    publicFiles.Add(newFile);
-                }
-                view.PublicFiles = publicFiles;
+            foreach (var file in PublicFiles)
+            {
+                FilesAssosiation newFile = new FilesAssosiation();
+                newFile.File = file;
+                if (file.OwnerID != 1) newFile.Author = _context.Professors.Single(i => i.Id == file.OwnerID).FullName;
+                else newFile.Author = "Administrator";
+                publicFiles.Add(newFile);
+            }
+            view.PublicFiles = publicFiles;
 
-            var PrivateFiles = view.Meeting.Files.Where(i => i.OwnerID == (int)privelegy[0] && i.Owned == Ownership.meetingPriv).ToList();
+            var PrivateFiles = view.Meeting.Files.Where(i => i.OwnerID == (int)privelegy[0] && i.Owned == Ownership.meetingPriv).ToList().OrderByDescending(d => d.Added);
             List<FilesAssosiation> privateFiles = new List<FilesAssosiation>();
             foreach (var file in PrivateFiles)
             {
@@ -479,7 +508,9 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
 
             ViewData["CommitteeID"] = view.Meeting.CommitteeID;
             ViewData["ProfessorID"] = (int)privelegy[0];
+            ViewData["Moderator"] = (bool)privelegy[2];
             return View(view);
+
         }
         static string GetMd5Hash(MD5 md5Hash, string input)
         {
@@ -542,8 +573,8 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                 {
                     return RedirectToAction("AccessDenied", "Account");
                 }
-                if (meeting.Files == null) model.Files = new List<FileBase>();
-                if ((int)privelegy[0] == 1) model.ProfessorName = "DMS_Admin";
+                //if (meeting.Files == null) model.Files = new List<FileBase>();
+                if ((int)privelegy[0] == 1) { model.ProfessorName = "DMS_Admin"; model.ProfessorID = null; }
                 else model.ProfessorName = _context.Professors.SingleOrDefault(i => i.Id == (int)privelegy[0]).FullName;
                 model.DateStamp = DateTime.Now;
                 _context.MeetComments.Add(model);
@@ -553,6 +584,94 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin, Professor")]
+        [HttpPost, ActionName("DeleteComment")]
+        public async Task<IActionResult> DeleteComment(int? ID)
+        {
+            if (ID == null) return NotFound();
+            var comment = await _context.MeetComments.SingleOrDefaultAsync(i => i.CommentID == ID);
+            if (comment != null)
+            {
+                var privelegy = await CheckPrivelegy(comment.CommitteeID);
+                if ((bool)privelegy[2])
+                {
+                    _context.Remove(comment);
+                    await _context.SaveChangesAsync();
+                    return Json("success");
+                }
+                else if((int)privelegy[0] == comment.ProfessorID){
+                    double time = (DateTime.Now - comment.DateStamp).TotalMinutes;
+                    if(time < 10)
+                    {
+                        _context.Remove(comment);
+                        await _context.SaveChangesAsync();
+                        return Json("success");
+                    }
+                }
+            }
+            return Json("error");
+        }
+
+        [Authorize(Roles = "Admin, Professor")]
+        [ActionName("EditComment")]
+        public async Task<IActionResult> EditComment(int? ID)
+        {
+            if (ID == null) return NotFound();
+            var comment = await _context.MeetComments.SingleOrDefaultAsync(i => i.CommentID == ID);
+            if (comment != null)
+            {
+                var privelegy = await CheckPrivelegy(comment.CommitteeID);
+                if ((bool)privelegy[2])
+                {
+                    return Json(comment.Comment);
+                    //_context.Remove(comment);
+                    //await _context.SaveChangesAsync();
+                    //return Json("success");
+                }
+                else if ((int)privelegy[0] == comment.ProfessorID)
+                {
+                    double time = (DateTime.Now - comment.DateStamp).TotalMinutes;
+                    if (time < 10)
+                    {
+                        return Json(comment.Comment);
+                    }
+                }
+            }
+            return Json("error getting comment");
+        }
+
+        [Authorize(Roles = "Admin, Professor")]
+        [HttpPost, ActionName("EditComment")]
+        public async Task<IActionResult> CommentEditSubmit(int? ID, string comment)
+        {
+            if(ID != null && comment != null)
+            {
+                var commentEntity = await _context.MeetComments.SingleOrDefaultAsync(i => i.CommentID == ID);
+                if (commentEntity != null)
+                {
+                    var privelegy = await CheckPrivelegy(commentEntity.CommitteeID);
+                    if ((bool)privelegy[2])
+                    {
+                        commentEntity.Comment = comment;
+                        await _context.SaveChangesAsync();
+                        //_context.Remove(comment);
+                        //await _context.SaveChangesAsync();
+                        //return Json("success");
+                    }
+                    else if ((int)privelegy[0] == commentEntity.ProfessorID)
+                    {
+                        double time = (DateTime.Now - commentEntity.DateStamp).TotalMinutes;
+                        if (time < 10)
+                        {
+                            commentEntity.Comment = comment;
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    return RedirectToAction("ViewMeeting", new { comID = commentEntity.CommitteeID, mtnID = commentEntity.MeetingID });
+                }
+            }
+            return RedirectToAction("AccessDenied", "Account");
+        }
         [Authorize(Roles = "Professor, Admin")]
         [HttpPost, ActionName("FileAdd")]
         public async Task<IActionResult> FileAdd(MeetingComment model, ICollection<IFormFile> files)
@@ -589,10 +708,11 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                             {
                                 Location = "/uploads/Committees/" + fileName,
                                 Owned = Ownership.meetingPriv,
-                                OwnerID = model.ProfessorID,
+                                OwnerID = (int)model.ProfessorID,
                                 Added = DateTime.Now,
                                 ViewTitle = name,
                             };
+                            if (User.IsInRole("Admin")) fileToSave.OwnerID = 1;
                             meeting.Files.Add(fileToSave);
                         }
                         else
@@ -601,10 +721,11 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                             {
                                 Location = "/uploads/Committees/" + fileName,
                                 Owned = Ownership.meetingPub,
-                                OwnerID = model.ProfessorID,
+                                OwnerID = (int)model.ProfessorID,
                                 Added = DateTime.Now,
                                 ViewTitle = name,
                             };
+                            if (User.IsInRole("Admin")) fileToSave.OwnerID = 1;
                             meeting.Files.Add(fileToSave);
                         }
                     }
@@ -714,6 +835,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
         private async Task<object[]> CheckPrivelegy(int comID)
         {
             //returns sequence: userID, access rights, change rights.
+            //data[0] = id, data[1] = is member, data[2] = is moderator
             object[] data = new object[3];
             bool check = false;
             IdentityUser<int> user = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -727,7 +849,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                     break;
                 }
             }
-            if (user.Id == 1) check = true;
+            if (User.IsInRole("Admin")) check = true;
             if (check == true) data[1] = true;
             else data[1] = false;
 

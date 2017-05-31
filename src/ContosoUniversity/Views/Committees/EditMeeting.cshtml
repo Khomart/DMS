@@ -1,4 +1,7 @@
 @model ContosoUniversity.Models.Meetings
+@{
+    ViewData["Title"] = "Edit " + Model.ShortTitle + " Meeting";
+}
 <h2>Edit meeting</h2>
 
 <form asp-action="EditMeeting" asp-route-CommitteeID="@ViewData["CommitteeID"]" >

@@ -14,8 +14,8 @@ namespace ContosoUniversity.Models.Entities
         Summer_I = 1,
         [Display(Name = "Summer Second")]
         Summer_II = 2,
-        //[Display(Name = "Summer Third")]
-        //Summer_III = 3,
+        [Display(Name = "Summer Third")]
+        Summer_III = 5,
         [Display(Name = "Autumn")]
         Autumn = 3,
         [Display(Name = "Winter")]
@@ -46,6 +46,11 @@ namespace ContosoUniversity.Models.Entities
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Term Start")]
         public DateTime StartingDate { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Term End")]
+        public DateTime EndingDate { get; set; }
         [Display(Name = "Current")]
         public bool Current { set; get; }
         [Display(Name = "Open")]

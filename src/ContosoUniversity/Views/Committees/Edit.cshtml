@@ -34,6 +34,13 @@
             </div>
         </div>
         <div class="form-group">
+            <label asp-for="Commentary" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea cols="160" rows="20" asp-for="Commentary" class="form-control"></textarea>
+            </div>
+            <span asp-validation-for="Commentary" class="text-danger" />
+        </div>
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>

@@ -1,7 +1,7 @@
 @model ContosoUniversity.Models.SchoolViewModels.MyCommittee
 <br />
 @{
-    ViewData["Title"] = "Committee Page";
+    ViewData["Title"] = Model.Committee.Title + " Committie Page";
 }
 <nav class="breadcrumb">
     @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })

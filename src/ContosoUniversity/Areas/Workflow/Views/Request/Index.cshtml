@@ -9,7 +9,7 @@
 </div>
 <nav class="breadcrumb">
 
-    @Html.ActionLink("Home", "Index", "Home", new { @class = "breadcrumb-item active"})
+    @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item active"})
     @if (ViewContext.RouteData.Values["controller"].ToString() != "Home")
     {
         @: / @Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(),null, new { @class = "breadcrumb-item active" })

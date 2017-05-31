@@ -1,0 +1,92 @@
+@model IEnumerable<ContosoUniversity.Areas.Workflow.Models.AcademicYear.AcademicYear>
+
+@{
+    ViewData["Title"] = "Academic Years";
+}
+
+<h2>Academic Years</h2>
+<br />
+<p>
+    <a class="btn btn-success createNew" asp-action="Create">New Year</a>
+</p>
+<hr />
+@*<div class="yearsTable">
+    @foreach (var item in Model)
+    {
+        <div class="row yearsTableRow">
+            <div class="col-xs-1 cal-cell yearCell">
+                <span>@item.StartingDate</span><br /><span>-</span><br /><span>@item.EndDate</span>
+            </div>
+        @{
+            var count = 0;
+            foreach (var semester in item.Semesters)
+            {
+            count++;
+                <div class="col-xs-1 @semester.Season cal-cell">
+                    @semester.Season
+                </div>
+            }
+            if (count < 5)
+            {
+                for (int i = count; i < 5; i++)
+                {
+                    <div class="col-xs-1 cal-cell">
+
+                    </div>
+                }
+            }
+        }
+        </div>
+    }
+</div>*@
+
+
+<table class="table yearsTable">
+    <thead>
+        <tr>
+            <th>
+                
+            </th>
+            <th>
+                Year
+            </th>
+            <th>
+                Semesters
+            </th>
+            <th>
+                Manage
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+
+            var counter = 0;
+            foreach (var item in Model)
+            {
+                counter++;
+            <tr>
+                <td>
+                    @counter
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Year)
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        @foreach (var sem in item.Semesters)
+                        {
+                            <li>
+                                @sem.Season: @sem.StartingDate.Date - @Html.Raw("end date")
+                            </li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    @Html.ActionLink("open","ViewYear",new { year = item.StartingDate },new { @class="btn btn-success" })
+                </td>
+            </tr>
+            }
+        }
+    </tbody>
+</table>

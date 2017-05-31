@@ -23,6 +23,7 @@
     <table class="table" style="margin: 10px    ">
         <tr>
             <th>Course</th>
+            <th>Credits</th>
             <th>Requested</th>
             <th>Assigned</th>
         </tr>
@@ -31,6 +32,9 @@
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Course.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Course.Credits)
                 </td>
                 @if (item.Requested)
                 {

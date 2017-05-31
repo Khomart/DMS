@@ -26,6 +26,7 @@ namespace ContosoUniversity.Models
         public string ViewTitle { get; set; }
         public DataType Type { get; set; }
         public int Size { get; set; }
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy HH:mm }")]
         public DateTime Added { get; set; }
         public DateTime Modified { get; set; }
 

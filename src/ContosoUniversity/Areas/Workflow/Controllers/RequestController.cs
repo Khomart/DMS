@@ -171,7 +171,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                 return NotFound();
             }
 
-            var fullCourseList = await _context.Courses.Include(t => t.Department).Where(i => i.Active == true).AsNoTracking().ToListAsync();
+            var fullCourseList = await _context.Courses.Include(t => t.Department).ThenInclude(i =>i.Faculty).Where(i => i.Active == true).AsNoTracking().ToListAsync();
             List<GivenCourse> somelist = new List<GivenCourse>();
             foreach (var s in fullCourseList)
             {
@@ -232,7 +232,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             }
             _context.CourseAssignments.AddRange(assigments);
             await _context.SaveChangesAsync();
-            return RedirectToAction("AdminIndex");
+            return RedirectToAction("Index");
         }
 
         [Authorize(Roles = "Professor, Admin")]

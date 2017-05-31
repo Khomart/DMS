@@ -14,6 +14,9 @@ using ContosoUniversity.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.EntityFrameworkCore.Update;
 
 namespace ContosoUniversity.Controllers
 {
@@ -50,9 +53,11 @@ namespace ContosoUniversity.Controllers
         {
             var viewModel = new ProfessorIndexData();
             viewModel.Professors = await _context.Professors
+                  .Where(i => !i.Archived)
                   .Include(i => i.OfficeAssignment)
                   .Include(i => i.Courses)
                     .ThenInclude(i => i.Course)
+                  .Include(d => d.Department)
                   .Include(i => i.Courses)
                     .ThenInclude(i => i.Course)
                         .ThenInclude(i => i.Department)
@@ -93,8 +98,10 @@ namespace ContosoUniversity.Controllers
         {
             //ViewData["DepartmentID"] = new SelectList(_context.Departments.Include(i => i.Faculty), "DepartmentID", "Name", null, "Faculty.Name");
             var professor = new RegProfModel();
-            professor.Courses = new List<CourseAssignment>();
-            PopulateAssignedCourseData(professor);
+            //// Deprecated block
+            //professor.Courses = new List<CourseAssignment>();
+            //PopulateAssignedCourseData(professor);
+            ////
             ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", null, "Faculty.Name");
             ViewData["Semesters"] = PopulateDropdown.Populate(_context, "semester");
             ViewData["Courses"] = PopulateDropdown.Populate(_context, "course");
@@ -203,12 +210,22 @@ namespace ContosoUniversity.Controllers
                 return NotFound();
             }
             PopulateAssignedCourseData(professor);
+            EditProf entity = new EditProf()
+            {
+                Id = professor.Id,
+                FirstMidName = professor.FirstMidName,
+                LastName = professor.LastName,
+                OfficeAssignment = professor.OfficeAssignment,
+                Email = professor.Email,
+                DepartmentID = professor.DepartmentID,
+                RowVersion = professor.RowVersion
+            };
             ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", professor.DepartmentID, "Faculty.Name");
             ViewData["Semesters"] = PopulateDropdown.Populate(_context, "semester");
             ViewData["Courses"] = PopulateDropdown.Populate(_context, "course");
             //PopulateDropDownList("semester");
             //PopulateDropDownList("course");
-            return View(professor);
+            return View(entity);
         }
 
         private void PopulateAssignedCourseData(Professor professor)
@@ -227,22 +244,24 @@ namespace ContosoUniversity.Controllers
             }
             ViewData["Courses"] = viewModel;
         }
-        private void PopulateAssignedCourseData(RegProfModel professor)
-        {
-            var allCourses = _context.Courses.Where(i => i.Active == true);
-            var professorCourses = new HashSet<int>(professor.Courses.Select(c => c.Course.CourseID));
-            var viewModel = new List<AssignedCourseData>();
-            foreach (var course in allCourses)
-            {
-                viewModel.Add(new AssignedCourseData
-                {
-                    CourseID = course.CourseID,
-                    Title = course.Title,
-                    Assigned = professorCourses.Contains(course.CourseID)
-                });
-            }
-            ViewData["Courses"] = viewModel;
-        }
+
+        //// This is being depricated since possibility to edit courses in this view was removed;
+        //private void PopulateAssignedCourseData(RegProfModel professor)
+        //{
+        //    var allCourses = _context.Courses.Where(i => i.Active == true);
+        //    var professorCourses = new HashSet<int>(professor.Courses.Select(c => c.Course.CourseID));
+        //    var viewModel = new List<AssignedCourseData>();
+        //    foreach (var course in allCourses)
+        //    {
+        //        viewModel.Add(new AssignedCourseData
+        //        {
+        //            CourseID = course.CourseID,
+        //            Title = course.Title,
+        //            Assigned = professorCourses.Contains(course.CourseID)
+        //        });
+        //    }
+        //    ViewData["Courses"] = viewModel;
+        //}
 
         // POST: Professors/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
@@ -250,81 +269,236 @@ namespace ContosoUniversity.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, int DepartmentID, string[] selectedCourses, string[] selectedSemesters)
+        public async Task<IActionResult> Edit(EditProf model, byte[] rowVersion)
         {
-            if (id == null)
+            if(model.Password == null)
+                ModelState.Remove("Password");
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
 
-            Professor professorToUpdate = await _context.Professors
-                .Include(i => i.OfficeAssignment)
-                .Include(i => i.Courses)
-                    .ThenInclude(i => i.Course)
-                .Include(i => i.Department)
-                .SingleOrDefaultAsync(m => m.Id == id);
-
-            if (await TryUpdateModelAsync<Professor>(
-                professorToUpdate,
-                "",
-                i => i.FirstMidName, i => i.LastName, i => i.HireDate, i => i.OfficeAssignment))
-            {
-                if (String.IsNullOrWhiteSpace(professorToUpdate.OfficeAssignment?.Location))
-                {
-                    professorToUpdate.OfficeAssignment = null;
+                var professor = await _context.Professors.Include(i => i.OfficeAssignment).SingleAsync(i => i.Id == model.Id);
+                if (professor == null) {
+                    Console.WriteLine("An error have occured editing instance. Make sure that this professor entity exists.");
+                    return View(model);
                 }
-                //UpdateProfessorCourses(selectedCourses, professorToUpdate);
 
-                if (selectedCourses != null)
-                {
-                    var selectedCoursesHS = new List<string>(selectedCourses);
-                    var selectedSemesterHS = new List<string>(selectedSemesters);
-                    for (int i = 0; i < Math.Max(selectedCoursesHS.Count(), selectedSemesterHS.Count()); i++)
+                //professor.Email = model.Email;
+                //professor.FirstMidName = model.FirstMidName;
+                //professor.LastName = model.LastName;
+                //professor.DepartmentID = model.DepartmentID;
+                //professor.OfficeAssignment.Location = model.OfficeAssignment.Location;
+
+
+                    //string code = await _userManager.GeneratePasswordResetTokenAsync(professor);
+                    //var result = await _userManager.ResetPasswordAsync(professor, code, model.Password);
+                    //if (result.Succeeded)
+                    _context.Entry(professor).Property("RowVersion").OriginalValue = rowVersion;
+                    if (await TryUpdateModelAsync<Professor>(
+                        professor,
+                        "",
+                        s => s.FirstMidName, s => s.LastName, s => s.Email, s => s.DepartmentID, s => s.OfficeAssignment))
                     {
-
-                        int course, semester;
-                        if (Int32.TryParse(selectedCoursesHS[i], out course) && Int32.TryParse(selectedSemesterHS[i], out semester))
+                        try
                         {
-                            if (professorToUpdate.Courses.SingleOrDefault(d => d.SemesterID == semester && d.CourseID == course) == null)
-                            {
-
-                                var assignment = new CourseAssignment { ProfessorID = professorToUpdate.Id, CourseID = course, SemesterID = semester };
-                                professorToUpdate.Courses.Add(assignment);
+                            int someting  = await _context.SaveChangesAsync();
+                            if (model.ChangePassword == true && model.Password!= null) {
+                                string code = await _userManager.GeneratePasswordResetTokenAsync(professor);
+                                var result = await _userManager.ResetPasswordAsync(professor, code, model.Password);
+                                //await _context.SaveChangesAsync();
                             }
+                            return RedirectToAction("Index");
+                        }
+                        catch (DbUpdateConcurrencyException ex)
+                        {
+                            var exceptionEntry = ex.Entries.Single();
+                            // Using a NoTracking query means we get the entity but it is not tracked by the context
+                            // and will not be merged with existing entities in the context.
+                            var databaseEntity = await _context.Professors
+                                .Include(i => i.OfficeAssignment)
+                                .AsNoTracking()
+                                .SingleAsync(d => d.Id == ((Professor)exceptionEntry.Entity).Id);
+                            var databaseEntry = _context.Entry(databaseEntity);
+
+                            var databaseFirstName = (string)databaseEntry.Property("FirstMidName").CurrentValue;
+                            var proposedFirstName = (string)exceptionEntry.Property("FirstMidName").CurrentValue;
+                            if (databaseFirstName != proposedFirstName)
+                            {
+                                ModelState.AddModelError("FirstMidName", $"Current value: {databaseFirstName}");
+                            }
+                            var databaseLastNameName = (string)databaseEntry.Property("LastName").CurrentValue;
+                            var proposedLastNameName = (string)exceptionEntry.Property("LastName").CurrentValue;
+                            if (databaseLastNameName != proposedLastNameName)
+                            {
+                                ModelState.AddModelError("LastName", $"Current value: {databaseLastNameName}");
+                            }
+                            var databaseDepartmentID = (Int32)databaseEntry.Property("DepartmentID").CurrentValue;
+                            var proposedDepartmentID = (Int32)exceptionEntry.Property("DepartmentID").CurrentValue;
+                            if (databaseDepartmentID != proposedDepartmentID)
+                            {
+                                ModelState.AddModelError("DepartmentID", $"Current value: {databaseDepartmentID:c}");
+                            }
+                            var databaseOfficeAssignment = (OfficeAssignment)databaseEntry.Entity.OfficeAssignment;
+                            var proposedOfficeAssignment = ((Professor)exceptionEntry.Entity).OfficeAssignment;
+                            if (databaseOfficeAssignment != proposedOfficeAssignment)
+                            {
+                                ModelState.AddModelError("OfficeAssignment", $"Current value: {databaseOfficeAssignment.Location}");
+                            }
+                            var databaseEmail = databaseEntry.Property("Email").CurrentValue;
+                            var proposedEmail = exceptionEntry.Property("Email").CurrentValue;
+                            if (databaseEmail != proposedEmail)
+                            {
+                                ModelState.AddModelError("Email", $"Current value: {databaseEmail}");
+                            }
+
+                            ModelState.AddModelError(string.Empty, "The professor entity you attempted to edit "
+                                    + "was modified by user after you got the original value. The "
+                                    + "edit operation was canceled and the current values in the database "
+                                    + "have been displayed. If you still want to edit this record, type the password again and click "
+                                    + "the Save button again. Otherwise click the Return.");
+                            model.RowVersion = (byte[])databaseEntry.Property("RowVersion").CurrentValue;
+                            ModelState.Remove("RowVersion");
                         }
                     }
-                    foreach (CourseAssignment cours in professorToUpdate.Courses)
-                    {
-                        bool net = true;
-                        for (int i = 0; i < Math.Max(selectedCoursesHS.Count(), selectedSemesterHS.Count()); i++)
-                            if (selectedCoursesHS[i].Contains(cours.CourseID.ToString()) && selectedSemesterHS[i].Contains(cours.SemesterID.ToString()))
-                            {
-                                net = false;;
-                            }
-                        if (net == true)
-                        {
-                            CourseAssignment courseToRemove = professorToUpdate.Courses.SingleOrDefault(i => i.CourseID == cours.CourseID && i.SemesterID == cours.SemesterID);
-                            _context.Remove(courseToRemove);
-                        }
-                    }
-                    professorToUpdate.DepartmentID = DepartmentID;
-                    try
-                    {
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateException /* ex */)
-                    {
-                        //Log the error (uncomment ex variable name and write a log.)
-                        ModelState.AddModelError("", "Unable to save changes. " +
-                            "Try again, and if the problem persists, " +
-                            "see your system administrator.");
-                    }
-                }
-                return RedirectToAction("Index");
+                
             }
-            ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", professorToUpdate.DepartmentID, "Faculty.Name");
-            return View(professorToUpdate);
+            //    if (await TryUpdateModelAsync<Professor>(
+            //    professorToUpdate,
+            //    "",
+            //    i => i.FirstMidName, i => i.LastName, i => i.HireDate, i => i.OfficeAssignment))
+            //{
+            //    if (String.IsNullOrWhiteSpace(professorToUpdate.OfficeAssignment?.Location))
+            //    {
+            //        professorToUpdate.OfficeAssignment = null;
+            //    }
+            //    //UpdateProfessorCourses(selectedCourses, professorToUpdate);
+
+            //    if (selectedCourses != null)
+            //    {
+            //        var selectedCoursesHS = new List<string>(selectedCourses);
+            //        var selectedSemesterHS = new List<string>(selectedSemesters);
+            //        for (int i = 0; i < Math.Max(selectedCoursesHS.Count(), selectedSemesterHS.Count()); i++)
+            //        {
+
+            //            int course, semester;
+            //            if (Int32.TryParse(selectedCoursesHS[i], out course) && Int32.TryParse(selectedSemesterHS[i], out semester))
+            //            {
+            //                if (professorToUpdate.Courses.SingleOrDefault(d => d.SemesterID == semester && d.CourseID == course) == null)
+            //                {
+
+            //                    var assignment = new CourseAssignment { ProfessorID = professorToUpdate.Id, CourseID = course, SemesterID = semester };
+            //                    professorToUpdate.Courses.Add(assignment);
+            //                }
+            //            }
+            //        }
+            //        foreach (CourseAssignment cours in professorToUpdate.Courses)
+            //        {
+            //            bool net = true;
+            //            for (int i = 0; i < Math.Max(selectedCoursesHS.Count(), selectedSemesterHS.Count()); i++)
+            //                if (selectedCoursesHS[i].Contains(cours.CourseID.ToString()) && selectedSemesterHS[i].Contains(cours.SemesterID.ToString()))
+            //                {
+            //                    net = false; ;
+            //                }
+            //            if (net == true)
+            //            {
+            //                CourseAssignment courseToRemove = professorToUpdate.Courses.SingleOrDefault(i => i.CourseID == cours.CourseID && i.SemesterID == cours.SemesterID);
+            //                _context.Remove(courseToRemove);
+            //            }
+            //        }
+            //        professorToUpdate.DepartmentID = DepartmentID;
+            //        try
+            //        {
+            //            await _context.SaveChangesAsync();
+            //        }
+            //        catch (DbUpdateException /* ex */)
+            //        {
+            //            //Log the error (uncomment ex variable name and write a log.)
+            //            ModelState.AddModelError("", "Unable to save changes. " +
+            //                "Try again, and if the problem persists, " +
+            //                "see your system administrator.");
+            //        }
+            //return RedirectToAction("Index");
+            //}
+            ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", model.DepartmentID, "Faculty.Name");
+            return View(model);
         }
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int? id, int DepartmentID, string[] selectedCourses, string[] selectedSemesters)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    Professor professorToUpdate = await _context.Professors
+        //        .Include(i => i.OfficeAssignment)
+        //        .Include(i => i.Courses)
+        //            .ThenInclude(i => i.Course)
+        //        .Include(i => i.Department)
+        //        .SingleOrDefaultAsync(m => m.Id == id);
+
+        //    if (await TryUpdateModelAsync<Professor>(
+        //        professorToUpdate,
+        //        "",
+        //        i => i.FirstMidName, i => i.LastName, i => i.HireDate, i => i.OfficeAssignment))
+        //    {
+        //        if (String.IsNullOrWhiteSpace(professorToUpdate.OfficeAssignment?.Location))
+        //        {
+        //            professorToUpdate.OfficeAssignment = null;
+        //        }
+        //        //UpdateProfessorCourses(selectedCourses, professorToUpdate);
+
+        //        if (selectedCourses != null)
+        //        {
+        //            var selectedCoursesHS = new List<string>(selectedCourses);
+        //            var selectedSemesterHS = new List<string>(selectedSemesters);
+        //            for (int i = 0; i < Math.Max(selectedCoursesHS.Count(), selectedSemesterHS.Count()); i++)
+        //            {
+
+        //                int course, semester;
+        //                if (Int32.TryParse(selectedCoursesHS[i], out course) && Int32.TryParse(selectedSemesterHS[i], out semester))
+        //                {
+        //                    if (professorToUpdate.Courses.SingleOrDefault(d => d.SemesterID == semester && d.CourseID == course) == null)
+        //                    {
+
+        //                        var assignment = new CourseAssignment { ProfessorID = professorToUpdate.Id, CourseID = course, SemesterID = semester };
+        //                        professorToUpdate.Courses.Add(assignment);
+        //                    }
+        //                }
+        //            }
+        //            foreach (CourseAssignment cours in professorToUpdate.Courses)
+        //            {
+        //                bool net = true;
+        //                for (int i = 0; i < Math.Max(selectedCoursesHS.Count(), selectedSemesterHS.Count()); i++)
+        //                    if (selectedCoursesHS[i].Contains(cours.CourseID.ToString()) && selectedSemesterHS[i].Contains(cours.SemesterID.ToString()))
+        //                    {
+        //                        net = false;;
+        //                    }
+        //                if (net == true)
+        //                {
+        //                    CourseAssignment courseToRemove = professorToUpdate.Courses.SingleOrDefault(i => i.CourseID == cours.CourseID && i.SemesterID == cours.SemesterID);
+        //                    _context.Remove(courseToRemove);
+        //                }
+        //            }
+        //            professorToUpdate.DepartmentID = DepartmentID;
+        //            try
+        //            {
+        //                await _context.SaveChangesAsync();
+        //            }
+        //            catch (DbUpdateException /* ex */)
+        //            {
+        //                //Log the error (uncomment ex variable name and write a log.)
+        //                ModelState.AddModelError("", "Unable to save changes. " +
+        //                    "Try again, and if the problem persists, " +
+        //                    "see your system administrator.");
+        //            }
+        //        }
+        //        return RedirectToAction("Index");
+        //    }
+        //    ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department", professorToUpdate.DepartmentID, "Faculty.Name");
+        //    return View(professorToUpdate);
+        //}
 
         private void UpdateProfessorCourses(string[] selectedCourses, Professor professorToUpdate)
         {
@@ -402,11 +576,41 @@ namespace ContosoUniversity.Controllers
                 .ToListAsync();
             memberships.ForEach(m => { m.FinishedWork = true; m.EndDate = DateTime.Now; });
             professor.Archived = true;
-
+            professor.Email = "archivedprofessor@dms.ca";
+            professor.NormalizedEmail = "ARCHIVEDPROFESSOR@DMS.CA";
+            professor.UserName = "archivedprofessor@dms.ca";
+            professor.NormalizedUserName = "ARCHIVEDPROFESSOR@DMS.CA";
+            //genRandomPassBlock
+            string code = await _userManager.GeneratePasswordResetTokenAsync(professor);
+            MD5 hash = MD5.Create();
+            DateTime now = new DateTime();
+            now = DateTime.Now;
+            string newpass = GetMd5Hash(hash, now.ToString());
+            await _userManager.ResetPasswordAsync(professor, code, newpass);
+            //endNewPassBlock
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+        static string GetMd5Hash(MD5 md5Hash, string input)
+        {
 
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            StringBuilder sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data 
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
+        }
         private bool ProfessorExists(int id)
         {
             return _context.Professors.Any(e => e.Id == id);

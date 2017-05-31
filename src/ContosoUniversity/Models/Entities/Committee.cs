@@ -32,6 +32,10 @@ namespace ContosoUniversity.Models.Entities
         [Required]
         [Display(Name = "Committee Title")]
         public string Title { get; set; }
+        [StringLength(300, MinimumLength = 5)]
+        [Required]
+        [Display(Name = "Description")]
+        public string Commentary { set; get; }
 
         public virtual ICollection<CommitieMembership> CommitieMembers { get; set; }
         public virtual ICollection<Meetings> Meetings { get; set; }

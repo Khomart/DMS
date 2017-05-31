@@ -67,14 +67,14 @@ namespace ContosoUniversity.Controllers
             ViewData["Professor"] = await _context.Professors.AsNoTracking().ToListAsync();
             ViewData["DepartmentID"] = PopulateDropdown.Populate(_context, "department",null, "Faculty.Name");
             ViewData["FacultyID"] = new SelectList(_context.Facultys.Include(i => i.Departments), "FacultyID", "Name");
-            Committee committee = new Committee();
+            //Committee committee = new Committee();
             //committee.SemesterID = _context.Semesters.Where(i => i.current == true).SingleOrDefault().ID;
-            return View(committee);
+            return View(/*committee*/);
         }
         [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("SubmitCommitie")]
+        [HttpPost, ActionName("CreateCommitie")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCommitie([Bind("DepartmentID,ProfessorID,Title,Level")] Committee model)
+        public async Task<IActionResult> CreateCommitie([Bind("DepartmentID,ProfessorID,FacultyID,Commentary,Title,Level")] Committee model)
         {
             if (ModelState.IsValid)
             {
@@ -213,7 +213,7 @@ namespace ContosoUniversity.Controllers
             if (await TryUpdateModelAsync<Committee>(
                 committeeToUpdate,
                 "",
-                s => s.CommitteeID, s => s.ProfessorID, s => s.FacultyID, s => s.Title, s => s.Level))
+                s => s.CommitteeID, s => s.ProfessorID, s => s.FacultyID, s => s.Title, s => s.Level, s => s.Commentary))
             {
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -451,252 +451,254 @@ namespace ContosoUniversity.Controllers
         }
 
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet, ActionName("SetMeeting")]
-        public async Task<IActionResult> SetMeeting(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            Committee committee = await _context.Committees.AsNoTracking().SingleAsync(i => i.CommitteeID == id);
-            ViewData["CommitteeID"] = committee.CommitteeID;
-            return View();
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet, ActionName("SetMeeting")]
+        //public async Task<IActionResult> SetMeeting(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Committee committee = await _context.Committees.AsNoTracking().SingleAsync(i => i.CommitteeID == id);
+        //    ViewData["CommitteeID"] = committee.CommitteeID;
+        //    return View();
 
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("SetMeeting")]
-        public async Task<IActionResult> SetMeeting(Meetings model, string CommitteeID)
-        {
-            if (ModelState.IsValid)
-            {
-                model.Suggestions = new List<DatesSuggestion>();
-                DatesSuggestion date;
-                DateTime datetime;
-                for (int i = 0; i < 5; i++)
-                {
-                    var suggestion = Request.Form["Suggestions[" + i + "]"];
-                    if (suggestion != "")
-                    {
-                        datetime = Convert.ToDateTime(Request.Form["Suggestions[" + i + "]"]);
-                        date = new DatesSuggestion()
-                        {
-                            Value = datetime,
-                        };
-                        model.Suggestions.Add(date);
-                    }
-                }
-                model.CommitteeID = int.Parse(CommitteeID);
-                model.FinalDate = false;
-                model.OpenDate = DateTime.Today;
-                _context.Meetings.Add(model);
-                await _context.SaveChangesAsync();
-                Committee committee = await _context.Committees.SingleAsync(i => i.CommitteeID == model.CommitteeID);
-                return RedirectToAction("ViewCommittee", new { id = committee.CommitteeID });
-            }
-            return View(model);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpGet, ActionName("EditMeeting")]
-        public async Task<IActionResult> EditMeeting(int? comID, int? mtnID)
-        {
-            if (comID == null || mtnID == null)
-            {
-                return NotFound();
-            }
-            Meetings meeting = await _context.Meetings.Include(i => i.Committee).SingleAsync(i => i.CommitteeID == comID && i.MeetingID == mtnID);
-            ViewData["CommitteeID"] = meeting.CommitteeID;
-            return View(meeting);
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("SetMeeting")]
+        //public async Task<IActionResult> SetMeeting(Meetings model, string CommitteeID)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        model.Suggestions = new List<DatesSuggestion>();
+        //        DatesSuggestion date;
+        //        DateTime datetime;
+        //        for (int i = 0; i < 5; i++)
+        //        {
+        //            var suggestion = Request.Form["Suggestions[" + i + "]"];
+        //            if (suggestion != "")
+        //            {
+        //                datetime = Convert.ToDateTime(Request.Form["Suggestions[" + i + "]"]);
+        //                date = new DatesSuggestion()
+        //                {
+        //                    Value = datetime,
+        //                };
+        //                model.Suggestions.Add(date);
+        //            }
+        //        }
+        //        model.CommitteeID = int.Parse(CommitteeID);
+        //        model.FinalDate = false;
+        //        model.OpenDate = DateTime.Today;
+        //        _context.Meetings.Add(model);
+        //        await _context.SaveChangesAsync();
+        //        Committee committee = await _context.Committees.SingleAsync(i => i.CommitteeID == model.CommitteeID);
+        //        return RedirectToAction("ViewCommittee", new { id = committee.CommitteeID });
+        //    }
+        //    return View(model);
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet, ActionName("EditMeeting")]
+        //public async Task<IActionResult> EditMeeting(int? comID, int? mtnID)
+        //{
+        //    if (comID == null || mtnID == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Meetings meeting = await _context.Meetings.Include(i => i.Committee).SingleAsync(i => i.CommitteeID == comID && i.MeetingID == mtnID);
+        //    ViewData["CommitteeID"] = meeting.CommitteeID;
+        //    return View(meeting);
 
-        }
-        [Authorize(Roles = "Admin")]
-        [ActionName("ViewMeeting")]
-        public async Task<IActionResult> ViewMeeting(int? comID, int? mtnID)
-        {
-            if (comID == null || mtnID == null)
-            {
-                return NotFound();
-            }
-            MeetingView view = new MeetingView();
-            view.Meeting = _context.Meetings.Include(i => i.Files).Include(i => i.Comments).ThenInclude(i => i.Files).Include(i => i.Committee).Single(i => i.CommitteeID == comID && i.MeetingID == mtnID);
-            view.PublicComments = view.Meeting.Comments.Where(i => i.Private == false).ToList();
-            view.PrivateComments = view.Meeting.Comments.Where(i => i.Private == true && i.ProfessorID == 1).ToList();
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[ActionName("ViewMeeting")]
+        //public async Task<IActionResult> ViewMeeting(int? comID, int? mtnID, int? page)
+        //{
+        //    if (comID == null || mtnID == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    MeetingView view = new MeetingView();
+        //    view.Meeting = _context.Meetings.Include(i => i.Files).Include(i => i.Comments)/*.ThenInclude(i => i.Files)*/.Include(i => i.Committee).Single(i => i.CommitteeID == comID && i.MeetingID == mtnID);
+        //    //view.PublicComments = view.Meeting.Comments.Where(i => i.Private == false).ToList();
+        //    view.PublicComments = PaginatedList<MeetingComment>.Create(view.Meeting.Comments.Where(i => i.Private == false).ToList().OrderByDescending(d => d.DateStamp), page ?? 1, 10);
 
-            var PublicFiles = view.Meeting.Files.Where(i => i.OwnerID == mtnID && i.Owned == Ownership.meetingPub).ToList();
-            List<FilesAssosiation> publicFiles = new List<FilesAssosiation>();
-            foreach (var file in PublicFiles)
-                publicFiles.Add(new FilesAssosiation()
-                {
-                    File = file,
-                    Author = _context.Professors.Single(i => i.Id == file.OwnerID).FullName,
-                });
-            view.PublicFiles = publicFiles;
+        //    view.PrivateComments = view.Meeting.Comments.Where(i => i.Private == true && i.ProfessorID == 1).ToList();
 
-            var PrivateFiles = new List<FilesAssosiation>();
-            view.PrivateFiles = PrivateFiles;
+        //    var PublicFiles = view.Meeting.Files.Where(i => i.OwnerID == mtnID && i.Owned == Ownership.meetingPub).ToList();
+        //    List<FilesAssosiation> publicFiles = new List<FilesAssosiation>();
+        //    foreach (var file in PublicFiles)
+        //        publicFiles.Add(new FilesAssosiation()
+        //        {
+        //            File = file,
+        //            Author = _context.Professors.Single(i => i.Id == file.OwnerID).FullName,
+        //        });
+        //    view.PublicFiles = publicFiles;
 
-            ViewData["CommitteeID"] = view.Meeting.CommitteeID;
-            ViewData["ProfessorID"] = 1;
-            return View(view);
-        }
-        static string GetMd5Hash(MD5 md5Hash, string input)
-        {
+        //    var PrivateFiles = new List<FilesAssosiation>();
+        //    view.PrivateFiles = PrivateFiles;
 
-            // Convert the input string to a byte array and compute the hash.
-            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+        //    ViewData["CommitteeID"] = view.Meeting.CommitteeID;
+        //    ViewData["ProfessorID"] = 1;
+        //    return View(view);
+        //}
+        //static string GetMd5Hash(MD5 md5Hash, string input)
+        //{
 
-            // Create a new Stringbuilder to collect the bytes
-            // and create a string.
-            StringBuilder sBuilder = new StringBuilder();
+        //    // Convert the input string to a byte array and compute the hash.
+        //    byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
 
-            // Loop through each byte of the hashed data 
-            // and format each one as a hexadecimal string.
-            for (int i = 0; i < data.Length; i++)
-            {
-                sBuilder.Append(data[i].ToString("x2"));
-            }
+        //    // Create a new Stringbuilder to collect the bytes
+        //    // and create a string.
+        //    StringBuilder sBuilder = new StringBuilder();
 
-            // Return the hexadecimal string.
-            return sBuilder.ToString();
-        }
+        //    // Loop through each byte of the hashed data 
+        //    // and format each one as a hexadecimal string.
+        //    for (int i = 0; i < data.Length; i++)
+        //    {
+        //        sBuilder.Append(data[i].ToString("x2"));
+        //    }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("EditMeeting")]
-        public async Task<IActionResult> EditMeeting(Meetings model, string CommitteeID)
-        {
-            var meetingToUpdate = _context.Meetings.Where(i => i.CommitteeID == model.CommitteeID && i.MeetingID == model.MeetingID).Single();
-            if (ModelState.IsValid)
-            {
-                model.CommitteeID = int.Parse(CommitteeID);
-                await TryUpdateModelAsync<Meetings>(
-                meetingToUpdate,
-                "",
-                s => s.Location, s => s.Title, s => s.Date);
+        //    // Return the hexadecimal string.
+        //    return sBuilder.ToString();
+        //}
 
-                await _context.SaveChangesAsync();
-                Committee committee = await _context.Committees.SingleAsync(i => i.CommitteeID == model.CommitteeID);
-                return RedirectToAction("ViewCommittee", new { id = committee.CommitteeID });
-            }
-            return View(model);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("CommentAdd")]
-        public async Task<IActionResult> CommentAdd(MeetingComment model/*, ICollection<IFormFile> files*/)
-        {
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("EditMeeting")]
+        //public async Task<IActionResult> EditMeeting(Meetings model, string CommitteeID)
+        //{
+        //    var meetingToUpdate = _context.Meetings.Where(i => i.CommitteeID == model.CommitteeID && i.MeetingID == model.MeetingID).Single();
+        //    if (ModelState.IsValid)
+        //    {
+        //        model.CommitteeID = int.Parse(CommitteeID);
+        //        await TryUpdateModelAsync<Meetings>(
+        //        meetingToUpdate,
+        //        "",
+        //        s => s.Location, s => s.Title, s => s.Date);
 
-            if (ModelState.IsValid)
-            {
-                Meetings meeting = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == model.MeetingID);
+        //        await _context.SaveChangesAsync();
+        //        Committee committee = await _context.Committees.SingleAsync(i => i.CommitteeID == model.CommitteeID);
+        //        return RedirectToAction("ViewCommittee", new { id = committee.CommitteeID });
+        //    }
+        //    return View(model);
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("CommentAdd")]
+        //public async Task<IActionResult> CommentAdd(MeetingComment model/*, ICollection<IFormFile> files*/)
+        //{
 
-
-                if (meeting.Files == null) model.Files = new List<FileBase>();
-                model.ProfessorName = "DMS_Admin";
-                model.DateStamp = DateTime.Now;
-                _context.MeetComments.Add(model);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("ViewMeeting", new { comID = meeting.CommitteeID, mtnID = meeting.MeetingID });
-            }
-            return View(model);
-        }
-
-        [Authorize(Roles = "Professor")]
-        [HttpPost, ActionName("FileAdd")]
-        public async Task<IActionResult> FileAdd(MeetingComment model, ICollection<IFormFile> files)
-        {
-            if (ModelState.IsValid)
-            {
-                Meetings meeting = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == model.MeetingID);
-
-                if (files == null) return RedirectToAction("ViewMeeting", new { comID = meeting.CommitteeID, mtnID = meeting.MeetingID });
-                if (meeting.Files == null) meeting.Files = new List<FileBase>();
-
-                var uploads = Path.Combine(_environment.WebRootPath, "uploads/Committees");
-                foreach (var file in files)
-                {
-                    if (file.Length > 0)
-                    {
-                        string name = file.FileName;
-                        MD5 hasher = MD5.Create();
-                        DateTime now = new DateTime();
-                        now = DateTime.Now;
-                        string fileName = GetMd5Hash(hasher, now.ToString()) + Path.GetExtension(file.FileName);
-
-                        using (var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
-                        {
-                            await file.CopyToAsync(fileStream);
-                        }
-                        if (model.Private == true)
-                        {
-                            FileBase fileToSave = new FileBase()
-                            {
-                                Location = "/uploads/Committees/" + fileName,
-                                Owned = Ownership.meetingPriv,
-                                OwnerID = model.ProfessorID,
-                                Added = DateTime.Now,
-                                ViewTitle = name,
-                            };
-                            meeting.Files.Add(fileToSave);
-                        }
-                        else
-                        {
-                            FileBase fileToSave = new FileBase()
-                            {
-                                Location = "/uploads/Committees/" + fileName,
-                                Owned = Ownership.meetingPub,
-                                OwnerID = model.ProfessorID,
-                                Added = DateTime.Now,
-                                ViewTitle = name,
-                            };
-                            meeting.Files.Add(fileToSave);
-                        }
-                    }
-
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction("ViewMeeting", new { comID = meeting.CommitteeID, mtnID = meeting.MeetingID });
+        //    if (ModelState.IsValid)
+        //    {
+        //        Meetings meeting = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == model.MeetingID);
 
 
+        //        //if (meeting.Files == null) model.Files = new List<FileBase>();
+        //        model.ProfessorName = "DMS_Admin";
+        //        model.DateStamp = DateTime.Now;
+        //        _context.MeetComments.Add(model);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction("ViewMeeting", new { comID = meeting.CommitteeID, mtnID = meeting.MeetingID });
+        //    }
+        //    return View(model);
+        //}
 
-                }
-                return View(model);
-            }
-            return RedirectToAction("ProfessorIndex");
-        }
+        //[Authorize(Roles = "Professor")]
+        //[HttpPost, ActionName("FileAdd")]
+        //public async Task<IActionResult> FileAdd(MeetingComment model, ICollection<IFormFile> files)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        Meetings meeting = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == model.MeetingID);
 
-        [Authorize(Roles = "Admin")]
-        [ActionName("Suggestions")]
-        public async Task<IActionResult> Suggestions(int? id)
-        {
-            if(id == null)
-            {
-                return NotFound();
-            }
-            ChooseMeetingDate set = new ChooseMeetingDate();
-            List<DatesSuggestion> suggestions = await _context.DatesSuggestion.Include(i => i.Checkers).Where(i => i.MeetingID == id).ToListAsync();
-            set.Members = _context.Meetings.Include(c => c.Committee)
-                .ThenInclude(c => c.CommitieMembers)
-                .ThenInclude(c => c.Professor)
-                .Single(i => i.MeetingID == id)
-                .Committee.CommitieMembers
-                .Where(i => i.FinishedWork == false && i.Professor != i.Committee.Chair)
-                .ToList();
-            set.Dates = _context.DatesSuggestion.Where(i => i.MeetingID == id).ToList();
-            ViewBag.Dates = new SelectList(set.Dates, "Value", "Value");
-            ViewData["MeetingID"] = id;
-            ViewData["CommitteeID"] = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == (int)id).Committee.CommitteeID;
-            return View(set);
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("SetMeetingDate")]
-        public async Task<IActionResult> SetMeetingDate(int MeetingID, string Date)
-        {
-            DateTime date = Convert.ToDateTime(Request.Form["Date"]);
-            int meetingID = int.Parse(Request.Form["MeetingID"]);
-            Meetings meeting = _context.Meetings.SingleOrDefault(i => i.MeetingID == meetingID);
-            meeting.Date = date;
-            meeting.FinalDate = true;
-            await _context.SaveChangesAsync();
-            return RedirectToAction("ViewCommittee", new { id = meeting.CommitteeID });
-        }
+        //        if (files == null) return RedirectToAction("ViewMeeting", new { comID = meeting.CommitteeID, mtnID = meeting.MeetingID });
+        //        if (meeting.Files == null) meeting.Files = new List<FileBase>();
+
+        //        var uploads = Path.Combine(_environment.WebRootPath, "uploads/Committees");
+        //        foreach (var file in files)
+        //        {
+        //            if (file.Length > 0)
+        //            {
+        //                string name = file.FileName;
+        //                MD5 hasher = MD5.Create();
+        //                DateTime now = new DateTime();
+        //                now = DateTime.Now;
+        //                string fileName = GetMd5Hash(hasher, now.ToString()) + Path.GetExtension(file.FileName);
+
+        //                using (var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
+        //                {
+        //                    await file.CopyToAsync(fileStream);
+        //                }
+        //                if (model.Private == true)
+        //                {
+        //                    FileBase fileToSave = new FileBase()
+        //                    {
+        //                        Location = "/uploads/Committees/" + fileName,
+        //                        Owned = Ownership.meetingPriv,
+        //                        OwnerID = model.ProfessorID,
+        //                        Added = DateTime.Now,
+        //                        ViewTitle = name,
+        //                    };
+        //                    meeting.Files.Add(fileToSave);
+        //                }
+        //                else
+        //                {
+        //                    FileBase fileToSave = new FileBase()
+        //                    {
+        //                        Location = "/uploads/Committees/" + fileName,
+        //                        Owned = Ownership.meetingPub,
+        //                        OwnerID = model.ProfessorID,
+        //                        Added = DateTime.Now,
+        //                        ViewTitle = name,
+        //                    };
+        //                    meeting.Files.Add(fileToSave);
+        //                }
+        //            }
+
+        //            await _context.SaveChangesAsync();
+        //            return RedirectToAction("ViewMeeting", new { comID = meeting.CommitteeID, mtnID = meeting.MeetingID });
+
+
+
+        //        }
+        //        return View(model);
+        //    }
+        //    return RedirectToAction("ProfessorIndex");
+        //}
+
+        //[Authorize(Roles = "Admin")]
+        //[ActionName("Suggestions")]
+        //public async Task<IActionResult> Suggestions(int? id)
+        //{
+        //    if(id == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    ChooseMeetingDate set = new ChooseMeetingDate();
+        //    List<DatesSuggestion> suggestions = await _context.DatesSuggestion.Include(i => i.Checkers).Where(i => i.MeetingID == id).ToListAsync();
+        //    set.Members = _context.Meetings.Include(c => c.Committee)
+        //        .ThenInclude(c => c.CommitieMembers)
+        //        .ThenInclude(c => c.Professor)
+        //        .Single(i => i.MeetingID == id)
+        //        .Committee.CommitieMembers
+        //        .Where(i => i.FinishedWork == false && i.Professor != i.Committee.Chair)
+        //        .ToList();
+        //    set.Dates = _context.DatesSuggestion.Where(i => i.MeetingID == id).ToList();
+        //    ViewBag.Dates = new SelectList(set.Dates, "Value", "Value");
+        //    ViewData["MeetingID"] = id;
+        //    ViewData["CommitteeID"] = _context.Meetings.Include(i => i.Committee).Single(i => i.MeetingID == (int)id).Committee.CommitteeID;
+        //    return View(set);
+        //}
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost, ActionName("SetMeetingDate")]
+        //public async Task<IActionResult> SetMeetingDate(int MeetingID, string Date)
+        //{
+        //    DateTime date = Convert.ToDateTime(Request.Form["Date"]);
+        //    int meetingID = int.Parse(Request.Form["MeetingID"]);
+        //    Meetings meeting = _context.Meetings.SingleOrDefault(i => i.MeetingID == meetingID);
+        //    meeting.Date = date;
+        //    meeting.FinalDate = true;
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction("ViewCommittee", new { id = meeting.CommitteeID });
+        //}
 
         public async Task<IActionResult> Archive(int? id)
         {

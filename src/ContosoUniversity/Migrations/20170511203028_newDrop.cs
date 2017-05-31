@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace ContosoUniversity.Migrations
 {
-    public partial class init : Migration
+    public partial class newDrop : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -598,17 +598,24 @@ namespace ContosoUniversity.Migrations
                     CommentID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Comment = table.Column<string>(maxLength: 350, nullable: true),
+                    CommentTitle = table.Column<string>(maxLength: 50, nullable: true),
                     CommitteeID = table.Column<int>(nullable: false),
                     DateStamp = table.Column<DateTime>(nullable: false),
                     MeetingID = table.Column<int>(nullable: false),
                     Private = table.Column<bool>(nullable: false),
-                    Professor = table.Column<int>(nullable: false),
-                    ProfessorID = table.Column<int>(nullable: false),
-                    ProfessorName = table.Column<string>(nullable: true)
+                    ProfessorID = table.Column<int>(nullable: true),
+                    ProfessorName = table.Column<string>(nullable: true),
+                    adminComment = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MeetingComment", x => x.CommentID);
+                    table.ForeignKey(
+                        name: "FK_MeetingComment_Users_ProfessorID",
+                        column: x => x.ProfessorID,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_MeetingComment_Meeting_MeetingID_CommitteeID",
                         columns: x => new { x.MeetingID, x.CommitteeID },
@@ -785,6 +792,11 @@ namespace ContosoUniversity.Migrations
                 name: "IX_FileBase_MeetingsMeetingID_MeetingsCommitteeID",
                 table: "FileBase",
                 columns: new[] { "MeetingsMeetingID", "MeetingsCommitteeID" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MeetingComment_ProfessorID",
+                table: "MeetingComment",
+                column: "ProfessorID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MeetingComment_MeetingID_CommitteeID",

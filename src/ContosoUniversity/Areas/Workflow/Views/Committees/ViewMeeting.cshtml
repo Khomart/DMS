@@ -1,4 +1,7 @@
 @model ContosoUniversity.Models.SchoolViewModels.MeetingView
+@{
+    ViewData["Title"] = Model.Meeting.ShortTitle + " Meeting Page";
+}
 <br />
 <nav class="breadcrumb">
     @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "breadcrumb-item" })
@@ -37,42 +40,6 @@
     </li>
 </ul>
 <hr />
-@*<dl class="row">
-        <dt>
-            Committee
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Meeting.Committee.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Meeting.Location)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Meeting.Location)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Meeting.Date)
-        </dt>
-        @{
-            if (Model.Meeting.FinalDate == true)
-            {
-
-                <dd>
-                    @Html.DisplayFor(model => model.Meeting.Date)
-                </dd>
-            }
-            else
-            {
-                <dd>
-                    Not set
-                </dd>
-            }
-        }
-    </dl>
-    <div class="input-group" style="margin-bottom:10px;">
-        <a data-toggle="modal" data-target="#myModal2" class="btn btn-success">Add Comment</a>
-        <a data-toggle="modal" data-target="#myModal" class="btn btn-success">Add new File</a>
-    </div>*@
 <ul class="nav nav-tabs" role="tablist" id="meetingTab">
     <li role="presentation" class="active">
         <a href="#publicSection" aria-controls="publicSection"
@@ -89,10 +56,10 @@
            data-toggle="tab">Attachments</a>
     </li>
     <li role="presentation">
-        <a data-toggle="modal" data-target="#myModal2" class="btn-success commentBtn">Add New Comment</a>
+        <a href="" data-toggle="modal" data-target="#myModal2" class="btn-success commentBtn">Add New Comment</a>
     </li>
     <li>
-        <a data-toggle="modal" data-target="#myModal" class="btn-success fileBtn">Upload an Attachment</a>
+        <a href="" data-toggle="modal" data-target="#myModal" class="btn-success fileBtn">Upload an Attachment</a>
     </li>
 </ul>
 <div class="tab-content">
@@ -119,17 +86,49 @@
                             commWritten = " at " + comment.DateStamp.ToString("t");
                         }
                         {
-                        <div class="panel panel-default">
+                        <div class="panel panel-default" id="commentBlock_@comment.CommentID">
                             <div class="panel-heading">
-                                <span>Wrote </span>
+                                <span>By </span>
                                 <strong> @Html.DisplayFor(ModelItem => comment.ProfessorName)</strong><span class="text-muted messageTime">@commWritten</span>
                             </div>
                             <div class="panel-body">
                                 @Html.Raw(comment.Comment)
                             </div><!-- /panel-body -->
+                            <div class="panel-footer">
+                                @{
+                                    if (((diff.TotalMinutes < 10 && (int)ViewData["ProfessorID"] == comment.ProfessorID)) || User.IsInRole("Admin") || (bool)ViewData["Moderator"])
+                                    {
+                                        <a href="#" class="commentEdit">Edit</a>
+                                        <span> | </span>
+                                        <a href="#" class="commentDelete" id="comment_@comment.CommentID">Delete</a>
+                                    }
+                                }
+                            </div>
                         </div><!-- /panel panel-default -->
                         }
                     }
+                }
+                @{
+                    var prevDisabled = !Model.PublicComments.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.PublicComments.HasNextPage ? "disabled" : "";
+                }
+                @if (countpub > 0)
+                {
+
+                <a asp-action="ViewMeeting"
+                   asp-route-comID="@Model.Meeting.CommitteeID"
+                   asp-route-mtnID="@Model.Meeting.MeetingID"
+                   asp-route-page="@(Model.PublicComments.PageIndex - 1)"
+                   class="btn btn-default @prevDisabled btn">
+                    Previous
+                </a>
+                <a asp-action="ViewMeeting"
+                   asp-route-comID="@Model.Meeting.CommitteeID"
+                   asp-route-mtnID="@Model.Meeting.MeetingID"
+                   asp-route-page="@(Model.PublicComments.PageIndex + 1)"
+                   class="btn btn-default @nextDisabled btn">
+                    Next
+                </a>
                 }
             </div>
         </div>
@@ -157,16 +156,26 @@
                             commWritten = "commented at " + comment.DateStamp.ToString("t");
                         }
                         {
-                            <div class="panel panel-default">
+                            <div class="panel panel-default" id="commentBlock_@comment.CommentID">
                                 <div class="panel-heading">
                                     <span class="text-muted messageTime">@commWritten</span>
                                 </div>
                                 <div class="panel-body">
                                     @Html.Raw(comment.Comment)
                                 </div><!-- /panel-body -->
+                                <div class="panel-footer">
+                                    @{
+                                        if (((diff.TotalMinutes < 10 && (int)ViewData["ProfessorID"] == comment.ProfessorID)) || User.IsInRole("Admin") || (bool)ViewData["Moderator"])
+                                        {
+                                            <a href="#" class="commentEdit">Edit</a>
+                                            <span> | </span>
+                                            <a href="#" class="commentDelete" id="comment_@comment.CommentID">Delete</a>
+                                        }
+                                    }
+                                </div>
                             </div><!-- /panel panel-default -->
-                            }
-                        }
+                                            }
+                                        }
                     }
             </div>
         </div>
@@ -175,35 +184,63 @@
         <div class="row">
             <div class="col-sm-6">
                 <h3>Public Files</h3>
-                <ul class="list-unstyled">
-                    @foreach (var file in Model.PublicFiles)
-            {
-                        <li>
-                            <div style="border:solid 1px black;">
-                                <dl class="">
-                                    <dt>
-                                        <span>Uploaded: </span> @Html.DisplayFor(owner => file.Author)
-                                    </dt>
-                                    <dd>
-                                        <a style="font-size:18px;" href="@file.File.Location"><span>Title: </span>@file.File.ViewTitle </a>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </li>
+                <div class="list-group">
+                @{
+                    int count = 0;
+                    foreach (var file in Model.PublicFiles)
+                    {
+                        if (count == 0)
+                        {
+                            <a href="@file.File.Location" class="list-group-item list-group-item-action flex-column align-items-start active">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h3 class="mb-1">@file.File.ViewTitle</h3>
+                                    <p>Uploaded on @file.File.Added by @file.Author</p>
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@file.File.Location" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h3 class="mb-1">@file.File.ViewTitle</h3>
+                                    <p>Uploaded on @file.File.Added by @file.Author</p>
+                                </div>
+                            </a>
+                        }
+                        count++;
                     }
-                </ul>
+                }
+                </div>
             </div>
             <div class="col-sm-6">
                 <h3>My Files</h3>
-                <ul class="list-unstyled">
-
-                    @foreach (var file in Model.PrivateFiles)
-            {
-                        <li>
-                            <a style="font-size:18px;" href="@file.File.Location">@file.File.ViewTitle </a><br />
-                        </li>
+                <div class="list-group">
+                    @{
+                        int counter = 0;
+                        foreach (var file in Model.PrivateFiles)
+                        {
+                            if (counter == 0)
+                            {
+                                <a href="@file.File.Location" class="list-group-item list-group-item-action flex-column align-items-start active">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h3 class="mb-1">@file.File.ViewTitle</h3>
+                                        <p>Added on @file.File.Added </p>
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@file.File.Location" class="list-group-item list-group-item-action flex-column align-items-start">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h3 class="mb-1">@file.File.ViewTitle</h3>
+                                        <p>Uploaded on @file.File.Added </p>
+                                    </div>
+                                </a>
+                            }
+                            counter++;
+                        }
                     }
-                </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -222,13 +259,12 @@
                     </div>
                     <form asp-action="FileAdd" enctype="multipart/form-data">
                         <div class="modal-body" style="padding: 20px;">
-                            @*<form asp-action="FileAdd" enctype="multipart/form-data">*@
                             <div class="form-horizontal">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                 <input type="hidden" name="ProfessorID" value="@ViewData["ProfessorID"]" class="form-control" />
                                 <input type="hidden" name="MeetingID" value="@Model.Meeting.MeetingID" class="form-control" />
                                 <input type="hidden" name="CommitteeID" value="@ViewData["CommitteeID"]" class="form-control" />
-                                <div class="form-group">
+                                @*<div class="form-group">
                                     <label name="Private" class="col-md-2 control-label">Make private</label>
                                     <div class="col-md-10">
                                         <div class="form-check form-check-inline">
@@ -237,7 +273,13 @@
                                             </label>
                                         </div>
                                     </div>
-                                </div>
+                                </div>*@
+                                @*<div class="form-group">
+                                    <label class="col-md-2" for="Description">Optional description:</label>
+                                    <div class="col-md-12">
+                                        <textarea id="fileDesc" cols="80" rows="5" name="Description"></textarea>
+                                    </div>
+                                </div>*@
                                 <div class="form-group">
                                     <label name="Files" class="col-md-2 control-label">File input</label>
                                     <div class="col-md-10">
@@ -245,16 +287,14 @@
                                         <small id="fileHelp" class="form-text text-muted">Add required files.</small>
                                     </div>
                                 </div>
+
                             </div>
-                            @*</form>*@
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            @*<div class="form-group">
-                                <div class="col-md-offset-2 col-md-10">*@
-                            <input type="submit" value="Submit files" class="btn btn-default" />
-                            @*</div>
-                                </div>*@
+                            <button style="float: left;" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <input style="float: right;"  type="submit" value="Submit files" class="btn btn-default" />
+                            <input style="float: right;    margin: 10px 10px 0 0;" name="Private" class="form-check-input" value="true" type="checkbox">
+                            <label style="float: right;    margin-top: 5px;" for="Private" class="col-md-4 control-label">Make upload private</label>
                         </div>
                     </form>
                 </div>
@@ -277,26 +317,10 @@
                                 <input type="hidden" name="CommitteeID" value="@ViewData["CommitteeID"]" class="form-control" />
 
                                 <div class="form-group">
-                                    @*<label name="Comment" class="col-md-2 control-label"></label>*@
                                     <div class="col-md-12">
-                                        <textarea id="html" cols="80" rows="20" name="Comment"></textarea>
+                                        <textarea id="html" cols="80" rows="20" name="Comment" class="myEditor"></textarea>
                                     </div>
                                 </div>
-                                @*<div class="form-group">
-                                    <label for="Private" class="col-md-2 control-label">Make private</label>
-                                    <div class="col-md-10">
-                                        <div class="form-check form-check-inline">
-                                            <label class="form-check-label">
-                                                <input name="Private" class="form-check-input" value="true" type="checkbox">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>*@
-                                @*<div class="form-group">
-                                        <div class="col-md-offset-2 col-md-10">
-                                            <input type="submit" value="Create" class="btn btn-default" />
-                                        </div>
-                                    </div>*@
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -312,16 +336,42 @@
             </div>
         </div>
 
+<div class="modal fade bs-example-modal-lg" id="comEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Write a comment:</h4>
+            </div>
+            <form asp-action="EditComment">
+                <div class="modal-body" style="padding: 20px;">
+                    <div class="form-horizontal">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" name="ID" id="editCommentID" value="" class="form-control" />
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <textarea id="commentEditArea" cols="80" rows="20" name="Comment" class="myEditor"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button style="float: left;" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input style="float: right;" type="submit" value="Post" class="btn btn-default" />
+                    <input style="float: right;    margin: 10px 10px 0 0;" name="Private" class="form-check-input" value="true" type="checkbox">
+                    <label style="float: right;    margin-top: 5px;" for="Private" class="col-md-2 control-label">Make private</label>
 
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
         @section Scripts {
             <script src="//cloud.tinymce.com/stable/tinymce.min.js?apiKey=65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo"></script>
             <script>
-                //tinymce.init({
-                //selector: 'textarea',
-                //mediaembed_api_key: '65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo'
-                //});
                 tinymce.init({
-                    selector: 'textarea',
+                    selector: '.myEditor',
                     height: 200,
                     menubar: false,
                     mediaembed_api_key: '65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo',
@@ -333,12 +383,68 @@
                     toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
                     content_css: '//www.tinymce.com/css/codepen.min.css'
                 });
-            </script>
 
-            @*<script language="javascript">
-                $(document).ready(function () {
-                    $('#html').markItUp(myHtmlSettings);
+                $(".commentDelete").on("click", function (event) {
+                    event.preventDefault();
+                    if (confirm("Are you sure you want to delete this comment?"))
+                        deleteComment($(this))
                 });
-            </script>*@
+
+                function deleteComment(object) {
+                    blockID = object.attr("id");
+                    commentID = blockID.match(/\d+/g)[0];
+
+                        url = '/Workflow/Committees/DeleteComment';
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: { 'ID': commentID},
+                            //contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: successFunc,
+                            error: errorFunc
+                        });
+                        function successFunc() {
+                            //alert('succ');
+                            $("#commentBlock_" + commentID).next("hr").remove();
+                            $("#commentBlock_" + commentID).remove();
+                        }
+
+                        function errorFunc() {
+                            alert('An error occured. Please try again, if this error repeats please contact administrator');
+                        };
+                }
+
+                $(".commentEdit").on("click", function (event) {
+                    event.preventDefault();
+                    editComment($(this))
+                });
+
+                function editComment(object) {
+                    blockID = object.next().next().attr("id");
+                    commentID = blockID.match(/\d+/g)[0];
+
+                    url = '/Workflow/Committees/EditComment';
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        data: { 'ID': commentID },
+                        //contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: successFunc,
+                        error: errorFunc
+                    });
+                    function successFunc(data) {
+                        tinymce.get('commentEditArea').setContent(data);
+                        $("#editCommentID").val(commentID);
+                        //$("#commentEditArea").val(data);
+                        $('#comEdit').modal('show');
+                    }
+
+                    function errorFunc() {
+                        alert('An error occured. Please try again, if this error repeats please contact administrator');
+                    };
+                }
+            </script>
             @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
         }

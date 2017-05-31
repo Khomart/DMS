@@ -23,9 +23,29 @@ namespace ContosoUniversity.Controllers
 
         // GET: Semesters
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index(
+                        string searchString,
+                        string currentFilter,
+                        int? page)
         {
-            return View(await _context.Semesters.OrderByDescending(i=> i.StartYear).ThenByDescending(i => i.Season).ToListAsync());
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+            IEnumerable<Semester> semesters = _context.Semesters.ToList().OrderByDescending(i => i.StartYear).ThenByDescending(i => i.StartingDate);
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                semesters = semesters.Where(s => s.StartYear == int.Parse(searchString));
+            }
+            var list = PaginatedList<Semester>.Create(semesters, page ?? 1, 10);
+            //return View(await _context.Semesters.OrderByDescending(i=> i.StartYear).ThenByDescending(i => i.Season).ToListAsync());
+            return View(list);
         }
 
         // GET: Semesters/Details/5
@@ -36,7 +56,6 @@ namespace ContosoUniversity.Controllers
             {
                 return NotFound();
             }
-
             var semester = await _context.Semesters.SingleOrDefaultAsync(m => m.ID == id);
             if (semester == null)
             {
@@ -47,20 +66,20 @@ namespace ContosoUniversity.Controllers
         }
 
         // GET: Semesters/Create
-        [Authorize(Roles = "Admin")]
-        public IActionResult Create()
-        {
-            List<SelectListItem> semesters = new List<SelectListItem>()
-            {
+        //[Authorize(Roles = "Admin")]
+        //public IActionResult Create()
+        //{
+        //    List<SelectListItem> semesters = new List<SelectListItem>()
+        //    {
 
-                new SelectListItem { Text = "Summer First", Value = "1" },
-                new SelectListItem { Text = "Summer Second", Value = "2" },
-                new SelectListItem { Text = "Autumn", Value = "3" },
-                new SelectListItem { Text = "Winter", Value = "4" },
-            };
-            ViewBag.Semesters = new SelectList(semesters, "Value", "Text");
-            return View();
-        }
+        //        new SelectListItem { Text = "Summer First", Value = "1" },
+        //        new SelectListItem { Text = "Summer Second", Value = "2" },
+        //        new SelectListItem { Text = "Autumn", Value = "3" },
+        //        new SelectListItem { Text = "Winter", Value = "4" },
+        //    };
+        //    ViewBag.Semesters = new SelectList(semesters, "Value", "Text");
+        //    return View();
+        //}
 
         // POST: Semesters/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 

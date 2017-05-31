@@ -8,8 +8,8 @@ using ContosoUniversity.Data;
 namespace ContosoUniversity.Migrations
 {
     [DbContext(typeof(SchoolContext))]
-    [Migration("20170430224204_init")]
-    partial class init
+    [Migration("20170511203028_newDrop")]
+    partial class newDrop
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -342,6 +342,9 @@ namespace ContosoUniversity.Migrations
                     b.Property<string>("Comment")
                         .HasAnnotation("MaxLength", 350);
 
+                    b.Property<string>("CommentTitle")
+                        .HasAnnotation("MaxLength", 50);
+
                     b.Property<int>("CommitteeID");
 
                     b.Property<DateTime>("DateStamp");
@@ -350,13 +353,15 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<bool>("Private");
 
-                    b.Property<int>("Professor");
-
-                    b.Property<int>("ProfessorID");
+                    b.Property<int?>("ProfessorID");
 
                     b.Property<string>("ProfessorName");
 
+                    b.Property<bool>("adminComment");
+
                     b.HasKey("CommentID");
+
+                    b.HasIndex("ProfessorID");
 
                     b.HasIndex("MeetingID", "CommitteeID");
 
@@ -870,6 +875,10 @@ namespace ContosoUniversity.Migrations
 
             modelBuilder.Entity("ContosoUniversity.Models.MeetingComment", b =>
                 {
+                    b.HasOne("ContosoUniversity.Models.Professor", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorID");
+
                     b.HasOne("ContosoUniversity.Models.Meetings", "Meeting")
                         .WithMany("Comments")
                         .HasForeignKey("MeetingID", "CommitteeID")

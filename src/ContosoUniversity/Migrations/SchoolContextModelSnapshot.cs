@@ -138,6 +138,10 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<bool>("Archived");
 
+                    b.Property<string>("Commentary")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 300);
+
                     b.Property<int?>("DepartmentID");
 
                     b.Property<int?>("FacultyID");
@@ -145,6 +149,10 @@ namespace ContosoUniversity.Migrations
                     b.Property<int>("Level");
 
                     b.Property<int?>("ProfessorID");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -173,6 +181,10 @@ namespace ContosoUniversity.Migrations
                     b.Property<int>("Credits");
 
                     b.Property<int>("DepartmentID");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<string>("ShortTitle")
                         .IsRequired()
@@ -233,6 +245,10 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<int?>("ProfessorID");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
                     b.Property<DateTime>("StartDate");
 
                     b.HasKey("FacultyID");
@@ -251,7 +267,13 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<bool>("Current");
 
+                    b.Property<DateTime>("EndingDate");
+
                     b.Property<bool>("Open");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<int>("Season");
 
@@ -272,6 +294,10 @@ namespace ContosoUniversity.Migrations
                     b.Property<bool>("Archived");
 
                     b.Property<int>("DepartmentID");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<string>("Short")
                         .HasAnnotation("MaxLength", 20);
@@ -341,6 +367,9 @@ namespace ContosoUniversity.Migrations
                     b.Property<string>("Comment")
                         .HasAnnotation("MaxLength", 350);
 
+                    b.Property<string>("CommentTitle")
+                        .HasAnnotation("MaxLength", 50);
+
                     b.Property<int>("CommitteeID");
 
                     b.Property<DateTime>("DateStamp");
@@ -349,13 +378,19 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<bool>("Private");
 
-                    b.Property<int>("Professor");
-
-                    b.Property<int>("ProfessorID");
+                    b.Property<int?>("ProfessorID");
 
                     b.Property<string>("ProfessorName");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<bool>("adminComment");
+
                     b.HasKey("CommentID");
+
+                    b.HasIndex("ProfessorID");
 
                     b.HasIndex("MeetingID", "CommitteeID");
 
@@ -368,6 +403,8 @@ namespace ContosoUniversity.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("CommitteeID");
+
+                    b.Property<bool>("Archived");
 
                     b.Property<DateTime>("Date");
 
@@ -691,6 +728,10 @@ namespace ContosoUniversity.Migrations
                         .IsRequired()
                         .HasAnnotation("MaxLength", 50);
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
+
                     b.HasIndex("DatesSuggestionSuggestionID");
 
                     b.HasIndex("DepartmentID");
@@ -718,6 +759,10 @@ namespace ContosoUniversity.Migrations
                         .HasAnnotation("MaxLength", 50);
 
                     b.Property<int>("ProgramID");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.HasIndex("ProgramID");
 
@@ -869,6 +914,10 @@ namespace ContosoUniversity.Migrations
 
             modelBuilder.Entity("ContosoUniversity.Models.MeetingComment", b =>
                 {
+                    b.HasOne("ContosoUniversity.Models.Professor", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorID");
+
                     b.HasOne("ContosoUniversity.Models.Meetings", "Meeting")
                         .WithMany("Comments")
                         .HasForeignKey("MeetingID", "CommitteeID")

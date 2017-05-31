@@ -1,4 +1,7 @@
 @model ContosoUniversity.Models.Meetings
+@{
+    ViewData["Title"] = "Create new Meeting";
+}
 <h2>Create meeting</h2>
 
 <form asp-action="SetMeeting" asp-route-CommitteeID="@ViewData["CommitteeID"]">

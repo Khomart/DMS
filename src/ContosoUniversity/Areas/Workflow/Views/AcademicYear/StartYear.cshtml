@@ -1,0 +1,99 @@
+﻿@model ContosoUniversity.Areas.Workflow.Models.AcademicYear.Year
+@{
+    ViewData["Title"] = "New Year";
+}
+
+<h2>Academic Year Creation Page</h2>
+<hr />
+<div id="YearCreationSection">
+    <div class="yesNoNewYear" style="width:350px;text-align: center;">
+        <h3>Do you wish to start new academic year?</h3>
+        <p>You will setup @ViewData["year"] academic year</p>
+        <div class="col-sm-offset-1 col-sm-4">
+            <input style="width:100%" type="button" value="YES" class="btn yesYearBtn" />
+        </div>
+        <div class="col-sm-offset-2 col-sm-4">
+            <input style="width:100%" type="button" value="NO" class="btn noYearBtn" />
+        </div>
+    </div>
+    <div class="setupSems" style="display:none;">
+        <h3>Input Semesters periods in following form</h3>
+        <form asp-action="createYear">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="YearValue" value="@ViewData["hiddenActualYear"]" />
+            <div class="form-group" id="initSummer1">
+                <label asp-for="Summer1" class="control-label">Summer First Semester:</label>
+                <div class="inlineDatesPickers">
+                    <input id="Summer1input" asp-for="Summer1" class="form-control datesInputSemesters" />
+                    <span> - </span>
+                    <input id="Summer1inputEnd" asp-for="Summer1End" class="form-control datesInputSemesters" />
+                </div>
+                </div>
+            <div class="form-group" id="initSummer2">
+                <label asp-for="Summer2" class="control-label">Summer Second Semester:</label>
+                <div class="inlineDatesPickers">
+                    <input id="Summer2input" asp-for="Summer2" class="form-control datesInputSemesters" />
+                    <span> - </span>
+                    <input id="Summer2inputEnd" asp-for="Summer2End" class="form-control datesInputSemesters" />
+                </div>
+            </div>
+            <div class="form-group" id="initSummer_long">
+                <label asp-for="Summer_long" class="control-label">Summer Third Semester:</label>
+                <div class="inlineDatesPickers">
+                    <input id="Summer_longinput" asp-for="Summer_long" class="form-control datesInputSemesters" />
+                    <span> - </span>
+                    <input id="Summer_longinputEnd" asp-for="Summer_longEnd" class="form-control datesInputSemesters" />
+                </div>
+            </div>
+            <div class="form-group" id="initFall">
+                <label asp-for="Fall" class="control-label">Fall Semester:</label>
+                <div class="inlineDatesPickers">
+                    <input id="Fallinput" asp-for="Fall" class="form-control datesInputSemesters" />
+                    <span> - </span>
+                    <input id="FallinputEnd" asp-for="FallEnd" class="form-control datesInputSemesters" />
+                </div>
+            </div>
+            <div class="form-group" id="initWinter">
+                <label asp-for="Winter" class="control-label">Winter Semester:</label>
+                <div class="inlineDatesPickers">
+                    <input id="Winterinput" asp-for="Winter" class="form-control datesInputSemesters" />
+                    <span> - </span>
+                    <input id="WinterinputEnd" asp-for="WinterEnd" class="form-control datesInputSemesters" />
+                </div>
+            </div>
+            <small>The date ranges maximum is set to 150 days</small>
+            <br />
+            <div class="form-group">
+                <div @*class="col-md-offset-0 col-md-10"*@>
+                    <input type="submit" value="Create" class="btn btn-default" />
+                </div>
+            </div>
+        </form>
+        <hr />
+        <a class="btn btn-info" asp-controller="Home" asp-action="Index" asp-area="">Return</a>
+    </div>
+</div>
+@*<form asp-action="Create">
+    <div class="form-group">
+        <label for="YearInput">Input year</label>
+        <input type="number" min="" class="form-control" id="YearInput" aria-describedby="" placeholder="Enter email"><span> - <short id="endYearInput"></short></span>
+    </div>
+</form>*@
+@section Scripts {
+    <script>
+        $(".yesYearBtn, .noYearBtn").on("click", function () {
+            var value = $(this).val();
+            if (value == "YES") {
+                $(".yesNoNewYear").hide();
+                $(".setupSems").show("fast");
+            }
+            else {
+                var url = '@Url.Action("Index", "Home", new { area = "" })';
+                window.location.href = url;
+            }
+        });
+        //$('.datesInputSemesters').datetimepicker();
+        $(document).ready(setupPickersYearPage());
+
+    </script>
+}

@@ -1,7 +1,7 @@
 @model ContosoUniversity.Models.SchoolViewModels.RegProfModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Register Professor";
 }
 
 <h2>Create</h2>
@@ -104,7 +104,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
+    @*<script>
         var counter = 1;
         var limit = 15;
         function addInput(divName) {
@@ -128,5 +128,5 @@
             //element.parentNode.removeChild(element);
         }
 
-    </script>
+    </script>*@
 }

@@ -52,8 +52,8 @@ table{
 }
 /* Set widths on the form inputs since otherwise they're 100% wide */
 input,
-select,
-textarea {
+select/*,
+textarea*/ {
     max-width: 280px;
 }
 
@@ -256,7 +256,7 @@ input[type='checkbox']{
   z-index: -1;
 }
 .bgMain {
-  background: url('/images/pexels-photo-12064.jpeg') no-repeat center center;
+  background: url('/images/pexels-photo-12064.jpg') no-repeat center center;
     background-size: cover;
 
 }
@@ -470,6 +470,9 @@ input[type='checkbox']{
 #meetingTab .commentBtn:hover, #meetingTab .fileBtn:hover{
     background-color: #449d44;
 }
+#meetingTab .commentBtn:focus, #meetingTab .fileBtn:focus{
+    background-color:#449d44;
+}
 @media (max-width: 768px) {
     .meetingsInline {
        display: block;
@@ -505,4 +508,65 @@ input[type='checkbox']{
 }
 #publicSection .messageTime{
     float: right;
+}
+#fileSelection h3{
+    text-align: center;
+}
+/*.yearsTable{
+    width: 50%;
+}
+@media (max-width: 768px) {
+    .yearsTable {
+        width: 100%;
+    }
+}*/
+/*.yearCell{
+    background-color:transparent;
+}
+.yearsTableRow .cal-cell{
+    background-color: #f6f6f6;
+    border: 1px solid #fff;
+}
+.yearsTableRow{
+    height:150px;
+}
+.cal-cell{
+    text-align:center;
+    height:inherit;
+    display: inline-block;
+    float: left;
+    min-height: 1px;
+    padding: 0;
+    position: relative;
+    width: 16.66%;
+    background-size: cover;
+}
+.Winter{
+    background:url('/images/Seasons/winter.jpeg') no-repeat center center;
+}
+.Summer_I{
+    background:url('/images/Seasons/spring.jpg') no-repeat center center;
+}
+.Summer_II{
+    background:url('/images/Seasons/summer.jpg') no-repeat center center;
+}
+.Autumn{
+    background:url('/images/Seasons/autumn.jpg') no-repeat center center;
+}
+.Summer_III{
+    background:url('/images/Seasons/summer2.jpeg') no-repeat center center;
+}*/
+#YearCreationSection{
+    min-height: 100px;
+}
+.inlineDatesPickers > *{
+    display:inline-block;
+}
+.inlineDatesPickers > span{
+    margin: 0 10px;
+}
+.incorrectinputDate{
+    outline:none;
+    border-color:#ff9999;
+    box-shadow:0 0 10px #ff9999;
 }

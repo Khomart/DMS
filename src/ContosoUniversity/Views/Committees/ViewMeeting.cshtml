@@ -1,6 +1,6 @@
 @model ContosoUniversity.Models.SchoolViewModels.MeetingView
 @{
-    ViewData["Title"] = "Meeting Page";
+    ViewData["Title"] = Model.Meeting.ShortTitle + " Meeting Page";
 }
 <h2>@Html.DisplayFor(model => model.Meeting.Title)</h2>
 <br />

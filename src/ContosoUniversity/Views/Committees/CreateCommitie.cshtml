@@ -1,8 +1,12 @@
 @model ContosoUniversity.Models.Entities.Committee
 
-<form asp-action="SubmitCommitie" id="form">
+@{
+    ViewData["Title"] = "Create Committee";
+}
+
+<form asp-action="CreateCommitie" id="form">
     <div class="form-horizontal">
-        <h2>Committee Level</h2>
+        <h2>Committee Creation</h2>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -46,6 +50,13 @@
                 </datalist>
                 <input asp-for="ProfessorID" type="hidden" id="hiddenProf">
             </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Commentary" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <textarea cols="80" rows="10" asp-for="Commentary" class="form-control"></textarea>
+            </div>
+            <span asp-validation-for="Commentary" class="text-danger" />
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
@@ -130,11 +141,22 @@
         }
         );
         
-            $("#dataInput").on("click focusin", function () {
-                $("#dataInput").val('');
-            })
-        ;
-
+        $("#dataInput").on("click focusin", function () {
+            $("#dataInput").val('');
+        });
+        //tinymce.init({
+        //            selector: 'textarea',
+        //            height: 200,
+        //            menubar: false,
+        //            mediaembed_api_key: '65xcebn65p6pjrkcy30nuaoulo217ab1vjdykycyswvbmmfo',
+        //            plugins: [
+        //              'advlist autolink lists link image charmap print preview anchor',
+        //              'searchreplace visualblocks code fullscreen',
+        //              'insertdatetime media table contextmenu paste code'
+        //            ],
+        //            toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+        //            content_css: '//www.tinymce.com/css/codepen.min.css'
+        //        });
     }</script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
