@@ -35,7 +35,7 @@ namespace ContosoUniversity.Controllers
         [Authorize(Roles = "Admin, Professor")]
         public async Task<IActionResult> Index()
         {
-            var schoolContext = _context.Committees.Where( m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department);
+            var schoolContext = _context.Committees.AsNoTracking().Where( m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department);
             return View(await schoolContext.ToListAsync());
         }
 
@@ -48,7 +48,7 @@ namespace ContosoUniversity.Controllers
                 return NotFound();
             }
 
-            var committee = await _context.Committees.SingleOrDefaultAsync(m => m.CommitteeID == id && m.Archived == false);
+            var committee = await _context.Committees.AsNoTracking().SingleOrDefaultAsync(m => m.CommitteeID == id && m.Archived == false);
             if (committee == null)
             {
                 return NotFound();
@@ -128,6 +128,7 @@ namespace ContosoUniversity.Controllers
             }
 
             Committee committee = await _context.Committees
+                .AsNoTracking()
                 .Include(i => i.CommitieMembers)
                 .ThenInclude(i => i.Professor)
                 .ThenInclude(i => i.OfficeAssignment)
@@ -388,7 +389,7 @@ namespace ContosoUniversity.Controllers
             else
             {
                 int CommID = (int)id;
-                var profs = await _context.Professors.Include(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
+                var profs = await _context.Professors.AsNoTracking().Include(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).Where(i => i.Archived == false).ToListAsync();
                 for (int i = 0; i < profs.Count(); i++)
                 {
                     var prof = profs[i];
@@ -706,8 +707,7 @@ namespace ContosoUniversity.Controllers
             {
                 return NotFound();
             }
-
-            var committee = await _context.Committees.Include(p => p.Chair).SingleOrDefaultAsync(m => m.CommitteeID == id);
+            var committee = await _context.Committees.Include(p => p.Chair).SingleOrDefaultAsync(m => m.CommitteeID == id && m.Archived == false);
             if (committee == null)
             {
                 return NotFound();

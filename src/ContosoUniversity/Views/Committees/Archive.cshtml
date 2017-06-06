@@ -31,9 +31,9 @@
         </dd>
     </dl>
     
-    <form asp-action="ConfirmArchive">
+    <form asp-action="Delete">
         <div class="form-actions no-color btn-group">
-            <input type="hidden" asp-for="CommitteeID" />
+            <input type="hidden" name="id" value="@Model.CommitteeID" />
             <input type="submit" value="Archive" class="btn btn-warning" />
             <a class="btn btn-info" asp-action="Index">Back to List</a>
         </div>

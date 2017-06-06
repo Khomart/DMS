@@ -51,7 +51,22 @@ namespace ContosoUniversity.Controllers
             var viewModel = new ProfessorViews();
             viewModel.Professors = await _context.Professors
                 .AsNoTracking()
+                .Include(i => i.Commities)
+                .ThenInclude(p => p.Committee)
+                .ThenInclude(i => i.Meetings)
                 .SingleOrDefaultAsync(m => m.Id == user.Id);
+
+                List<Meetings> temp = new List<Meetings>();
+            foreach (var membership in viewModel.Professors.Commities)
+            {
+                if (membership.FinishedWork == false)
+                {
+                    foreach (var meeting in membership.Committee.Meetings)
+                        if (meeting.Archived == false && ((meeting.FinalDate && meeting.Date > DateTime.Today) || (meeting.FinalDate == false)))
+                            temp.Add(meeting);
+                }
+            }
+            viewModel.Meetings = temp;
 
             //RequestsPart
             PopulateYearAndSemeter(requestYear, requestSemester);
@@ -76,6 +91,8 @@ namespace ContosoUniversity.Controllers
             else if (courseYear == null)
                 viewModel.CoursesAssignments = _context.CourseAssignments.Include(c => c.Course).Include(s => s.Semester).AsNoTracking().Where(s => s.ProfessorID == user.Id && s.Semester.StartYear == (int)ViewData["thisYear"] && (int)s.Semester.Season == (int)ViewData["thisSemester"]).ToList();
             //viewModel.Requests = _context.TeachingRequests.Include(c => c.SemesterForAssignment).Where(s => s.ProfessorID == user.Id).AsNoTracking().ToList();
+
+            //meetings part
 
             ViewData["ProfessorID"] = user.Id;
             viewModel.Membership = _context.CommitieMembership.Include(i => i.Committee).Where(i => i.ProfessorID == user.Id).ToList();

@@ -1,10 +1,10 @@
 @model ContosoUniversity.Models.Entities.Department
 
 @{
-    ViewData["Title"] = "Create Deaprtment";
+    ViewData["Title"] = "Create Department";
 }
 
-<h2>Create</h2>
+<h2>Create Department</h2>
 
 <form asp-action="Create">
     <div class="form-horizontal">
@@ -35,16 +35,19 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
+            <div class="col-md-offset-1 col-md-1">
+                <a asp-action="Index">Return</a>
+            </div>
+            <div class="col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
         </div>
     </div>
 </form>
 
-<div>
+@*<div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div>*@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

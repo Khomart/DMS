@@ -52,15 +52,15 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             {
                 view = new IndexView()
                 {
-                    Commitees = _context.Committees.Include(c => c.Chair).Include(c => c.Department).Include(c => c.Faculty).Where(m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department),
-                    MembershipIn = _context.CommitieMembership.Where(i => i.ProfessorID == user.Id && i.FinishedWork == false).ToList()
+                    Commitees = _context.Committees.AsNoTracking().Include(c => c.Chair).Include(c => c.Department).Include(c => c.Faculty).Where(m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department),
+                    MembershipIn = _context.CommitieMembership.AsNoTracking().Where(i => i.ProfessorID == user.Id && i.FinishedWork == false).ToList()
                 };
             }
             else
             {
                 view = new IndexView()
                 {
-                    Commitees = _context.Committees.Include(c => c.Chair).Include(c => c.Department).Include(c => c.Faculty).Where(m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department),
+                    Commitees = _context.Committees.AsNoTracking().Include(c => c.Chair).Include(c => c.Department).Include(c => c.Faculty).Where(m => m.Archived == false).Include(c => c.Chair).Include(c => c.Department),
                     MembershipIn = null
                 };
             }
@@ -78,7 +78,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                 return NotFound();
             }
 
-            var committee = await _context.Committees.Include(i => i.Chair).SingleOrDefaultAsync(m => m.CommitteeID == id && m.Archived == false);
+            var committee = await _context.Committees.AsNoTracking().Include(i => i.Chair).SingleOrDefaultAsync(m => m.CommitteeID == id && m.Archived == false);
             if (committee == null)
             {
                 return NotFound();
@@ -95,7 +95,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             {
                 return NotFound();
             }
-            Committee committee = await _context.Committees
+            var committee = await _context.Committees
                 .Include(i => i.Chair)
                 .Include(i => i.CommitieMembers)
                 .ThenInclude(i => i.Professor)
@@ -107,7 +107,8 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                 .ThenInclude(i => i.Suggestions)
                 .ThenInclude(i => i.Checkers)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(i => i.CommitteeID == id);
+                .SingleOrDefaultAsync(i => i.CommitteeID == id && i.Archived == false);
+            if (committee == null) return RedirectToAction("AccessDenied", "Account");
             var privelegy = await CheckPrivelegy((int)id);
             if ((bool)privelegy[1] == false)
             {
@@ -267,7 +268,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
             else
             {
                 int CommID = (int)id;
-                var profs = await _context.Professors.Include(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).AsNoTracking().ToListAsync();
+                var profs = await _context.Professors.Include(i => i.Department).ThenInclude(i => i.Faculty).Include(i => i.Commities).Where(i => i.Archived == false).AsNoTracking().ToListAsync();
                 for (int i = 0; i < profs.Count(); i++)
                 {
                     var prof = profs[i];
@@ -456,7 +457,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
                 //.Include(i => i.Files)
                 .Include(i => i.Committee)
                 .SingleAsync(i => i.CommitteeID == comID && i.MeetingID == mtnID);
-            if(view.Meeting.Archived) return RedirectToAction("AccessDenied", "Account");
+            if(view.Meeting.Archived || view.Meeting.Committee.Archived) return RedirectToAction("AccessDenied", "Account");
             //view.PublicComments =  view.Meeting.Comments.Where(i => i.Private == false).ToList().OrderByDescending(d => d.DateStamp);
             view.PublicComments = PaginatedList<MeetingComment>.Create(view.Meeting.Comments.Where(i => i.Private == false).ToList().OrderByDescending(d => d.DateStamp), page ?? 1, 10);
             view.PrivateComments = view.Meeting.Comments.Where(i => i.Private == true && i.ProfessorID == (int)privelegy[0]).ToList().OrderByDescending(d => d.DateStamp);
@@ -768,6 +769,7 @@ namespace ContosoUniversity.Areas.Workflow.Controllers
         }
         [Authorize(Roles = "Admin, Professor")]
         [HttpPost, ActionName("SetMeetingDate")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetMeetingDate(int MeetingID, string Date)
         {
             DateTime date = Convert.ToDateTime(Request.Form["Date"]);

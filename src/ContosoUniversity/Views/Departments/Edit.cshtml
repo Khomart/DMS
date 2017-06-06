@@ -35,9 +35,14 @@
                 <select asp-for="FacultyID" class="form-control" asp-items="ViewBag.FacultyID">
                     <option value="">-- Select Faculty --</option>
                 </select>
+                <span asp-validation-for="FacultyID" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
+            <div class="col-md-2 btn-group" style="float:right;">
+                <a class="btn btn-warning" asp-action="Archive" asp-route-id="@Model.DepartmentID">Archive</a>
+                <a class="btn btn-info" asp-action="Index">Back to List</a>
+            </div>
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
@@ -45,10 +50,10 @@
     </div>
 </form>
 
-<div class="btn-group">
+@*<div class="btn-group">
     <a class="btn btn-warning" asp-action="Archive" asp-route-id="@Model.DepartmentID">Archive</a>
     <a class="btn btn-info" asp-action="Index">Back to List</a>
-</div>
+</div>*@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

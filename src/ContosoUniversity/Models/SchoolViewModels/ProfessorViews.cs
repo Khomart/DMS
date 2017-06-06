@@ -11,5 +11,7 @@ namespace ContosoUniversity.Models.SchoolViewModels
         public IEnumerable<CourseAssignment> CoursesAssignments { get; set; }
         public IEnumerable<CommitieMembership> Membership { get; set; }
         public IEnumerable<TeachingRequest> Requests { get; set;  }
+        
+        public IEnumerable<Meetings> Meetings { set; get; }
     }
 }

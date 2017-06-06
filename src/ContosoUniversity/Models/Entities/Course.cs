@@ -23,6 +23,7 @@ namespace ContosoUniversity.Models.Entities
         [Required]
         public int Credits { get; set; }
 
+        [Display(Name = "Department")]
         public int DepartmentID { get; set; }
 
         public Department Department { get; set; }

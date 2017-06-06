@@ -11,19 +11,20 @@
         <h4>Course</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="CourseID" />
+        <input type="hidden" asp-for="CourseID" />
+        <input type="hidden" asp-for="RowVersion" />
         <div class="form-group">
             <label asp-for="Title" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger" />
+                <span asp-validation-for="Title" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
             <label asp-for="ShortTitle" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input asp-for="ShortTitle" class="form-control" />
-                <span asp-validation-for="ShortTitle" class="text-danger" />
+                <span asp-validation-for="ShortTitle" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
@@ -39,13 +40,14 @@
                         <input asp-for="Active" class="form-check-input" value="false" type="radio"> No
                     </label>
                 </div>
+                <span asp-validation-for="Active" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
             <label asp-for="Credits" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input min="0" max="7" asp-for="Credits" class="form-control" />
-                <span asp-validation-for="Credits" class="text-danger" />
+                <span asp-validation-for="Credits" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
@@ -54,20 +56,23 @@
                 <select asp-for="DepartmentID" class="form-control" asp-items="ViewBag.DepartmentID">
                     <option value="">-- Select Department --</option>
                 </select>
-                <span asp-validation-for="DepartmentID" class="text-danger" />
+                <span asp-validation-for="DepartmentID" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
+            <div class="col-md-offset-1 col-md-1">
+                <a class="btn btn-info" asp-action="Index" style="float: right;">Cancel</a>
+            </div>
+            <div class="col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </div>
     </div>
 </form>
 
-<div>
+@*<div>
     <a class="btn btn-info" asp-action="Index">Back to List</a>
-</div>
+</div>*@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
